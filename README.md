@@ -15,16 +15,11 @@ This is a Rails project, deployed on Heroku.
 ## Local development
 ```
 $ bundle install
-$ bundle exec rake data:load
+$ bundle exec rake db:create db:migrate db:seed
 ```
+At this point you can run the app and login.  There won't be any data yet, keep reading!
 
-## Seeding
-```
-user = User.create(email: 'demo@demo.edcontext.org', password: '123456')
-```
-
-
-## Data
+## Loading Data
 Postgres is the primary data store for the webapp, but the raw survey data is stored in `.json` and `.csv` files.  These are collected offline, and then processed by the rake tasks to load that data into Postgres for use by the webapp.
 
 There are several different kinds of data needed:
@@ -33,8 +28,17 @@ There are several different kinds of data needed:
 - `student_responses.csv`
 - `teacher_responses.csv`
 
+You can load these into the database and index them for use in the webapp by running rake tasks.  Loading all the response data take a while, so you can start by loading only a sample of the data for one particular school with:
 
-## Deployment
+```
+$ bundle exec rake data:load_sample
+```
+
+This loads all the data:
+
+```
+$ bundle exec rake data:load
+```
 
 
 ## Path to open source
