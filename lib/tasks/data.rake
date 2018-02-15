@@ -29,7 +29,6 @@ namespace :data do
     generator = Generator.new
     generator.create_demo_data
   end
-end
 
   desc 'Show qualitative comments'
   task qualitative: :environment do
