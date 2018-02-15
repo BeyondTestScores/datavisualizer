@@ -1,4 +1,3 @@
-# For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
 Rails.application.routes.draw do
   resources :question_lists
   resources :questions
@@ -25,6 +24,7 @@ Rails.application.routes.draw do
   as :user do
     get 'users', :to => 'users#show', :as => :user_root # Rails 3
   end
+  # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
 
   get '/admin', to: 'admin#index', as: 'admin'
   post '/twilio', to: 'attempts#twilio'

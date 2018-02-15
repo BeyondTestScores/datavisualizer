@@ -6,7 +6,7 @@
       %p= link_to "Create A New School", new_school_path
 
 
-- if user_signed_in?
+- if true || user_signed_in?
   .row.mt-3
     .col-6
       %h4 Districts
@@ -15,6 +15,7 @@
 
     .col-6
       %h4 Schools
+      -# current_user.schools.each do |school|
       - School.all.each do |school|
         %p= link_to school.name, school
 

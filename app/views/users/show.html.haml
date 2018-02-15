@@ -6,9 +6,7 @@
 %h3 Schools
 - if current_user.schools.blank?
   %p
-    %strong No schools Yet
-    %br
-    %a{href: '/'} Home page
+    %strong None Yet
 - else
   %table{style: 'width: 100%;'}
     %tbody

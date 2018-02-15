@@ -1,11 +1,9 @@
-- if @school.present?
-  = render 'layouts/school_header'
+= render 'layouts/school_header'
 
-- if @school_category.present?
-  .row
-    .col-12
-      %p
-        = render 'categories/breadcrumbs', school_category: @school_category
+.row
+  .col-12
+    %p
+      = render 'categories/breadcrumbs', school_category: @school_category
 
 .row
   .col-12
@@ -14,20 +12,18 @@
         = @category.name
 
       %p= @category.description
+      %p
+        %b Total&nbsp;Responses:
+        = number_with_delimiter(@school_category.response_count)
 
-      - if @school_category.present?
-        %p
-          %b Total&nbsp;Responses:
-          = number_with_delimiter(@school_category.response_count)
+        &nbsp; &nbsp; &nbsp;
 
-          &nbsp; &nbsp; &nbsp;
+        %b Average&nbsp;Response:
+        = @school_category.answer_index_average.round(1)
+        (out of 5)
 
-          %b Average&nbsp;Response:
-          = @school_category.answer_index_average.round(1)
-          (out of 5)
-
-        .indicator-container.py-3
-          = render 'school_categories/indicator', info: @school_category
+      .indicator-container.py-3
+        = render 'school_categories/indicator', info: @school_category
 
 - if @child_school_categories.present?
   .row

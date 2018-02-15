@@ -1,6 +1,4 @@
 class CategoriesController < ApplicationController
-  before_action :authenticate_user!
-  before_action :verify_super_admin, except: [:show, :index]
   before_action :set_school, only: [:show]
   before_action :set_category, only: [:show, :edit, :update, :destroy]
 
@@ -68,13 +66,10 @@ class CategoriesController < ApplicationController
   end
 
   private
-    # This can be access through a school-scoped route, or not
     def set_school
-      if params.include?(:school_id)
-        @school = School.friendly.find(params[:school_id])
-      else
-        @school = nil
-      end
+      redirect_to root_path and return false unless params.include?(:school_id)
+      @school = School.friendly.find(params[:school_id])
+      redirect_to root_path and return false if @school.nil?
     end
 
     def set_category

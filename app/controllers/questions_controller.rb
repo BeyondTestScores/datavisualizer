@@ -1,6 +1,6 @@
 class QuestionsController < ApplicationController
-  before_action :authenticate_user!
-  before_action :verify_super_admin, except: [:show, :index]
+  before_action :authenticate_user!, except: [:show]
+  before_action :verify_super_admin, except: [:show]
   before_action :set_school, only: [:show]
   before_action :set_question, only: [:show, :edit, :update, :destroy]
 
@@ -65,13 +65,10 @@ class QuestionsController < ApplicationController
   end
 
   private
-    # This can be access through a school-scoped route, or not
     def set_school
-      if params.include?(:school_id)
-        @school = School.friendly.find(params[:school_id])
-      else
-        @school = nil
-      end
+      redirect_to root_path and return false unless params.include?(:school_id)
+      @school = School.friendly.find(params[:school_id])
+      redirect_to root_path and return false if @school.nil?
     end
 
     # Use callbacks to share common setup or constraints between actions.
@@ -82,5 +79,9 @@ class QuestionsController < ApplicationController
     # Never trust parameters from the scary internet, only allow the white list through.
     def question_params
       params.require(:question).permit(:text, :option1, :option2, :option3, :option4, :option5, :category_id)
+    end
+
+    def verify_super_admin
+      user_signed_in? && current_user.super_admin?
     end
 end
