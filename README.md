@@ -28,7 +28,15 @@ There are several different kinds of data needed:
 - `student_responses.csv`
 - `teacher_responses.csv`
 
-You can load these into the database and index them for use in the webapp by running rake tasks.  Loading all the response data take a while, so you can start by loading only a sample of the data for one particular school with:
+You can load these into the database and index them for use in the webapp by running rake tasks.
+
+You can start by generating fake data:
+```
+$ bundle exec rake data:generate
+```
+
+
+Loading all the real response data take a while, so you can start by loading only a sample of the data for one particular school with:
 
 ```
 $ bundle exec rake data:load_sample
