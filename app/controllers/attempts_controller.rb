@@ -88,7 +88,6 @@ class AttemptsController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def twilio_params
-      {"Body"=>"5", ""=>"US", "To"=>"+16172023890", "ToZip"=>"02135", "NumSegments"=>"1", "MessageSid"=>"SMe37977e625b7f0b429339e752dddefef", "AccountSid"=>"AC57dc8a5a6d75addb9528e730e92f66b2", "From"=>"+16502693205", "ApiVersion"=>"2010-04-01"}
       params.permit(:FromCountry, :FromState, :FromZip, :FromCity, :ToCountry, :ToState, :SmsStatus, :SmsSid, :SmsMessageSid, :MessageSid, :AccountSid, :MessagingServiceSid, :From, :To, :Body, :NumMedia)
     end
 end
