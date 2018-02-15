@@ -33,7 +33,8 @@
 %br
 %br
 %br
-%h4
-  Results For
-  = @school.name
-= render @question
+- if @school.present?
+  %h4
+    Results For
+    = @school.name
+  = render @question

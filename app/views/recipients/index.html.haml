@@ -30,4 +30,5 @@
         %td= link_to 'Edit', edit_school_recipient_path(@school, recipient)
         %td= link_to 'Destroy', school_recipient_path(@school, recipient), method: :delete, data: { confirm: 'Are you sure?' }
 %br/
-= link_to 'New Recipient', new_school_recipient_path(@school)
+%p= link_to 'New Recipient', new_school_recipient_path(@school)
+%p= link_to 'Import Recipients', import_school_recipients_path(@school)

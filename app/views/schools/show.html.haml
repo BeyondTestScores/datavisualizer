@@ -2,3 +2,6 @@
 
 .row
   = render @school_categories
+
+%p= link_to 'Recipients', school_recipients_path(@school)
+%p= link_to 'Recipient lists', school_recipient_lists_path(@school)

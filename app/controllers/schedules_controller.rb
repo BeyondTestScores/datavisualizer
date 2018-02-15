@@ -5,6 +5,11 @@ class SchedulesController < ApplicationController
   before_action :set_schedule, only: [:show, :edit, :update, :destroy]
   before_action :set_time, only: [:create, :update]
 
+  # GET schools/1/schedules
+  def index
+    @schedules = @school.schedules
+  end
+
   # GET schools/1/schedules/1
   def show
   end
