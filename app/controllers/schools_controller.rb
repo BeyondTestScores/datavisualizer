@@ -10,6 +10,10 @@ class SchoolsController < ApplicationController
     @school_categories = @school.school_categories.for_parent_category(@school, nil).sort
   end
 
+  def index
+    @district = District.where(id: params[:district_id]).includes(:schools).first
+  end
+
   def admin
   end
 

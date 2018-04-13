@@ -1,0 +1,4 @@
+%h2= @district.name
+
+- @district.schools.each do |school|
+  %p= link_to school.name, school_admin_path(school)

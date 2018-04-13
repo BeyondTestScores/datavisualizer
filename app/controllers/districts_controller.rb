@@ -1,5 +1,6 @@
 class DistrictsController < ApplicationController
   before_action :set_district, only: [:show, :edit, :update, :destroy]
+  before_action :verify_admin, only: [:index_users_on_email]
 
   # GET /districts
   # GET /districts.json
