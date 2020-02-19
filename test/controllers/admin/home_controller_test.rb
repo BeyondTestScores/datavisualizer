@@ -1,0 +1,18 @@
+require 'test_helper'
+
+class Admin::HomeControllerTest < ActionDispatch::IntegrationTest
+  def test_authentication
+    # get the admin page
+    get "/admin"
+    assert_equal 401, status
+
+    # post the login and follow through to the home page
+    get "/admin", headers: {
+      Authorization: ActionController::HttpAuthentication::Basic.encode_credentials(
+        Rails.application.credentials.test[:authentication][:admin][:username],
+        Rails.application.credentials.test[:authentication][:admin][:password]
+      )
+    }
+    assert_equal "/admin", path
+  end
+end
