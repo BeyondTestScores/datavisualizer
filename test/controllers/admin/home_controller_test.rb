@@ -15,4 +15,14 @@ class Admin::HomeControllerTest < ActionDispatch::IntegrationTest
     }
     assert_equal "/admin", path
   end
+
+  def test_index_links_to_create_new_category
+    get "/admin", headers: {
+      Authorization: ActionController::HttpAuthentication::Basic.encode_credentials(
+        Rails.application.credentials.test[:authentication][:admin][:username],
+        Rails.application.credentials.test[:authentication][:admin][:password]
+      )
+    }
+    assert_select "a", "Create New Category", :href => /categories\/new/
+  end
 end
