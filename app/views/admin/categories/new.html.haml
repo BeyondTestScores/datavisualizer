@@ -1,0 +1,10 @@
+%h2 New Category
+
+%br
+
+%div
+  = form_with model: [:admin, @category] do |f|
+    = f.text_field :name
+    = f.text_field :blurb
+    = f.text_area :description
+    = f.submit "Create"
