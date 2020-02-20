@@ -1,14 +1,20 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
-  name: MyString
-  slug: mystring
-  blurb: MyString
-  description: MyText
+  name: Category One
+  slug: category-one
+  blurb: It's a category
+  description: Here is a detailed description of the category
 
 two:
-  name: MyString2
-  slug: mystring2
-  blurb: MyString2
-  description: MyText2
+  name: Category Two
+  slug: category-two
+  blurb: It's a child category!
+  description: This is a child category of category one.
   parent_category: one
+
+three:
+  name: Category Three
+  slug: category-threee
+  blurb: It's another category
+  description: Here is a detailed description of this category
