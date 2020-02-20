@@ -1,49 +1,39 @@
 require 'test_helper'
 
 class Admin::CategoriesControllerTest < ActionDispatch::IntegrationTest
+
+  def authorized_headers
+    return {
+      Authorization: ActionController::HttpAuthentication::Basic.encode_credentials(
+        Rails.application.credentials.test[:authentication][:admin][:username],
+        Rails.application.credentials.test[:authentication][:admin][:password]
+      )
+    }
+  end
+
   def test_authentication
     # get the admin page
     get "/admin/categories/new"
     assert_equal 401, status
 
     # post the login and follow through to the home page
-    get "/admin/categories/new", headers: {
-      Authorization: ActionController::HttpAuthentication::Basic.encode_credentials(
-        Rails.application.credentials.test[:authentication][:admin][:username],
-        Rails.application.credentials.test[:authentication][:admin][:password]
-      )
-    }
+    get "/admin/categories/new", headers: authorized_headers
     assert_equal "/admin/categories/new", path
   end
 
   def test_new_has_form
-    get "/admin/categories/new", headers: {
-      Authorization: ActionController::HttpAuthentication::Basic.encode_credentials(
-        Rails.application.credentials.test[:authentication][:admin][:username],
-        Rails.application.credentials.test[:authentication][:admin][:password]
-      )
-    }
+    get "/admin/categories/new", headers: authorized_headers
     assert_select "form"
     assert_select "option", Category.count + 1
   end
 
   def test_create__only_requires_name
     category_count = Category.count
-    post "/admin/categories", headers: {
-      Authorization: ActionController::HttpAuthentication::Basic.encode_credentials(
-        Rails.application.credentials.test[:authentication][:admin][:username],
-        Rails.application.credentials.test[:authentication][:admin][:password]
-      )
-    }
+    post "/admin/categories", headers: authorized_headers
     assert_select "p", "Invalid Parameters"
     assert_equal category_count, Category.count
 
-    post "/admin/categories", headers: {
-      Authorization: ActionController::HttpAuthentication::Basic.encode_credentials(
-        Rails.application.credentials.test[:authentication][:admin][:username],
-        Rails.application.credentials.test[:authentication][:admin][:password]
-      )
-    }, params: {
+    post "/admin/categories", headers: authorized_headers, params: {
       category: {
         name: ""
       }
@@ -51,12 +41,7 @@ class Admin::CategoriesControllerTest < ActionDispatch::IntegrationTest
     assert_select "li", "Name can't be blank"
     assert_equal category_count, Category.count
 
-    post "/admin/categories", headers: {
-      Authorization: ActionController::HttpAuthentication::Basic.encode_credentials(
-        Rails.application.credentials.test[:authentication][:admin][:username],
-        Rails.application.credentials.test[:authentication][:admin][:password]
-      )
-    }, params: {
+    post "/admin/categories", headers: authorized_headers, params: {
       category: {
         name: "New Category"
       }
@@ -71,12 +56,7 @@ class Admin::CategoriesControllerTest < ActionDispatch::IntegrationTest
     parent_category = Category.last
     child_category_count = parent_category.child_categories.count
 
-    post "/admin/categories", headers: {
-      Authorization: ActionController::HttpAuthentication::Basic.encode_credentials(
-        Rails.application.credentials.test[:authentication][:admin][:username],
-        Rails.application.credentials.test[:authentication][:admin][:password]
-      )
-    }, params: {
+    post "/admin/categories", headers: authorized_headers, params: {
       category: {
         name: "New Category",
         parent_category_id: parent_category.id
@@ -89,12 +69,7 @@ class Admin::CategoriesControllerTest < ActionDispatch::IntegrationTest
 
   def test_show
     category = categories(:two)
-    get "/admin/categories/#{category.slug}", headers: {
-      Authorization: ActionController::HttpAuthentication::Basic.encode_credentials(
-        Rails.application.credentials.test[:authentication][:admin][:username],
-        Rails.application.credentials.test[:authentication][:admin][:password]
-      )
-    }
+    get "/admin/categories/#{category.slug}", headers: authorized_headers
 
     assert_select "h2", category.name
     assert_select "a", categories(:one).name, :href => /categories\/#{categories(:one).slug}/
@@ -102,14 +77,14 @@ class Admin::CategoriesControllerTest < ActionDispatch::IntegrationTest
 
   def test_show__with_no_parent_category
     category = categories(:one)
-    get "/admin/categories/#{category.slug}", headers: {
-      Authorization: ActionController::HttpAuthentication::Basic.encode_credentials(
-        Rails.application.credentials.test[:authentication][:admin][:username],
-        Rails.application.credentials.test[:authentication][:admin][:password]
-      )
-    }
+    get "/admin/categories/#{category.slug}", headers: authorized_headers
 
     assert_select "h2", category.name
-    assert_no_select "p", /Parent/
+    assert_select "p", {count: 0, text: /Parent/}
+  end
+
+  def test_index
+    get "/admin/categories", headers: authorized_headers
+    assert_select "h2", "All Categories"
   end
 end
