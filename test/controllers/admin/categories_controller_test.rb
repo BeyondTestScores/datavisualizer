@@ -86,5 +86,8 @@ class Admin::CategoriesControllerTest < ActionDispatch::IntegrationTest
   def test_index
     get "/admin/categories", headers: authorized_headers
     assert_select "h2", "All Categories"
+    Category.all.each do |c|
+      assert_select "a", c.name, href: admin_category_path(c)
+    end
   end
 end
