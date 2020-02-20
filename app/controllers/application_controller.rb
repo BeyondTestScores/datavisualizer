@@ -12,4 +12,8 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  rescue_from ActionController::ParameterMissing do |e|
+    render plain: 'Invalid Parameters'
+  end
+
 end

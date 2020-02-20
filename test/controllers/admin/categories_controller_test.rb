@@ -35,6 +35,7 @@ class Admin::CategoriesControllerTest < ActionDispatch::IntegrationTest
         Rails.application.credentials.test[:authentication][:admin][:password]
       )
     }
+    assert_select "p", "Invalid Parameters"
     assert_equal category_count, Category.count
 
     post "/admin/categories", headers: {
@@ -43,7 +44,9 @@ class Admin::CategoriesControllerTest < ActionDispatch::IntegrationTest
         Rails.application.credentials.test[:authentication][:admin][:password]
       )
     }, params: {
-      name: "New Category"
+      category: {
+        name: "New Category"
+      }
     }
     assert_equal category_count + 1, Category.count
   end
@@ -58,8 +61,10 @@ class Admin::CategoriesControllerTest < ActionDispatch::IntegrationTest
         Rails.application.credentials.test[:authentication][:admin][:password]
       )
     }, params: {
-      name: "New Category",
-      parent_category_id: parent_category.id
+      category: {
+        name: "New Category",
+        parent_category_id: parent_category.id
+      }
     }
 
     assert_equal child_category_count + 1, parent_category.child_categories.count
