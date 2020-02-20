@@ -9,10 +9,11 @@ class Admin::CategoriesController < Admin::AdminController
   end
 
   def create
-    category = Category.new(category_params)
-    if category.save
-      redirect_to category
+    @category = Category.new(category_params)
+    if @category.save
+      redirect_to @category
     else
+      @parent_categories = Category.all.sort
       render :new
     end
   end

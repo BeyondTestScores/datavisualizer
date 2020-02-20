@@ -45,6 +45,19 @@ class Admin::CategoriesControllerTest < ActionDispatch::IntegrationTest
       )
     }, params: {
       category: {
+        name: ""
+      }
+    }
+    assert_select "li", "Name can't be blank"
+    assert_equal category_count, Category.count
+
+    post "/admin/categories", headers: {
+      Authorization: ActionController::HttpAuthentication::Basic.encode_credentials(
+        Rails.application.credentials.test[:authentication][:admin][:username],
+        Rails.application.credentials.test[:authentication][:admin][:password]
+      )
+    }, params: {
+      category: {
         name: "New Category"
       }
     }
