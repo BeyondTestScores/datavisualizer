@@ -3,14 +3,8 @@
 %br
 
 %div
-  = form_with model: [:admin, @category] do |f|
-    %p
-      = f.label :name
-      = f.text_field :name
-    %p
-      = f.label :blurb
-      = f.text_field :blurb
-    %p
-      = f.label :description
-      = f.text_area :description
-    %p= f.submit "Create"
+  = bootstrap_form_with model: [:admin, @category], local: true do |f|
+    = f.text_field :name
+    = f.text_field :blurb
+    = f.text_area :description
+    = f.submit "Create"
