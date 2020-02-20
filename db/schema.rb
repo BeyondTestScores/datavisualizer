@@ -19,7 +19,7 @@ ActiveRecord::Schema.define(version: 2020_02_19_143042) do
     t.string "name"
     t.string "blurb"
     t.text "description"
-    t.integer "parent_category_id", null: false
+    t.integer "parent_category_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.string "slug"

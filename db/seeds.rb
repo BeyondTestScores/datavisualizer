@@ -6,6 +6,10 @@
 #   movies = Movie.create([{ name: 'Star Wars' }, { name: 'Lord of the Rings' }])
 #   Character.create(name: 'Luke', movie: movies.first)
 
-r1 = Category.create("Root 1")
-r2 = Category.create("Root 2")
-r3 = Category.create("Root 3")
+r1 = Category.create(name: "Root 1")
+r2 = Category.create(name: "Root 2")
+r3 = Category.create(name: "Root 3")
+
+r1a = r1.child_categories.create(name: "R1A")
+r1b = r1.child_categories.create(name: "R1B")
+r2a = r1.child_categories.create(name: "R2A")

@@ -24,5 +24,6 @@ class Admin::CategoriesControllerTest < ActionDispatch::IntegrationTest
       )
     }
     assert_select "form"
+    assert_select "option", Category.count
   end
 end

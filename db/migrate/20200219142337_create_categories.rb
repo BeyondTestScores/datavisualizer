@@ -4,7 +4,7 @@ class CreateCategories < ActiveRecord::Migration[6.0]
       t.string :name
       t.string :blurb
       t.text :description
-      t.integer :parent_category_id, null: false, foreign_key: true
+      t.integer :parent_category_id, foreign_key: true
 
       t.timestamps
     end
