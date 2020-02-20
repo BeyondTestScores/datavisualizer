@@ -99,4 +99,17 @@ class Admin::CategoriesControllerTest < ActionDispatch::IntegrationTest
     assert_select "h2", category.name
     assert_select "a", categories(:one).name, :href => /categories\/#{categories(:one).slug}/
   end
+
+  def test_show__with_no_parent_category
+    category = categories(:one)
+    get "/admin/categories/#{category.slug}", headers: {
+      Authorization: ActionController::HttpAuthentication::Basic.encode_credentials(
+        Rails.application.credentials.test[:authentication][:admin][:username],
+        Rails.application.credentials.test[:authentication][:admin][:password]
+      )
+    }
+
+    assert_select "h2", category.name
+    assert_no_select "p", /Parent/
+  end
 end

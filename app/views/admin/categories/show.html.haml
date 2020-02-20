@@ -1,13 +1,18 @@
 %h2= @category.name
+
 %p
   %b Slug:
   = @category.slug
+
 %p
   %b Blurb:
   = @category.blurb
+
 %p
   %b Description:
   = @category.description
-%p
-  %b Parent Category:
-  =link_to @category.parent_category.name, [:admin, @category.parent_category]
+
+- if @category.parent_category.present?
+  %p
+    %b Parent Category:
+    =link_to @category.parent_category.name, [:admin, @category.parent_category]
