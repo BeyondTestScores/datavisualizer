@@ -5,4 +5,8 @@ class Admin::CategoriesController < Admin::AdminController
     @parent_categories = Category.all.sort
   end
 
+  def create
+    
+  end
+
 end
