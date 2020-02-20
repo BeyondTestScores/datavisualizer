@@ -7,8 +7,8 @@ one:
   description: MyText
 
 two:
-  name: MyString
+  name: MyString2
   slug: mystring2
-  blurb: MyString
-  description: MyText
+  blurb: MyString2
+  description: MyText2
   parent_category: one

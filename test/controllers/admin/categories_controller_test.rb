@@ -88,7 +88,7 @@ class Admin::CategoriesControllerTest < ActionDispatch::IntegrationTest
   end
 
   def test_show
-    category = Category.first
+    category = categories(:two)
     get "/admin/categories/#{category.slug}", headers: {
       Authorization: ActionController::HttpAuthentication::Basic.encode_credentials(
         Rails.application.credentials.test[:authentication][:admin][:username],
@@ -97,5 +97,6 @@ class Admin::CategoriesControllerTest < ActionDispatch::IntegrationTest
     }
 
     assert_select "h2", category.name
+    assert_select "a", categories(:one).name, :href => /categories\/#{categories(:one).slug}/
   end
 end
