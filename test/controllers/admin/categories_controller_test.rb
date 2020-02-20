@@ -62,6 +62,9 @@ class Admin::CategoriesControllerTest < ActionDispatch::IntegrationTest
       }
     }
     assert_equal category_count + 1, Category.count
+    assert_equal 302, status
+    follow_redirect!
+    assert_equal "/admin/categories/new-category", path
   end
 
   def test_create__assigns_parent_category
@@ -82,5 +85,17 @@ class Admin::CategoriesControllerTest < ActionDispatch::IntegrationTest
 
     assert_equal child_category_count + 1, parent_category.child_categories.count
     assert_equal Category.find_by_name("New Category").parent_category, parent_category
+  end
+
+  def test_show
+    category = Category.first
+    get "/admin/categories/#{category.slug}", headers: {
+      Authorization: ActionController::HttpAuthentication::Basic.encode_credentials(
+        Rails.application.credentials.test[:authentication][:admin][:username],
+        Rails.application.credentials.test[:authentication][:admin][:password]
+      )
+    }
+
+    assert_select "h2", category.name
   end
 end

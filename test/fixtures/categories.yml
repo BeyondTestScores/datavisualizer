@@ -2,12 +2,13 @@
 
 one:
   name: MyString
+  slug: mystring
   blurb: MyString
   description: MyText
-  parent_category: one
 
 two:
   name: MyString
+  slug: mystring2
   blurb: MyString
   description: MyText
-  parent_category: two
+  parent_category: one

@@ -1,7 +1,10 @@
 require 'test_helper'
 
 class CategoryTest < ActiveSupport::TestCase
-  # test "the truth" do
-  #   assert true
-  # end
+
+  def test_sets_slug_on_create
+    category = Category.create(name: "Test")
+    assert_equal "test", category.slug
+  end
+
 end
