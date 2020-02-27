@@ -18,3 +18,10 @@ three:
   slug: category-threee
   blurb: It's another category
   description: Here is a detailed description of this category
+
+four:
+  name: Category Four
+  slug: category-four
+  blurb: A child's child
+  description: A child category has this as it's child category
+  parent_category: two

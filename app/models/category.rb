@@ -8,4 +8,10 @@ class Category < ApplicationRecord
   include FriendlyId
   friendly_id :name, :use => [:slugged]
 
+  scope :root, -> { where(parent_category: nil) }
+
+  def to_s
+    name
+  end
+
 end

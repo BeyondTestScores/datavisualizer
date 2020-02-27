@@ -13,3 +13,5 @@ r3 = Category.create(name: "Root 3")
 r1a = r1.child_categories.create(name: "R1A")
 r1b = r1.child_categories.create(name: "R1B")
 r2a = r1.child_categories.create(name: "R2A")
+
+r2aa = r1a.child_categories.create(name: "R2AA")
