@@ -1,4 +1,2 @@
 %h2 All Categories
-- Category.root.each do |c|
-  %p= link_to c.name, c
-  = render "child_categories", category: c
+= render "category_tree", category_partial: "category_link"

@@ -1,0 +1,3 @@
+- Category.root.each do |c|
+  = render category_partial, category: c
+  = render "child_categories", category: c, category_partial: category_partial

@@ -1,4 +1,4 @@
 .child-categories
   - category.child_categories.each do |child|
-    %p= link_to child, child
-    = render "child_categories", category: child
+    = render category_partial, category: child
+    = render "child_categories", category: child, category_partial: category_partial
