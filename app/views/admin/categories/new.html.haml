@@ -19,6 +19,6 @@
     = f.text_field :name
     = f.text_field :blurb
     = f.text_area :description
-    = f.select :parent_category, @parent_categories.map { |pc| [pc.name, pc.id] }, { include_blank: true }
+    = f.select :parent_category_id, @parent_categories.map { |pc| [pc.name, pc.id] }, { include_blank: true }
     = render "category_tree", category_partial: "category_selector"
     = f.submit "Create"

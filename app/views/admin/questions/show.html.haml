@@ -1,0 +1,11 @@
+%h2= @question.text
+
+%p
+  %b Category:
+  = link_to(@question.category, @question.category)
+
+%br
+
+%h3 Options
+- 5.times do |i|
+  %p= @question.send("option#{i + 1}")
