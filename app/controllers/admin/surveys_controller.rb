@@ -21,7 +21,7 @@ class Admin::SurveysController < Admin::AdminController
 
   private
   def survey_params
-    params.require(:survey).permit(:name, :question_ids)
+    params.require(:survey).permit(:name, :survey_monkey_id, question_ids: [])
   end
 
   def set_survey

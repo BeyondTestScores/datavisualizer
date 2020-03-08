@@ -43,9 +43,9 @@ class Admin::SurveysControllerTest < ActionDispatch::IntegrationTest
 
     survey = Survey.last
     post "/admin/surveys", headers: authorized_headers, params: {
-      question: {
+      survey: {
         name: "New Survey",
-        questions: [Question.first.id, Question.last.id].join(',')
+        question_ids: [Question.first.id, Question.last.id]
       }
     }
     assert_equal survey_count + 1, Survey.count
@@ -53,7 +53,7 @@ class Admin::SurveysControllerTest < ActionDispatch::IntegrationTest
     follow_redirect!
 
     survey = Survey.last
-    assert_equal "/admin/survey/#{survey.id}", path
+    assert_equal "/admin/surveys/#{survey.id}", path
     assert_equal 2, survey.questions.count
   end
 
