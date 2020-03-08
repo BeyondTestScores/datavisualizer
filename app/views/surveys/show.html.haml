@@ -1,0 +1,10 @@
+%p#notice= notice
+
+%p
+  %b Name:
+  = @survey.name
+%p
+  %b Survey monkey:
+  = @survey.survey_monkey_id
+
+= link_to 'Edit', admin_edit_survey_path(@survey)
