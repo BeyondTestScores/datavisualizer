@@ -1,5 +1,6 @@
 class Question < ApplicationRecord
   belongs_to :category
+  has_many :surveys, through: :survey_questions
 
   validates :text, presence: true, length: { minimum: 1 }
   validates :option1, presence: true, length: { minimum: 1 }

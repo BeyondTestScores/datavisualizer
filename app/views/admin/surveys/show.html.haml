@@ -1,21 +1,4 @@
-%h2 New Survey
+%h2= @survey.name
 
-%br
-
-%div
-  = bootstrap_form_with model: [:admin, @survey], local: true do |f|
-
-    - if @survey.errors.any?
-      #error_explanation
-        %h2
-          = pluralize(@survey.errors.count, "error")
-          prohibited
-          this survey from being saved:
-        %ul
-          - @survey.errors.full_messages.each do |msg|
-            %li= msg
-
-
-    = f.text_field :name
-
-    = f.submit "Create"
+- @survey.questions.each do |question|
+  %p= link_to question, [:admin, question]

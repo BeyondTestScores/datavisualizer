@@ -20,19 +20,22 @@ r2aa = r1a.child_categories.create(name: "R2AA")
 q1a = Question.create(
   text: "What is the answer to this question?",
   option1: "Option 1",
-  option1: "Option 2",
-  option1: "Option 3",
-  option1: "Option 4",
-  option1: "Option 5",
+  option2: "Option 2",
+  option3: "Option 3",
+  option4: "Option 4",
+  option5: "Option 5",
   category: r1a
 )
 
 q2aa = Question.create(
   text: "What is the answer to this other question?",
   option1: "Option 1",
-  option1: "Option 2",
-  option1: "Option 3",
-  option1: "Option 4",
-  option1: "Option 5",
+  option2: "Option 2",
+  option3: "Option 3",
+  option4: "Option 4",
+  option5: "Option 5",
   category: r2aa
 )
+
+survey = Survey.create!(name: "Survey 1")
+survey.survey_questions.create!(question: q1a)
