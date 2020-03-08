@@ -1,6 +1,8 @@
 setTimeout(function() {
-  $('.category-selector').click(function(categorySelector) {
-    alert("ID: " + $(categorySelector).attr("category_id"));
+  $('.category-selector a').click(function(event) {
+    event.preventDefault();
+    const {categoryId} = event.currentTarget.dataset;
+    $('.category-selector-target').val(categoryId);
     return false;
   });
 }, 1000);

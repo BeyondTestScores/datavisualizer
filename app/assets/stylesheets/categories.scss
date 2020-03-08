@@ -6,3 +6,16 @@
   padding-left: 30px;
   overflow: hidden;
 }
+
+.category-tree {
+  padding: 30px;
+
+  .category-selector {
+    a:not([href]) {
+      color: blue;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+  }
+
+}
