@@ -1,11 +1,19 @@
 %h2= @question.text
 
-%p
-  %b Category:
-  = link_to(@question.category, @question.category)
-
 %br
 
 %h3 Options
 - 5.times do |i|
   %p= @question.send("option#{i + 1}")
+
+%br
+
+%p
+  %b Category:
+  = link_to(@question.category, @question.category)
+
+
+%br
+%br
+
+= render 'category_tree', category_partial: "category_link", show_questions: true

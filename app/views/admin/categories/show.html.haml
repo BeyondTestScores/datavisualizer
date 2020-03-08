@@ -15,4 +15,21 @@
 - if @category.parent_category.present?
   %p
     %b Parent Category:
-    =link_to @category.parent_category.name, [:admin, @category.parent_category]
+    =link_to @category.parent_category, [:admin, @category.parent_category]
+
+- if @category.child_categories.present?
+  %br
+    %b Child Categories:
+    - @category.child_categories.each do |child_category|
+      %p= link_to child_category, [:admin, child_category]
+
+- if @category.questions.present?
+  %br
+    %b Questions:
+    - @category.questions.each do |question|
+      %p= link_to question, [:admin,question]
+
+%br
+%br
+
+= render 'category_tree', category_partial: "category_link", show_questions: true
