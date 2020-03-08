@@ -1,4 +1,6 @@
 .child-categories
   - category.child_categories.each do |child|
     = render category_partial, category: child
-    = render "child_categories", category: child, category_partial: category_partial
+    = render "child_categories", category: child, category_partial: category_partial, show_questions: show_questions
+    - if show_questions
+      = render "category_questions", category: child

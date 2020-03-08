@@ -1,4 +1,4 @@
 .category-tree
   - Category.root.each do |c|
     = render category_partial, category: c
-    = render "child_categories", category: c, category_partial: category_partial
+    = render "child_categories", category: c, category_partial: category_partial, show_questions: local_assigns[:show_questions]

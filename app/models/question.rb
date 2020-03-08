@@ -8,4 +8,8 @@ class Question < ApplicationRecord
   validates :option4, presence: true, length: { minimum: 1 }
   validates :option5, presence: true, length: { minimum: 1 }
 
+  def to_s
+    text
+  end
+
 end
