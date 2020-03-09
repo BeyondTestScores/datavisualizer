@@ -3,13 +3,16 @@
 %br
 
 %p
-  %a=link_to "Create New Survey", new_admin_survey_path
+  %a=link_to "+ Create New Survey", new_admin_survey_path
 
-- Survey.all.each do |survey|
-  %p= link_to survey, survey
+.surveys
+  - Survey.all.each do |survey|
+    %p= link_to survey, survey
 
 %br
 %p
-  %a= link_to "Create New Category", new_admin_category_path
+  %a= link_to "+ Create New Category", new_admin_category_path
+%p
+  %a= link_to "+ Create New Question", new_admin_question_path
 
-= render 'category_tree', category_partial: "category_link", show_questions: true
+= render 'category_tree', template: "link", show_questions: true
