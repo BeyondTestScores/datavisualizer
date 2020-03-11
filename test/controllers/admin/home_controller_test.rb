@@ -23,6 +23,8 @@ class Admin::HomeControllerTest < ActionDispatch::IntegrationTest
         Rails.application.credentials.test[:authentication][:admin][:password]
       )
     }
-    assert_select "a", "Create New Category", :href => /categories\/new/
+    assert_select "a", "+ Create New Survey", :href => /admin\/surveys\/new/
+    assert_select "a", "+ Create New Category", :href => /admin\/categories\/new/
+    assert_select "a", "+ Create New Question", :href => /admin\/questions\/new/
   end
 end

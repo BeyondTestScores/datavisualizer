@@ -1,0 +1,19 @@
+= bootstrap_form_with model: [:admin, @question], local: true do |f|
+
+  - if @question.errors.any?
+    #error_explanation
+      %h2
+        = pluralize(@question.errors.count, "error")
+        prohibited
+        this category from being saved:
+      %ul
+        - @question.errors.full_messages.each do |msg|
+          %li= msg
+
+
+  = f.text_field :text
+  - 5.times do |i|
+    = f.text_field "option#{i + 1}"
+  = f.select :category_id, @categories.map { |c| [c.name, c.id] }, { include_blank: true }, { class: 'category-selector-target' }
+  = render "category_tree", template: "selector"
+  %p= f.submit "Create"

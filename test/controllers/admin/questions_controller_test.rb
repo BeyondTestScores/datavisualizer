@@ -24,6 +24,15 @@ class Admin::QuestionsControllerTest < ActionDispatch::IntegrationTest
   def test_new_has_form
     get "/admin/questions/new", headers: authorized_headers
     assert_select "form"
+    assert_select "select" do
+      assert_select "option", Category.count + 1
+      assert_select "option[selected]", {count: 0}
+    end
+  end
+
+  def test_new_has_form
+    get "/admin/questions/new", headers: authorized_headers
+    assert_select "form"
     assert_select "option", Category.count + 1
   end
 
@@ -71,6 +80,17 @@ class Admin::QuestionsControllerTest < ActionDispatch::IntegrationTest
     assert_select "h2", question.text
     assert_select "p", question.option1
     assert_select "a", categories(:two).name, :href => /categories\/#{categories(:two).slug}/
+  end
+
+  def test_edit
+    question = questions(:two)
+    get "/admin/questions/#{question.id}/edit", headers: authorized_headers
+
+    assert_select "form"
+    assert_select "select" do
+      assert_select "option", Category.count + 1
+      assert_select "option[value='#{question.category.id}'][selected]"
+    end
   end
 
   # def test_index

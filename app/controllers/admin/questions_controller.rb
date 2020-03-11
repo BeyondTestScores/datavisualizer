@@ -1,12 +1,12 @@
 class Admin::QuestionsController < Admin::AdminController
 
-  before_action :set_question, only: [:show]
+  before_action :set_question, only: [:show, :edit]
 
   def show
   end
 
   def new
-    @question = Question.new
+    @question = Question.new(category_id: params[:category_id])
     @categories = Category.all.sort
   end
 
@@ -18,6 +18,10 @@ class Admin::QuestionsController < Admin::AdminController
       @categories = Category.all.sort
       render :new
     end
+  end
+
+  def edit
+    @categories = Category.all.sort
   end
 
 

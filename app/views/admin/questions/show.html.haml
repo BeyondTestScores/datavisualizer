@@ -2,6 +2,11 @@
 
 %br
 
+%p
+  = link_to("Edit Question", edit_admin_question_path(@question))
+
+%br
+
 %h3 Options
 - 5.times do |i|
   %p= @question.send("option#{i + 1}")
