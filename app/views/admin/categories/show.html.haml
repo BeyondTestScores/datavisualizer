@@ -30,6 +30,12 @@
       %p= link_to question, [:admin,question]
 
 %br
+
+%p= link_to "+ Add A Child Category", new_admin_category_path(parent_category_id: @category.id)
+%p= link_to "+ Add A Question To This Category", new_admin_question_path(category_id: @category.id)
+
+%br
+%br
 %br
 
 = render 'category_tree', template: "link", show_questions: true

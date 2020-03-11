@@ -19,6 +19,8 @@
     = f.text_field :name
     = f.text_field :blurb
     = f.text_area :description
-    = f.select :parent_category_id, @parent_categories.map { |pc| [pc.name, pc.id] }, { include_blank: true }, {class: 'category-selector-target'}
+    = f.select :parent_category_id, @parent_categories.map { |pc| [pc.name, pc.id] }, { selected: params[:parent_category_id], include_blank: true }, {class: 'category-selector-target'}
+    %p Or click a category in the tree below to select it as the parent.
     = render "category_tree", template: "selector"
-    = f.submit "Create"
+    %br
+    %p= f.submit "Create"
