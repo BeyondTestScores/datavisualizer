@@ -23,8 +23,19 @@ class Admin::CategoriesControllerTest < ActionDispatch::IntegrationTest
 
   def test_new_has_form
     get "/admin/categories/new", headers: authorized_headers
-    assert_select "form"
-    assert_select "option", Category.count + 1
+    assert_select "select" do
+      assert_select "option", Category.count + 1
+      assert_select "option[selected]", {count: 0}
+    end
+  end
+
+  def test_new_assigns_parent_category_id_when_passed_in
+    parent_category = categories(:two)
+    get "/admin/categories/new?parent_category_id=#{parent_category.id}", headers: authorized_headers
+    assert_select "select" do
+      assert_select "option", Category.count + 1
+      assert_select "option[value='#{parent_category.id}'][selected]", {count: 1}
+    end
   end
 
   def test_create__only_requires_name
@@ -87,7 +98,18 @@ class Admin::CategoriesControllerTest < ActionDispatch::IntegrationTest
     get "/admin/categories", headers: authorized_headers
     assert_select "h2", "All Categories"
     Category.all.each do |c|
-      assert_select "a", c.name, href: admin_category_path(c)  
+      assert_select "a", c.name, href: admin_category_path(c)
+    end
+  end
+
+  def test_edit
+    category = categories(:two)
+    get "/admin/categories/#{category.id}/edit", headers: authorized_headers
+
+    assert_select "form"
+    assert_select "select" do
+      assert_select "option", Category.count + 1
+      assert_select "option[value='#{category.parent_category.id}'][selected]"
     end
   end
 end
