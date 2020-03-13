@@ -1,6 +1,6 @@
 class Admin::QuestionsController < Admin::AdminController
 
-  before_action :set_question, only: [:show, :edit]
+  before_action :set_question, only: [:show, :edit, :update]
   before_action :set_categories, only: [:new, :edit]
 
   def show
@@ -21,6 +21,30 @@ class Admin::QuestionsController < Admin::AdminController
   end
 
   def edit
+  end
+
+  # PATCH/PUT /admin/questions/1
+  # PATCH/PUT /admin/questions/1.json
+  def update
+    respond_to do |format|
+      if @question.update(question_params)
+        format.html { redirect_to [:admin, @question], notice: 'Question was successfully updated.' }
+        # format.json { render :show, status: :ok, location: @question }
+      else
+        format.html { render :edit }
+        # format.json { render json: @question.errors, status: :unprocessable_entity }
+      end
+    end
+  end
+
+  # DELETE /admin/questions/1
+  # DELETE /admin/questions/1.json
+  def destroy
+    @question.destroy
+    respond_to do |format|
+      format.html { redirect_to admin_root_url, notice: 'Question was successfully destroyed.' }
+      # format.json { head :no_content }
+    end
   end
 
 

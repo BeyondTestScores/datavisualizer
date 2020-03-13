@@ -1,6 +1,6 @@
 class Admin::CategoriesController < Admin::AdminController
 
-  before_action :set_category, only: [:show, :edit]
+  before_action :set_category, only: [:show, :edit, :update, :destroy]
   before_action :set_parent_categories, only: [:new, :edit]
 
   def index
@@ -26,6 +26,27 @@ class Admin::CategoriesController < Admin::AdminController
   def edit
   end
 
+  # PATCH/PUT /admin/categories/1
+  # PATCH/PUT /admin/categories/1.json
+  def update
+    respond_to do |format|
+      if @category.update(category_params)
+        format.html { redirect_to [:admin, @category], notice: 'Category was successfully updated.' }
+        # format.json { render :show, status: :ok, location: @question }
+      else
+        format.html { render :edit }
+        # format.json { render json: @question.errors, status: :unprocessable_entity }
+      end
+    end
+  end
+
+  def destroy
+    @category.destroy
+    respond_to do |format|
+      format.html { redirect_to admin_root_path, notice: 'Category was successfully destroyed.' }
+      format.json { head :no_content }
+    end
+  end
 
   private
   def set_parent_categories

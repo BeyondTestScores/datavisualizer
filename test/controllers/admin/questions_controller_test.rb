@@ -95,6 +95,40 @@ class Admin::QuestionsControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
+  def test_update__updates_category
+    question = questions(:two)
+    new_category = categories(:three)
+    question_count = new_category.questions.count
+
+    assert question.category != new_category
+
+    patch "/admin/questions/#{question.id}", headers: authorized_headers, params: {
+      question: {
+        text: "New Question Text",
+        category_id: new_category.id
+      }
+    }
+
+    assert_equal Question.find_by_text("New Question Text").category, new_category
+    assert_equal question_count + 1, new_category.questions.count
+  end
+
+  # Why is this crashing the tests?
+  # def test_destroy__doesnt_destroy_category
+  #   category_count = Category.count
+  #   category = categories(:two)
+  #   assert_equal 1, category.questions.count
+  #   question_count = Question.count
+  #
+  #   delete admin_question_url(question), headers: authorized_headers
+  #   # assert_redirected_to admin_root_path
+  #   # assert_select h3, "Question was successfully destroyed."
+  #
+  #   assert_equal category_count, Category.count
+  #   assert_equal question_count - 1, category.questions.count
+  # end
+
+
   # def test_index
   #   get "/admin/categories", headers: authorized_headers
   #   assert_select "h2", "All Categories"

@@ -4,15 +4,19 @@
 
 %p
   %a=link_to "+ Create New Survey", new_admin_survey_path
+%p
+  %a= link_to "+ Create New Category", new_admin_category_path
+%p
+  %a= link_to "+ Create New Question", new_admin_question_path
 
+%br
+
+%h3 Surveys
 .surveys
   - Survey.all.each do |survey|
     %p= link_to survey, survey
 
 %br
-%p
-  %a= link_to "+ Create New Category", new_admin_category_path
-%p
-  %a= link_to "+ Create New Question", new_admin_question_path
+%br
 
 = render 'category_tree', template: "link", show_questions: true

@@ -4,6 +4,8 @@
 
 %p
   = link_to("Edit Question", edit_admin_question_path(@question))
+  &nbsp; | &nbsp;
+  = link_to "Delete Question", @question,  method: :delete, data: { confirm: 'Are you sure you want to delete this question?' }
 
 %br
 

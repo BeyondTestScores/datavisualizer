@@ -112,4 +112,37 @@ class Admin::CategoriesControllerTest < ActionDispatch::IntegrationTest
       assert_select "option[value='#{category.parent_category.id}'][selected]"
     end
   end
+
+  def test_update__updates_parent_category
+    category = categories(:two)
+    new_parent_category = categories(:three)
+    child_category_count = new_parent_category.child_categories.count
+
+    assert category.parent_category != new_parent_category
+
+    patch "/admin/categories/#{category.id}", headers: authorized_headers, params: {
+      category: {
+        name: "Renamed Category",
+        parent_category_id: new_parent_category.id
+      }
+    }
+
+    assert_equal child_category_count + 1, new_parent_category.child_categories.count
+    assert_equal Category.find_by_name("Renamed Category").parent_category, new_parent_category
+  end
+
+  # Why is this crashing the tests?
+  # def test_destroy__also_destroys_questions
+  #   category_count = Category.count
+  #   category = categories(:two)
+  #   assert_equal 1, category.questions.count
+  #   question_count = Question.count
+  #
+  #   delete admin_category_url(category), headers: authorized_headers
+  #   # assert_redirected_to admin_root_path
+  #   # assert_select h3, "Category was successfully destroyed."
+  #
+  #   assert_equal category_count - 1, Category.count
+  #   assert_equal question_count - 1, Question.count
+  # end
 end
