@@ -104,7 +104,7 @@ class Admin::CategoriesControllerTest < ActionDispatch::IntegrationTest
 
   def test_edit
     category = categories(:two)
-    get "/admin/categories/#{category.id}/edit", headers: authorized_headers
+    get "/admin/categories/#{category.slug}/edit", headers: authorized_headers
 
     assert_select "form"
     assert_select "select" do
@@ -120,7 +120,7 @@ class Admin::CategoriesControllerTest < ActionDispatch::IntegrationTest
 
     assert category.parent_category != new_parent_category
 
-    patch "/admin/categories/#{category.id}", headers: authorized_headers, params: {
+    patch "/admin/categories/#{category.slug}", headers: authorized_headers, params: {
       category: {
         name: "Renamed Category",
         parent_category_id: new_parent_category.id
@@ -128,7 +128,9 @@ class Admin::CategoriesControllerTest < ActionDispatch::IntegrationTest
     }
 
     assert_equal child_category_count + 1, new_parent_category.child_categories.count
-    assert_equal Category.find_by_name("Renamed Category").parent_category, new_parent_category
+    updated_category = Category.find_by_name("Renamed Category")
+    assert_equal new_parent_category, updated_category.parent_category
+    # assert_equal "renamed-category", updated_category.slug
   end
 
   # Why is this crashing the tests?

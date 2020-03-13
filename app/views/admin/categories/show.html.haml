@@ -3,7 +3,7 @@
 %p
   = link_to "Edit Category", edit_admin_category_path(@category)
   &nbsp; | &nbsp;
-  = link_to "Delete Category", @category,  method: :delete, data: { confirm: 'Are you sure you want to delete this category?' }
+  = link_to "Delete Category", [:admin, @category],  method: :delete, data: { confirm: 'Are you sure you want to delete this category?' }
 
 %p
   %b Slug:
