@@ -16,4 +16,4 @@
     = f.text_field "option#{i + 1}"
   = f.select :category_id, @categories.map { |c| [c.name, c.id] }, { include_blank: true }, { class: 'category-selector-target' }
   = render "category_tree", template: "selector"
-  %p= f.submit "Create"
+  %p= f.submit @question.new_record? ? "Create" : "Update"

@@ -18,4 +18,4 @@
   %p Or click a category in the tree below to select it as the parent.
   = render "category_tree", template: "selector"
   %br
-  %p= f.submit "Create"
+  %p= f.submit @category.new_record? ? "Create" : "Update"

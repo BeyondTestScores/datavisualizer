@@ -10,4 +10,9 @@
   %body.container
     = render 'header'
     .container.p-3
+      - if notice
+        %p#notice= notice
+      - if alert
+        %p#alert= alert
+
       = yield
