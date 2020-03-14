@@ -65,35 +65,24 @@ class Admin::SurveysControllerTest < ActionDispatch::IntegrationTest
     assert_select "a", survey.questions.first.text
   end
 
-  # def test_index
-  #   get "/admin/categories", headers: authorized_headers
-  #   assert_select "h2", "All Categories"
-  #   Category.all.each do |c|
-  #     assert_select "a", c.name, href: admin_category_path(c)
-  #   end
-  # end
+  test "should get edit" do
+    survey = surveys(:two)
+    get edit_admin_survey_url(survey), headers: authorized_headers
+    assert_response :success
+  end
 
-  # def test_index
-  #   get "/admin/categories", headers: authorized_headers
-  #   assert_select "h2", "All Categories"
-  #   Category.all.each do |c|
-  #     assert_select "a", c.name, href: admin_category_path(c)
-  #   end
-  # end
-  #
-  # test "should get edit" do
-  #   get edit_survey_url(@survey)
-  #   assert_response :success
-  # end
-  #
-  # test "should update survey" do
-  #   patch survey_url(@survey), params: { survey: { name: @survey.name, survey_monkey_id: @survey.survey_monkey_id } }
-  #   assert_redirected_to survey_url(@survey)
-  # end
-  #
+  test "should update survey" do
+    survey = surveys(:two)
+    patch admin_survey_url(survey), headers: authorized_headers, params: {
+      survey: { name: survey.name, survey_monkey_id: survey.survey_monkey_id }
+    }
+    assert_redirected_to admin_survey_url(survey)
+  end
+
   # test "should destroy survey" do
+  #   survey = surveys(:two)
   #   assert_difference('Survey.count', -1) do
-  #     delete survey_url(@survey)
+  #     delete admin_survey_url(survey), headers: authorized_headers
   #   end
   #
   #   assert_redirected_to surveys_url

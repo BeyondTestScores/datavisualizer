@@ -14,7 +14,7 @@
 %h3 Surveys
 .surveys
   - Survey.all.each do |survey|
-    %p= link_to survey, survey
+    %p= link_to survey, [:admin, survey]
 
 %br
 %br
