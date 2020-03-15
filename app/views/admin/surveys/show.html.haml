@@ -13,11 +13,8 @@
   %h4
     Questions In This Survey
 
-  -# - Category.root.each do |c|
-  -#   .category
-  -#     = render "category_#{template}", category: c
-  -#     = render "child_categories", category: c, template: template, show_questions: true
-
-
-- @survey.questions.each do |question|
-  %p= link_to question, [:admin, question]
+  - @survey.category_tree[:children].keys.sort.each do |category_name|
+    - category = @survey.category_tree[:children][category_name]
+    .category
+      = render "category_selector", category: category[:category]
+      = render "child_categories", category: category, template: "selector", show_questions: true
