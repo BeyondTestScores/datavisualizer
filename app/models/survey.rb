@@ -10,7 +10,7 @@ class Survey < ApplicationRecord
   end
 
   def category_tree
-    tree = {children: {}}
+    tree = {child_categories: []}
 
     questions.each do |question|
         category = question.category
@@ -22,11 +22,15 @@ class Survey < ApplicationRecord
 
         node = tree
         question_path.reverse.each do |category|
-          category_hash = node[:children][category.name]
-          category_hash = {category: category, children: {}} if category_hash.blank?
-          node[:children][category.name] = category_hash
+          category_hash = node[:child_categories].find { |cc| cc[:category].name == category.name }
+          if category_hash.blank?
+            category_hash = {category: category, child_categories: []}
+            node[:child_categories].push(category_hash)
+          end
+          node[:child_categories].sort! { |a,b| a[:category].name <=> b[:category].name }
           node = category_hash
         end
+
         node[:questions] ||= []
         node[:questions] << question
     end

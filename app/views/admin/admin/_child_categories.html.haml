@@ -1,8 +1,7 @@
 .child-categories
-  - (category[:children].keys || category.child_categories).each do |child_category|
-    - child = category[:children][child_category] || child_category
+  - (category[:child_categories] || category.child_categories).each do |child_category|
     .category
-      = render "category_#{template}", category: child[:category] || child
+      = render "category_#{template}", category: child_category[:category] || child_category
       - if show_questions
-        = render 'category_questions', category: child, template: template
-      = render "child_categories", category: child, template: template, show_questions: show_questions
+        = render 'category_questions', category: child_category, template: template
+      = render "child_categories", category: child_category, template: template, show_questions: show_questions
