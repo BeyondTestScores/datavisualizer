@@ -42,4 +42,18 @@ class Survey < ApplicationRecord
     return tree
   end
 
+  def surveyMonkeyConnection
+    Faraday.new(
+      url: 'https://api.surveymonkey.com/v3',
+      headers: {
+        'Authorization' => 'bearer ZP.5GmFFT9TZ5WkNVnvgrd7NIPYWsHjRsnkyN07BEd3ku9FF-9v2GIohzYjW6gcYyBi.WbBhoB3W15Gg-WmbCYPaNbEMRGSbBQG03ErVMLma2sU6YLSTjzwTMDp4839w',
+        'Content-Type' => 'application/json'
+      }
+    )
+  end
+
+  def monkey
+    surveyMonkeyConnection.post('surveys', {"title":"#{name}"}.to_json)
+  end
+
 end
