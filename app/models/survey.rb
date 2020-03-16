@@ -7,7 +7,7 @@ class Survey < ApplicationRecord
 
   after_create :create_survey_monkey_survey
 
-  # after_commit :sync_with_survey_monkey
+  after_commit :sync_with_survey_monkey
 
   def to_s
     name
@@ -56,12 +56,29 @@ class Survey < ApplicationRecord
   end
 
   def create_survey_monkey_survey
+    return if survey_monkey_id.present?
     response = surveyMonkeyConnection.post('surveys', {"title":"#{name}"}.to_json)
     update(survey_monkey_id: response.body['id'])
   end
 
   def survey_monkey_details
     surveyMonkeyConnection.get("surveys/#{survey_monkey_id}/details").body
+  end
+
+  def survey_monkey_pages
+    surveyMonkeyConnection.get("surveys/#{survey_monkey_id}/pages").body
+  end
+
+  def update_survey_monkey(updates)
+    surveyMonkeyConnection.patch("surveys/#{survey_monkey_id}", updates.to_json)
+  end
+
+  def sync_with_survey_monkey
+    details = survey_monkey_details
+    pages = survey_monkey_pages
+    if name != details['title']
+      update_survey_monkey(title: name)
+    end
   end
 
 end
