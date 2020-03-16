@@ -8,8 +8,8 @@
 }
 
 .category-tree {
-  
-  .category-selector {
+
+  .category-selector, .question-selector {
     a:not([href]) {
       color: blue;
       text-decoration: underline;

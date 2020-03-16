@@ -14,6 +14,6 @@
     Questions In This Survey
 
   - @survey.category_tree[:child_categories].each do |child_category|
-    .category
+    .category{data: {category_id: child_category[:category].id}}
       = render "category_selector", category: child_category[:category]
-      = render "child_categories", category: child_category, template: "selector", show_questions: true
+      = render "child_categories", category: child_category, template: "link", show_questions: true

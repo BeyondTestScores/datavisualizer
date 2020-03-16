@@ -1,7 +1,8 @@
 .child-categories
   - (category[:child_categories] || category.child_categories).each do |child_category|
-    .category
-      = render "category_#{template}", category: child_category[:category] || child_category
+    - category = child_category[:category] || child_category
+    .category{data: {category_id: category.id}}
+      = render "category_#{template}", category: category
       - if show_questions
         = render 'category_questions', category: child_category, template: template
       = render "child_categories", category: child_category, template: template, show_questions: show_questions

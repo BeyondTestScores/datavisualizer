@@ -9,6 +9,10 @@ class Survey < ApplicationRecord
     name
   end
 
+  def has_question(question)
+    questions.include?(question)
+  end
+
   def category_tree
     tree = {child_categories: []}
 

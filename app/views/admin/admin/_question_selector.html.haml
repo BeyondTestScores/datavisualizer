@@ -1,2 +1,4 @@
-.question-selector
-  %a.question{data: {question_id: question.id}}= question
+.question-selector{data: {question_id: question.id}}
+  = check_box_tag "question-#{question.id}", question.id, @survey.try(:has_question, question)
+  &nbsp;
+  %a= question

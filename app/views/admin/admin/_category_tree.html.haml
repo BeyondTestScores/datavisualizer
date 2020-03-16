@@ -5,6 +5,6 @@
       and Questions
 
   - Category.root.each do |c|
-    .category
+    .category{data: {category_id: c.id}}
       = render "category_#{template}", category: c
       = render "child_categories", category: c, template: template, show_questions: local_assigns[:show_questions]

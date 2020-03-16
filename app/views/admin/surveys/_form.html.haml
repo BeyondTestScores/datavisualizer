@@ -16,4 +16,5 @@
   = f.collection_check_boxes :question_ids, Question.all, :id, :text, { class: 'question-selector-target' }
   = render "category_tree", template: "selector", show_questions: true
 
+  %br
   %p= f.submit @survey.new_record? ? "Create" : "Update"
