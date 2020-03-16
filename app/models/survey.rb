@@ -5,6 +5,10 @@ class Survey < ApplicationRecord
 
   validates :name, presence: true, length: { minimum: 1 }
 
+  after_create :create_survey_monkey_survey
+
+  after_commit :sync_with_survey_monkey
+
   def to_s
     name
   end
@@ -46,13 +50,13 @@ class Survey < ApplicationRecord
     Faraday.new(
       url: 'https://api.surveymonkey.com/v3',
       headers: {
-        'Authorization' => 'bearer ZP.5GmFFT9TZ5WkNVnvgrd7NIPYWsHjRsnkyN07BEd3ku9FF-9v2GIohzYjW6gcYyBi.WbBhoB3W15Gg-WmbCYPaNbEMRGSbBQG03ErVMLma2sU6YLSTjzwTMDp4839w',
+        'Authorization' => "bearer #{Rails.application.credentials.dig(:surveymonkey)[:access_token]}",
         'Content-Type' => 'application/json'
       }
     )
   end
 
-  def monkey
+  def create_survey_monkey_survey
     surveyMonkeyConnection.post('surveys', {"title":"#{name}"}.to_json)
   end
 
