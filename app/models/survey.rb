@@ -60,4 +60,8 @@ class Survey < ApplicationRecord
     update(survey_monkey_id: response.body['id'])
   end
 
+  def survey_monkey_details
+    surveyMonkeyConnection.get("surveys/#{survey_monkey_id}/details").body
+  end
+
 end

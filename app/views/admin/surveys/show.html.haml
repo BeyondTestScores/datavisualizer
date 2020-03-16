@@ -1,7 +1,7 @@
 %h2= @survey.name
 
 %br
-%p= link_to "Survey Monkey", "https://api.surveymonkey.com/v3/surveys/#{@survey.survey_monkey_id}"
+%p= link_to "Survey Monkey", @survey.survey_monkey_details['summary_url'], target: '_blank'
 
 %p
   = link_to("Edit Survey", edit_admin_survey_path(@survey))
