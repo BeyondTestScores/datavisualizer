@@ -47,17 +47,17 @@ class Survey < ApplicationRecord
   end
 
   def surveyMonkeyConnection
-    Faraday.new(
-      url: 'https://api.surveymonkey.com/v3',
-      headers: {
-        'Authorization' => "bearer #{Rails.application.credentials.dig(:surveymonkey)[:access_token]}",
-        'Content-Type' => 'application/json'
-      }
-    )
+    Faraday.new('https://api.surveymonkey.com/v3') do |conn|
+      conn.adapter Faraday.default_adapter
+      conn.response :json, :content_type => /\bjson$/
+      conn.headers['Authorization'] = "bearer #{Rails.application.credentials.dig(:surveymonkey)[:access_token]}"
+      conn.headers['Content-Type'] = 'application/json'
+    end
   end
 
   def create_survey_monkey_survey
-    surveyMonkeyConnection.post('surveys', {"title":"#{name}"}.to_json)
+    response = surveyMonkeyConnection.post('surveys', {"title":"#{name}"}.to_json)
+    update(survey_monkey_id: response.body['id'])
   end
 
 end

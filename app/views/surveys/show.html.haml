@@ -5,6 +5,6 @@
   = @survey.name
 %p
   %b Survey monkey:
-  = @survey.survey_monkey_id
+  = link_to @survey.survey_monkey_id, "https://api.surveymonkey.com/v3/surveys/#{@survey.survey_monkey_id}"
 
 = link_to 'Edit', admin_edit_survey_path(@survey)
