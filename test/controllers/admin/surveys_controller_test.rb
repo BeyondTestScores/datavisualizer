@@ -28,6 +28,16 @@ class Admin::SurveysControllerTest < ActionDispatch::IntegrationTest
   end
 
   def test_create__requirements
+    survey_name = "New Survey"
+    stub_request(:post, "https://api.surveymonkey.com/v3/surveys").
+      with(
+        body: {"title": survey_name}.to_json,
+        headers: {
+          'Content-Type' => 'application/json',
+          'Authorization' => "bearer #{Rails.application.credentials.dig(:surveymonkey)[:access_token]}"
+        }
+      )
+
     survey_count = Survey.count
     post "/admin/questions", headers: authorized_headers
     assert_select "p", "Invalid Parameters"
@@ -44,7 +54,7 @@ class Admin::SurveysControllerTest < ActionDispatch::IntegrationTest
     survey = Survey.last
     post "/admin/surveys", headers: authorized_headers, params: {
       survey: {
-        name: "New Survey",
+        name: survey_name,
         question_ids: [Question.first.id, Question.last.id]
       }
     }

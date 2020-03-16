@@ -7,7 +7,7 @@ class Survey < ApplicationRecord
 
   after_create :create_survey_monkey_survey
 
-  after_commit :sync_with_survey_monkey
+  # after_commit :sync_with_survey_monkey
 
   def to_s
     name
