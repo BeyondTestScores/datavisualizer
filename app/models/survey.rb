@@ -62,15 +62,27 @@ class Survey < ApplicationRecord
   end
 
   def survey_monkey_details
+    return if survey_monkey_id.blank?
     surveyMonkeyConnection.get("surveys/#{survey_monkey_id}/details").body
   end
 
   def survey_monkey_pages
+    return if survey_monkey_id.blank?
     surveyMonkeyConnection.get("surveys/#{survey_monkey_id}/pages").body
   end
 
   def update_survey_monkey(updates)
+    return if survey_monkey_id.blank?
     surveyMonkeyConnection.patch("surveys/#{survey_monkey_id}", updates.to_json)
+  end
+
+  def create_survey_monkey_question(question)
+  end
+
+  def update_survey_monkey_question(question)
+  end
+
+  def remove_survey_monkey_question(question)
   end
 
   def sync_with_survey_monkey

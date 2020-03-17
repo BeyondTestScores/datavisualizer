@@ -14,4 +14,6 @@ class Question < ApplicationRecord
     text
   end
 
+  
+
 end
