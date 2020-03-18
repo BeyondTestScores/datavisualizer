@@ -10,10 +10,14 @@ class Question < ApplicationRecord
   validates :option4, presence: true, length: { minimum: 1 }
   validates :option5, presence: true, length: { minimum: 1 }
 
+  after_create :sync_surveys
+
   def to_s
     text
   end
 
-  
+  def sync_surveys
+    surveys.each { |survey| survey.update_survey_monkey_question(self) }
+  end
 
 end
