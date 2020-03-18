@@ -11,6 +11,18 @@ class Admin::SurveysControllerTest < ActionDispatch::IntegrationTest
     }
   end
 
+  def survey_monkey_mock(method: :get, url: "surveys", body: nil, response: {})
+    with = {headers: {
+      'Content-Type' => 'application/json',
+      'Authorization' => "bearer #{Rails.application.credentials.dig(:surveymonkey)[:access_token]}"
+    }}
+
+    with[:body] = body.to_json if body != nil
+
+    stub_request(method, "https://api.surveymonkey.com/v3/#{url}").with(with).
+      to_return(status: 200, body: response.to_json, headers: {'Content-Type'=>'application/json'})
+  end
+
   def test_authentication
     # get the admin page
     get "/admin/surveys/new"
@@ -30,32 +42,22 @@ class Admin::SurveysControllerTest < ActionDispatch::IntegrationTest
   def test_create__requirements
     survey_name = "New Survey"
     survey_monkey_id = "SURVEY_MONKEY_ID"
-    stub_request(:post, "https://api.surveymonkey.com/v3/surveys").
-      with(
-        body: {"title": survey_name}.to_json,
-        headers: {
-          'Content-Type' => 'application/json',
-          'Authorization' => "bearer #{Rails.application.credentials.dig(:surveymonkey)[:access_token]}"
-        }
-      ).
-      to_return(status: 200, body: {"title": survey_name, "id": survey_monkey_id}.to_json, headers: {'Content-Type'=>'application/json'})
 
-    stub_request(:get, "https://api.surveymonkey.com/v3/surveys/#{survey_monkey_id}/details").
-      with(
-        headers: {
-      	  'Authorization'=>"bearer #{Rails.application.credentials.dig(:surveymonkey)[:access_token]}",
-      	  'Content-Type'=>'application/json',
-        }).
-      to_return(status: 200, body: {'title': survey_name}.to_json, headers: {'Content-Type'=>'application/json'})
-
-    stub_request(:get, "https://api.surveymonkey.com/v3/surveys/#{survey_monkey_id}/pages").
-      with(
-        headers: {
-      	  'Authorization'=>"bearer #{Rails.application.credentials.dig(:surveymonkey)[:access_token]}",
-      	  'Content-Type'=>'application/json',
-    	  }).
-      to_return(status: 200, body: "", headers: {})
-
+    survey_monkey_mock(
+      method: :post,
+      url: "surveys",
+      body: {"title": survey_name},
+      response: {"title": survey_name, "id": survey_monkey_id}
+    )
+    survey_monkey_mock(
+      method: :get,
+      url: "surveys/#{survey_monkey_id}/details",
+      response: {'title': survey_name}
+    )
+    survey_monkey_mock(
+      method: :get,
+      url: "surveys/#{survey_monkey_id}/pages"
+    )
 
     survey_count = Survey.count
     post "/admin/questions", headers: authorized_headers
@@ -112,31 +114,22 @@ class Admin::SurveysControllerTest < ActionDispatch::IntegrationTest
     survey = surveys(:two)
     new_survey_name = "New Survey Name"
 
-    stub_request(:get, "https://api.surveymonkey.com/v3/surveys/#{survey.survey_monkey_id}/details").
-      with(
-        headers: {
-      	  'Authorization'=>"bearer #{Rails.application.credentials.dig(:surveymonkey)[:access_token]}",
-      	  'Content-Type'=>'application/json',
-        }).
-      to_return(status: 200, body: {title: new_survey_name}.to_json, headers: {'Content-Type'=>'application/json'})
+    survey_monkey_mock(
+      method: :get,
+      url: "surveys/#{survey.survey_monkey_id}/details",
+      response: {"title": new_survey_name}
+    )
 
-    stub_request(:get, "https://api.surveymonkey.com/v3/surveys/#{survey.survey_monkey_id}/pages").
-      with(
-        headers: {
-      	  'Authorization'=>"bearer #{Rails.application.credentials.dig(:surveymonkey)[:access_token]}",
-      	  'Content-Type'=>'application/json',
-        }).
-      to_return(status: 200, body: "", headers: {})
+    survey_monkey_mock(
+      method: :get,
+      url: "surveys/#{survey.survey_monkey_id}/pages"
+    )
 
-    stub_request(:patch, "https://api.surveymonkey.com/v3/surveys/#{survey.survey_monkey_id}").
-      with(
-        body: {"title": "New Survey Name"}.to_json,
-        headers: {
-    	  'Authorization'=>"bearer #{Rails.application.credentials.dig(:surveymonkey)[:access_token]}",
-    	  'Content-Type'=>'application/json',
-        }).
-      to_return(status: 200, body: "", headers: {})
-
+    survey_monkey_mock(
+      method: :patch,
+      url: "surveys/#{survey.survey_monkey_id}",
+      body: {"title": "New Survey Name"}
+    )
 
     patch admin_survey_url(survey), headers: authorized_headers, params: {
       survey: { name: new_survey_name, survey_monkey_id: survey.survey_monkey_id }
