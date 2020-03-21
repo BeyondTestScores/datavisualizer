@@ -46,7 +46,10 @@ class Admin::SurveysControllerTest < ActionDispatch::IntegrationTest
     survey_monkey_mock(
       method: :post,
       url: "surveys",
-      body: {"title": survey_name},
+      body: {
+        "title": survey_name,
+        "pages":[{"title":"Category Two","questions":[{"family":"single_choice","subtype":"vertical","answers":{"choices":[{"text":"Option 1","position":1},{"text":"Option 2","position":2},{"text":"Option 3","position":3},{"text":"Option 4","position":4},{"text":"Option 5","position":5}]},"headings":[{"heading":"Question two text?"}],"position":0}]},{"title":"Category One","questions":[{"family":"single_choice","subtype":"vertical","answers":{"choices":[{"text":"Option 1","position":1},{"text":"Option 2","position":2},{"text":"Option 3","position":3},{"text":"Option 4","position":4},{"text":"Option 5","position":5}]},"headings":[{"heading":"Question one text?"}],"position":1}]}]
+      },
       response: {"title": survey_name, "id": survey_monkey_id}
     )
     survey_monkey_mock(
@@ -54,10 +57,10 @@ class Admin::SurveysControllerTest < ActionDispatch::IntegrationTest
       url: "surveys/#{survey_monkey_id}/details",
       response: {'title': survey_name}
     )
-    survey_monkey_mock(
-      method: :get,
-      url: "surveys/#{survey_monkey_id}/pages"
-    )
+    # survey_monkey_mock(
+    #   method: :get,
+    #   url: "surveys/#{survey_monkey_id}/pages"
+    # )
 
     survey_count = Survey.count
     post "/admin/questions", headers: authorized_headers
@@ -90,13 +93,12 @@ class Admin::SurveysControllerTest < ActionDispatch::IntegrationTest
 
   def test_show
     survey = surveys(:two)
-    stub_request(:get, "https://api.surveymonkey.com/v3/surveys/#{survey.survey_monkey_id}/details").
-      with(
-        headers: {
-      	  'Authorization'=>"bearer #{Rails.application.credentials.dig(:surveymonkey)[:access_token]}",
-      	  'Content-Type'=>'application/json',
-        }).
-      to_return(status: 200, body: "", headers: {})
+
+    survey_monkey_mock(
+      method: :get,
+      url: "surveys/#{survey.survey_monkey_id}/details",
+      response: {'title': survey.name}
+    )
 
     get "/admin/surveys/#{survey.id}", headers: authorized_headers
 
