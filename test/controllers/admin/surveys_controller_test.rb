@@ -11,21 +11,6 @@ class Admin::SurveysControllerTest < ActionDispatch::IntegrationTest
     }
   end
 
-  def survey_monkey_mock(method: :get, url: "surveys", body: nil, responses: [])
-    with = {headers: {
-      'Content-Type' => 'application/json',
-      'Authorization' => "bearer #{Rails.application.credentials.dig(:surveymonkey)[:access_token]}"
-    }}
-
-    with[:body] = body.to_json if body != nil
-
-    stub = stub_request(method, "https://api.surveymonkey.com/v3/#{url}").with(with)
-
-    responses.each do |response|
-      stub.to_return(status: 200, body: response.to_json, headers: {'Content-Type'=>'application/json'}).then
-    end
-  end
-
   def test_authentication
     # get the admin page
     get "/admin/surveys/new"
