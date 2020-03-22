@@ -126,10 +126,21 @@ class Survey < ApplicationRecord
   end
 
   def update_survey_monkey_question(survey_question)
-    response = surveyMonkeyConnection.patch(
-      "surveys/#{survey_monkey_id}/pages/#{survey_question.survey_monkey_page_id}/questions/#{survey_question.survey_monkey_id}",
-      survey_question.question.survey_monkey_structure(1).to_json
-    )
+    page_id = survey_question.survey_monkey_page_id
+    question_id = survey_question.survey_monkey_id
+
+    if survey_question.question.category_id_previously_changed?
+      surveyMonkeyConnection.delete(
+        "surveys/#{survey_monkey_id}/pages/#{page_id}/questions/#{question_id}"
+      )
+
+      create_survey_monkey_question(survey_question)
+    else
+      surveyMonkeyConnection.patch(
+        "surveys/#{survey_monkey_id}/pages/#{page_id}/questions/#{question_id}",
+        survey_question.question.survey_monkey_structure(1).to_json
+      )
+    end
     sync_with_survey_monkey
   end
 

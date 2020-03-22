@@ -95,6 +95,43 @@ class Admin::QuestionsControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
+  def test_update
+    new_question_text = "New Question Text"
+    question = questions(:two)
+
+    question.text = new_question_text
+    question.survey_questions.each do |survey_question|
+      survey_monkey_id = survey_question.survey.survey_monkey_id
+      page_id = survey_question.survey_monkey_page_id
+      survey_monkey_question_id = survey_question.survey_monkey_id
+      survey_monkey_mock(
+        method: :patch,
+        url: "surveys/#{survey_monkey_id}/pages/#{page_id}/questions/#{survey_monkey_question_id}",
+        body: survey_question.question.survey_monkey_structure(1)
+      )
+
+      survey_monkey_mock(
+        method: :get,
+        url: "surveys/#{survey_monkey_id}/details",
+        responses: [{"title": survey_question.survey.name}]
+      )
+
+      survey_monkey_mock(
+        method: :get,
+        url: "surveys/#{survey_monkey_id}/pages",
+        responses: [{"data": [{"id": page_id}]}]
+      )
+    end
+
+    patch "/admin/questions/#{question.id}", headers: authorized_headers, params: {
+      question: {
+        text: new_question_text
+      }
+    }
+
+    assert_equal new_question_text, question.reload.text
+  end
+
   def test_update__updates_category
     new_question_text = "New Question Text"
     question = questions(:two)
@@ -109,8 +146,21 @@ class Admin::QuestionsControllerTest < ActionDispatch::IntegrationTest
       page_id = survey_question.survey_monkey_page_id
       survey_monkey_question_id = survey_question.survey_monkey_id
       survey_monkey_mock(
-        method: :patch,
-        url: "surveys/#{survey_monkey_id}/pages/#{page_id}/questions/#{survey_monkey_question_id}",
+        method: :delete,
+        url: "surveys/#{survey_monkey_id}/pages/#{page_id}/questions/#{survey_monkey_question_id}"
+      )
+
+      new_page_id = "NEW_PAGE_ID"
+      survey_monkey_mock(
+        method: :post,
+        url: "surveys/#{survey_monkey_id}/pages",
+        body: {"title": new_category.name},
+        responses: [{"id": new_page_id}]
+      )
+
+      survey_monkey_mock(
+        method: :post,
+        url: "surveys/#{survey_monkey_id}/pages/#{new_page_id}/questions",
         body: survey_question.question.survey_monkey_structure(1)
       )
 

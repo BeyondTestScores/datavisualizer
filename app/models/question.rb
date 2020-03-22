@@ -1,4 +1,6 @@
 class Question < ApplicationRecord
+  include ActiveModel::Dirty
+
   belongs_to :category
   has_many :survey_questions, dependent: :destroy
   has_many :surveys, through: :survey_questions, dependent: :destroy
@@ -54,7 +56,9 @@ class Question < ApplicationRecord
   end
 
   def sync_surveys
-    survey_questions.each { |survey_question| survey_question.survey.update_survey_monkey_question(survey_question) }
+    survey_questions.each do |survey_question|
+      survey_question.survey.update_survey_monkey_question(survey_question)
+    end
   end
 
 end
