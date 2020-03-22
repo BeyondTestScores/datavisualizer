@@ -10,7 +10,7 @@ class Question < ApplicationRecord
   validates :option4, presence: true, length: { minimum: 1 }
   validates :option5, presence: true, length: { minimum: 1 }
 
-  # after_commit :sync_surveys, on: :update
+  after_commit :sync_surveys, on: :update
 
   def to_s
     text
@@ -53,8 +53,8 @@ class Question < ApplicationRecord
     }
   end
 
-  # def sync_surveys
-  #   surveys.each { |survey| survey.update_survey_monkey_question(self) }
-  # end
+  def sync_surveys
+    survey_questions.each { |survey_question| survey_question.survey.update_survey_monkey_question(survey_question) }
+  end
 
 end

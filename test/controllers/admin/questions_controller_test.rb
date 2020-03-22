@@ -96,20 +96,46 @@ class Admin::QuestionsControllerTest < ActionDispatch::IntegrationTest
   end
 
   def test_update__updates_category
+    new_question_text = "New Question Text"
     question = questions(:two)
     new_category = categories(:three)
     question_count = new_category.questions.count
 
     assert question.category != new_category
 
+    question.text = new_question_text
+    question.survey_questions.each do |survey_question|
+      survey_monkey_id = survey_question.survey.survey_monkey_id
+      page_id = survey_question.survey_monkey_page_id
+      survey_monkey_question_id = survey_question.survey_monkey_id
+      survey_monkey_mock(
+        method: :patch,
+        url: "surveys/#{survey_monkey_id}/pages/#{page_id}/questions/#{survey_monkey_question_id}",
+        body: survey_question.question.survey_monkey_structure(1)
+      )
+
+      survey_monkey_mock(
+        method: :get,
+        url: "surveys/#{survey_monkey_id}/details",
+        responses: [{"title": survey_question.survey.name}]
+      )
+
+      survey_monkey_mock(
+        method: :get,
+        url: "surveys/#{survey_monkey_id}/pages",
+        responses: [{"data": [{"id": page_id}]}]
+      )
+    end
+
+
     patch "/admin/questions/#{question.id}", headers: authorized_headers, params: {
       question: {
-        text: "New Question Text",
+        text: new_question_text,
         category_id: new_category.id
       }
     }
 
-    assert_equal Question.find_by_text("New Question Text").category, new_category
+    assert_equal Question.find_by_text(new_question_text).category, new_category
     assert_equal question_count + 1, new_category.questions.count
   end
 

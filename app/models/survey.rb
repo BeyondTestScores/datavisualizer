@@ -126,6 +126,11 @@ class Survey < ApplicationRecord
   end
 
   def update_survey_monkey_question(survey_question)
+    response = surveyMonkeyConnection.patch(
+      "surveys/#{survey_monkey_id}/pages/#{survey_question.survey_monkey_page_id}/questions/#{survey_question.survey_monkey_id}",
+      survey_question.question.survey_monkey_structure(1).to_json
+    )
+    sync_with_survey_monkey
   end
 
   def remove_survey_monkey_question(survey_question)
