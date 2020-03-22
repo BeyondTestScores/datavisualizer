@@ -59,23 +59,23 @@ class Admin::SurveysControllerTest < ActionDispatch::IntegrationTest
       response: {'title': survey_name}
     )
 
-    page = "PAGE"
+    page_id = "PAGE"
     survey_monkey_mock(
       method: :get,
       url: "surveys/#{survey_monkey_id}/pages",
-      response: {"data": [{"id": page}]}
+      response: {"data": [{"id": page_id}]}
     )
 
     survey_monkey_mock(
       method: :post,
-      url: "surveys/#{survey_monkey_id}/pages/#{page}/questions",
-      body: {"family":"single_choice","subtype":"vertical","answers":{"choices":[{"text":"Option 1","position":1},{"text":"Option 2","position":2},{"text":"Option 3","position":3},{"text":"Option 4","position":4},{"text":"Option 5","position":5}]},"headings":[{"heading":"Question one text?"}],"position":1}
+      url: "surveys/#{survey_monkey_id}/pages/#{page_id}/questions",
+      body: questions(:one).survey_monkey_structure
     )
 
     survey_monkey_mock(
       method: :post,
-      url: "surveys/#{survey_monkey_id}/pages/#{page}/questions",
-      body: {"family":"single_choice","subtype":"vertical","answers":{"choices":[{"text":"Option 1","position":1},{"text":"Option 2","position":2},{"text":"Option 3","position":3},{"text":"Option 4","position":4},{"text":"Option 5","position":5}]},"headings":[{"heading":"Question two text?"}],"position":1}
+      url: "surveys/#{survey_monkey_id}/pages/#{page_id}/questions",
+      body: questions(:two).survey_monkey_structure
     )
 
     survey_count = Survey.count
@@ -152,6 +152,37 @@ class Admin::SurveysControllerTest < ActionDispatch::IntegrationTest
       survey: { name: new_survey_name, survey_monkey_id: survey.survey_monkey_id }
     }
     assert_redirected_to admin_survey_url(survey)
+  end
+
+  test "should update survey and add another question" do
+    survey = surveys(:one)
+    question = questions(:one)
+    question_count = survey.questions.count
+
+    survey_monkey_mock(
+      method: :get,
+      url: "surveys/#{survey.survey_monkey_id}/details",
+      response: {"title": survey.name}
+    )
+
+    page_id = "PAGE"
+    survey_monkey_mock(
+      method: :get,
+      url: "surveys/#{survey.survey_monkey_id}/pages",
+      response: {"data": [{"id": page_id}]}
+    )
+
+    survey_monkey_mock(
+      method: :post,
+      url: "surveys/#{survey.survey_monkey_id}/pages/#{page_id}/questions",
+      body: question.survey_monkey_structure
+    )
+
+    patch admin_survey_url(survey), headers: authorized_headers, params: {
+      survey: { question_ids: [question.id] }
+    }
+
+    assert_equal question_count + 1, survey.reload.questions.count
   end
 
   # test "should destroy survey" do

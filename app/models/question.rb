@@ -16,6 +16,43 @@ class Question < ApplicationRecord
     text
   end
 
+  def survey_monkey_structure(position=1)
+    {
+      "family": "single_choice",
+      "subtype": "vertical",
+      "answers": {
+        "choices": [
+          {
+            "text": option1,
+            "position": 1
+          },
+          {
+            "text": option2,
+            "position": 2
+          },
+          {
+            "text": option3,
+            "position": 3
+          },
+          {
+            "text": option4,
+            "position": 4
+          },
+          {
+            "text": option5,
+            "position": 5
+          }
+        ]
+      },
+      "headings": [
+        {
+          "heading": text
+        }
+      ],
+      "position": position
+    }
+  end
+
   # def sync_surveys
   #   surveys.each { |survey| survey.update_survey_monkey_question(self) }
   # end

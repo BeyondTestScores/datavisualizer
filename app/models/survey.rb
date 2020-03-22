@@ -55,48 +55,11 @@ class Survey < ApplicationRecord
     end
   end
 
-  def survey_monkey_question(question, position)
-    {
-      "family": "single_choice",
-      "subtype": "vertical",
-      "answers": {
-        "choices": [
-          {
-            "text": question.option1,
-            "position": 1
-          },
-          {
-            "text": question.option2,
-            "position": 2
-          },
-          {
-            "text": question.option3,
-            "position": 3
-          },
-          {
-            "text": question.option4,
-            "position": 4
-          },
-          {
-            "text": question.option5,
-            "position": 5
-          }
-        ]
-      },
-      "headings": [
-        {
-          "heading": question.text
-        }
-      ],
-      "position": position
-    }
-  end
-
   def survey_monkey_pages_structure
     pages = {}
     questions.each_with_index do |question, index|
       pages[question.category.name] ||= {title: question.category.name, questions: []}
-      pages[question.category.name][:questions] << survey_monkey_question(question)
+      pages[question.category.name][:questions] << question.survey_monkey_question(index)
     end
     return pages
   end
@@ -132,7 +95,7 @@ class Survey < ApplicationRecord
 
     response = surveyMonkeyConnection.post(
       "surveys/#{survey_monkey_id}/pages/#{page["id"]}/questions",
-      survey_monkey_question(question, 1).to_json
+      question.survey_monkey_structure(1).to_json
     )
   end
 
