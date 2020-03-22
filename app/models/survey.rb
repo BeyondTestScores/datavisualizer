@@ -55,44 +55,48 @@ class Survey < ApplicationRecord
     end
   end
 
+  def survey_monkey_question(question, position)
+    {
+      "family": "single_choice",
+      "subtype": "vertical",
+      "answers": {
+        "choices": [
+          {
+            "text": question.option1,
+            "position": 1
+          },
+          {
+            "text": question.option2,
+            "position": 2
+          },
+          {
+            "text": question.option3,
+            "position": 3
+          },
+          {
+            "text": question.option4,
+            "position": 4
+          },
+          {
+            "text": question.option5,
+            "position": 5
+          }
+        ]
+      },
+      "headings": [
+        {
+          "heading": question.text
+        }
+      ],
+      "position": position
+    }
+  end
+
   def survey_monkey_pages_structure
     pages = {}
     questions.each_with_index do |question, index|
       pages[question.category.name] ||= {title: question.category.name, questions: []}
-      pages[question.category.name][:questions] << {
-        "family": "single_choice",
-        "subtype": "vertical",
-        "answers": {
-          "choices": [
-            {
-              "text": question.option1,
-              "position": 1
-            },
-            {
-              "text": question.option2,
-              "position": 2
-            },
-            {
-              "text": question.option3,
-              "position": 3
-            },
-            {
-              "text": question.option4,
-              "position": 4
-            },
-            {
-              "text": question.option5,
-              "position": 5
-            }
-          ]
-        },
-        "headings": [
-          {
-            "heading": question.text
-          }
-        ],
-        "position": index
-      }
+      pages[question.category.name][:questions] << survey_monkey_question(question)
     end
     return pages
   end
@@ -101,8 +105,8 @@ class Survey < ApplicationRecord
     return if survey_monkey_id.present?
 
     response = surveyMonkeyConnection.post('surveys', {
-      "title":"#{name}",
-      "pages": survey_monkey_pages_structure.values
+      "title":"#{name}"#,
+      #"pages": survey_monkey_pages_structure.values
     }.to_json)
 
     update(survey_monkey_id: response.body['id'])
@@ -115,7 +119,7 @@ class Survey < ApplicationRecord
 
   def survey_monkey_pages
     return if survey_monkey_id.blank?
-    surveyMonkeyConnection.get("surveys/#{survey_monkey_id}/pages").body
+    surveyMonkeyConnection.get("surveys/#{survey_monkey_id}/pages").body["data"]
   end
 
   def update_survey_monkey(updates)
@@ -123,16 +127,20 @@ class Survey < ApplicationRecord
     surveyMonkeyConnection.patch("surveys/#{survey_monkey_id}", updates.to_json)
   end
 
-  # def create_survey_monkey_question(question)
-  #   pages = survey_monkey_pages
-  #   response = surveyMonkeyConnection.post("surveys/#{survey_monkey_id}")
-  # end
-  #
-  # def update_survey_monkey_question(question)
-  # end
-  #
-  # def remove_survey_monkey_question(question)
-  # end
+  def create_survey_monkey_question(question)
+    page = survey_monkey_pages.first
+
+    response = surveyMonkeyConnection.post(
+      "surveys/#{survey_monkey_id}/pages/#{page["id"]}/questions",
+      survey_monkey_question(question, 1).to_json
+    )
+  end
+
+  def update_survey_monkey_question(question)
+  end
+
+  def remove_survey_monkey_question(question)
+  end
 
   def sync_with_survey_monkey
     details = survey_monkey_details

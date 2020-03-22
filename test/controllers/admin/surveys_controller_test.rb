@@ -40,27 +40,43 @@ class Admin::SurveysControllerTest < ActionDispatch::IntegrationTest
   end
 
   def test_create__requirements
-    survey_name = "New Survey"
+    survey_name = "New Survey For Test"
     survey_monkey_id = "SURVEY_MONKEY_ID"
 
     survey_monkey_mock(
       method: :post,
       url: "surveys",
       body: {
-        "title": survey_name,
-        "pages":[{"title":"Category Two","questions":[{"family":"single_choice","subtype":"vertical","answers":{"choices":[{"text":"Option 1","position":1},{"text":"Option 2","position":2},{"text":"Option 3","position":3},{"text":"Option 4","position":4},{"text":"Option 5","position":5}]},"headings":[{"heading":"Question two text?"}],"position":0}]},{"title":"Category One","questions":[{"family":"single_choice","subtype":"vertical","answers":{"choices":[{"text":"Option 1","position":1},{"text":"Option 2","position":2},{"text":"Option 3","position":3},{"text":"Option 4","position":4},{"text":"Option 5","position":5}]},"headings":[{"heading":"Question one text?"}],"position":1}]}]
+        "title": survey_name#,
+        #{}"pages":[{"title":"Category Two","questions":[{"family":"single_choice","subtype":"vertical","answers":{"choices":[{"text":"Option 1","position":1},{"text":"Option 2","position":2},{"text":"Option 3","position":3},{"text":"Option 4","position":4},{"text":"Option 5","position":5}]},"headings":[{"heading":"Question two text?"}],"position":0}]},{"title":"Category One","questions":[{"family":"single_choice","subtype":"vertical","answers":{"choices":[{"text":"Option 1","position":1},{"text":"Option 2","position":2},{"text":"Option 3","position":3},{"text":"Option 4","position":4},{"text":"Option 5","position":5}]},"headings":[{"heading":"Question one text?"}],"position":1}]}]
       },
       response: {"title": survey_name, "id": survey_monkey_id}
     )
+
     survey_monkey_mock(
       method: :get,
       url: "surveys/#{survey_monkey_id}/details",
       response: {'title': survey_name}
     )
-    # survey_monkey_mock(
-    #   method: :get,
-    #   url: "surveys/#{survey_monkey_id}/pages"
-    # )
+
+    page = "PAGE"
+    survey_monkey_mock(
+      method: :get,
+      url: "surveys/#{survey_monkey_id}/pages",
+      response: {"data": [{"id": page}]}
+    )
+
+    survey_monkey_mock(
+      method: :post,
+      url: "surveys/#{survey_monkey_id}/pages/#{page}/questions",
+      body: {"family":"single_choice","subtype":"vertical","answers":{"choices":[{"text":"Option 1","position":1},{"text":"Option 2","position":2},{"text":"Option 3","position":3},{"text":"Option 4","position":4},{"text":"Option 5","position":5}]},"headings":[{"heading":"Question one text?"}],"position":1}
+    )
+
+    survey_monkey_mock(
+      method: :post,
+      url: "surveys/#{survey_monkey_id}/pages/#{page}/questions",
+      body: {"family":"single_choice","subtype":"vertical","answers":{"choices":[{"text":"Option 1","position":1},{"text":"Option 2","position":2},{"text":"Option 3","position":3},{"text":"Option 4","position":4},{"text":"Option 5","position":5}]},"headings":[{"heading":"Question two text?"}],"position":1}
+    )
 
     survey_count = Survey.count
     post "/admin/questions", headers: authorized_headers
@@ -86,9 +102,8 @@ class Admin::SurveysControllerTest < ActionDispatch::IntegrationTest
     assert_equal 302, status
     follow_redirect!
 
-    survey = Survey.last
+    survey = Survey.find_by_name(survey_name)
     assert_equal "/admin/surveys/#{survey.id}", path
-    assert_equal 2, survey.questions.count
   end
 
   def test_show
