@@ -7,7 +7,9 @@ class Survey < ApplicationRecord
 
   after_create :create_survey_monkey_survey
 
-  after_commit :sync_with_survey_monkey
+  after_commit :sync_with_survey_monkey, except: :on_destroy
+
+  before_destroy :delete_survey_monkey_survey
 
   def to_s
     name
@@ -73,6 +75,11 @@ class Survey < ApplicationRecord
     }.to_json)
 
     update(survey_monkey_id: response.body['id'])
+  end
+
+  def delete_survey_monkey_survey
+    return if survey_monkey_id.blank?
+    surveyMonkeyConnection.delete("surveys/#{survey_monkey_id}")
   end
 
   def survey_monkey_details
