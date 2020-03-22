@@ -59,23 +59,49 @@ class Admin::SurveysControllerTest < ActionDispatch::IntegrationTest
       response: {'title': survey_name}
     )
 
-    page_id = "PAGE"
+    question1 = questions(:one)
+    question1_id = "ID_FOR_QUESTION_#{question1.id}"
+
+    question2 = questions(:two)
+    question2_id = "ID_FOR_QUESTION_#{question2.id}"
+
+    page1_id = "PAGE_FOR_CATEGORY_#{question1.category.id}"
+    page2_id = "PAGE_FOR_CATEGORY_#{question2.category.id}"
     survey_monkey_mock(
       method: :get,
       url: "surveys/#{survey_monkey_id}/pages",
-      response: {"data": [{"id": page_id}]}
+      response: {"data": [
+        {"id": page1_id, "title": question1.category.name},
+        {"id": page2_id, "title": question2.category.name},
+      ]}
+    )
+
+    survey_monkey_mock(
+      method: :get,
+      url: "surveys/#{survey_monkey_id}/pages",
+      body: {"title": question1.category.name},
+      response: {"id": page1_id}
+    )
+
+    survey_monkey_mock(
+      method: :get,
+      url: "surveys/#{survey_monkey_id}/pages",
+      body: {"title": question2.category.name},
+      response: {"id": page2_id}
     )
 
     survey_monkey_mock(
       method: :post,
-      url: "surveys/#{survey_monkey_id}/pages/#{page_id}/questions",
-      body: questions(:one).survey_monkey_structure
+      url: "surveys/#{survey_monkey_id}/pages/#{page1_id}/questions",
+      body: question1.survey_monkey_structure,
+      response: {"id": question1_id}
     )
 
     survey_monkey_mock(
       method: :post,
-      url: "surveys/#{survey_monkey_id}/pages/#{page_id}/questions",
-      body: questions(:two).survey_monkey_structure
+      url: "surveys/#{survey_monkey_id}/pages/#{page2_id}/questions",
+      body: question2.survey_monkey_structure,
+      response: {"id": question2_id}
     )
 
     survey_count = Survey.count
@@ -104,6 +130,12 @@ class Admin::SurveysControllerTest < ActionDispatch::IntegrationTest
 
     survey = Survey.find_by_name(survey_name)
     assert_equal "/admin/surveys/#{survey.id}", path
+
+    assert_equal 2, survey.survey_questions.count
+    survey.survey_questions.each do |sq|
+      assert_not_empty sq.survey_monkey_id
+      assert_not_empty sq.survey_monkey_page_id
+    end
   end
 
   def test_show
@@ -154,8 +186,42 @@ class Admin::SurveysControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to admin_survey_url(survey)
   end
 
-  test "should update survey and add another question" do
+  test "updating survey to add another question" do
     survey = surveys(:one)
+    question = questions(:one)
+    question_count = survey.questions.count
+
+    survey_monkey_mock(
+      method: :get,
+      url: "surveys/#{survey.survey_monkey_id}/details",
+      response: {"title": survey.name}
+    )
+
+    question_id = "ID_FOR_QUESTION_#{question.id}"
+    page_id = "PAGE_FOR_CATEGORY_#{question.category.id}"
+    survey_monkey_mock(
+      method: :get,
+      url: "surveys/#{survey.survey_monkey_id}/pages",
+      response: {"data": [
+        {"id": page_id, "title": question.category.name}
+      ]}
+    )
+
+    survey_monkey_mock(
+      method: :post,
+      url: "surveys/#{survey.survey_monkey_id}/pages/#{page_id}/questions",
+      body: question.survey_monkey_structure
+    )
+
+    patch admin_survey_url(survey), headers: authorized_headers, params: {
+      survey: { question_ids: [question.id] }
+    }
+
+    assert_equal question_count + 1, survey.reload.questions.count
+  end
+
+  test "updating survey to remove a question" do
+    survey = surveys(:two)
     question = questions(:one)
     question_count = survey.questions.count
 
@@ -172,17 +238,17 @@ class Admin::SurveysControllerTest < ActionDispatch::IntegrationTest
       response: {"data": [{"id": page_id}]}
     )
 
-    survey_monkey_mock(
-      method: :post,
-      url: "surveys/#{survey.survey_monkey_id}/pages/#{page_id}/questions",
-      body: question.survey_monkey_structure
-    )
+    # survey_monkey_mock(
+    #   method: :post,
+    #   url: "surveys/#{survey.survey_monkey_id}/pages/#{page_id}/questions",
+    #   body: question.survey_monkey_structure
+    # )
 
     patch admin_survey_url(survey), headers: authorized_headers, params: {
       survey: { question_ids: [question.id] }
     }
 
-    assert_equal question_count + 1, survey.reload.questions.count
+    assert_equal question_count - 1, survey.reload.questions.count
   end
 
   # test "should destroy survey" do

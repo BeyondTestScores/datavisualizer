@@ -10,6 +10,8 @@ class CreateSurveys < ActiveRecord::Migration[6.0]
     create_table :survey_questions do |t|
       t.belongs_to :survey, null: false, foreign_key: true
       t.belongs_to :question, null: false, foreign_key: true
+      t.string :survey_monkey_page_id
+      t.string :survey_monkey_id
 
       t.timestamps
     end

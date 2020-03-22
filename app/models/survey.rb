@@ -90,19 +90,32 @@ class Survey < ApplicationRecord
     surveyMonkeyConnection.patch("surveys/#{survey_monkey_id}", updates.to_json)
   end
 
-  def create_survey_monkey_question(question)
-    page = survey_monkey_pages.first
+  def create_survey_monkey_question(survey_question)
+    page_title = survey_question.question.category.name
+    page = survey_monkey_pages.find do |p|
+      p['title'] == page_title
+    end
+
+    if page.nil?
+      page = surveyMonkeyConnection.post(
+        "surveys/#{survey_monkey_id}/pages",
+        {title: page_title}.to_json
+      ).body
+    end
 
     response = surveyMonkeyConnection.post(
       "surveys/#{survey_monkey_id}/pages/#{page["id"]}/questions",
-      question.survey_monkey_structure(1).to_json
+      survey_question.question.survey_monkey_structure(1).to_json
     )
+
+    survey_question.update(survey_monkey_id: response.body['id'], survey_monkey_page_id: page["id"])
   end
 
-  def update_survey_monkey_question(question)
+  def update_survey_monkey_question(survey_question)
   end
 
-  def remove_survey_monkey_question(question)
+  def remove_survey_monkey_question(survey_question)
+
   end
 
   def sync_with_survey_monkey

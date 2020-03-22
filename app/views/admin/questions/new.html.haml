@@ -1,5 +1,7 @@
-%h2 New Question
-
+%h2
+  New Question
+  - if @question.category.present?
+    = " for Category \"#{@question.category.name}\""
 %br
 
 %div= render 'form'
