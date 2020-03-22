@@ -11,7 +11,7 @@ class Admin::SurveysControllerTest < ActionDispatch::IntegrationTest
     }
   end
 
-  def survey_monkey_mock(method: :get, url: "surveys", body: nil, response: {})
+  def survey_monkey_mock(method: :get, url: "surveys", body: nil, responses: [])
     with = {headers: {
       'Content-Type' => 'application/json',
       'Authorization' => "bearer #{Rails.application.credentials.dig(:surveymonkey)[:access_token]}"
@@ -19,8 +19,11 @@ class Admin::SurveysControllerTest < ActionDispatch::IntegrationTest
 
     with[:body] = body.to_json if body != nil
 
-    stub_request(method, "https://api.surveymonkey.com/v3/#{url}").with(with).
-      to_return(status: 200, body: response.to_json, headers: {'Content-Type'=>'application/json'})
+    stub = stub_request(method, "https://api.surveymonkey.com/v3/#{url}").with(with)
+
+    responses.each do |response|
+      stub.to_return(status: 200, body: response.to_json, headers: {'Content-Type'=>'application/json'}).then
+    end
   end
 
   def test_authentication
@@ -46,62 +49,68 @@ class Admin::SurveysControllerTest < ActionDispatch::IntegrationTest
     survey_monkey_mock(
       method: :post,
       url: "surveys",
-      body: {
-        "title": survey_name#,
-        #{}"pages":[{"title":"Category Two","questions":[{"family":"single_choice","subtype":"vertical","answers":{"choices":[{"text":"Option 1","position":1},{"text":"Option 2","position":2},{"text":"Option 3","position":3},{"text":"Option 4","position":4},{"text":"Option 5","position":5}]},"headings":[{"heading":"Question two text?"}],"position":0}]},{"title":"Category One","questions":[{"family":"single_choice","subtype":"vertical","answers":{"choices":[{"text":"Option 1","position":1},{"text":"Option 2","position":2},{"text":"Option 3","position":3},{"text":"Option 4","position":4},{"text":"Option 5","position":5}]},"headings":[{"heading":"Question one text?"}],"position":1}]}]
-      },
-      response: {"title": survey_name, "id": survey_monkey_id}
+      body: {"title": survey_name},
+      responses: [{"title": survey_name, "id": survey_monkey_id}]
     )
 
     survey_monkey_mock(
       method: :get,
       url: "surveys/#{survey_monkey_id}/details",
-      response: {'title': survey_name}
+      responses: [{'title': survey_name}]
     )
 
     question1 = questions(:one)
-    question1_id = "ID_FOR_QUESTION_#{question1.id}"
+    question1_id = "ID_FOR_QUESTION1_#{question1.id}"
 
     question2 = questions(:two)
-    question2_id = "ID_FOR_QUESTION_#{question2.id}"
+    question2_id = "ID_FOR_QUESTION2_#{question2.id}"
 
-    page1_id = "PAGE_FOR_CATEGORY_#{question1.category.id}"
-    page2_id = "PAGE_FOR_CATEGORY_#{question2.category.id}"
+    default_page = "DEFAULT_PAGE" #survey monkey creates a page by default
+    page1_id = "PAGE_FOR_CATEGORY1_#{question1.category.id}"
+    page2_id = "PAGE_FOR_CATEGORY2_#{question2.category.id}"
     survey_monkey_mock(
       method: :get,
       url: "surveys/#{survey_monkey_id}/pages",
-      response: {"data": [
-        {"id": page1_id, "title": question1.category.name},
-        {"id": page2_id, "title": question2.category.name},
-      ]}
+      responses: [
+          {"data": [{"id": default_page}]},
+          {"data": [{"id": default_page}]},
+          {"data": [{"id": default_page}, {"id": page2_id}]},
+          {"data": [{"id": page2_id}]},
+          {"data": [{"id": page1_id}, {"id": page2_id}]}
+      ]
     )
 
     survey_monkey_mock(
-      method: :get,
+      method: :post,
       url: "surveys/#{survey_monkey_id}/pages",
       body: {"title": question1.category.name},
-      response: {"id": page1_id}
+      responses: [{"id": page1_id}]
     )
 
     survey_monkey_mock(
-      method: :get,
+      method: :post,
       url: "surveys/#{survey_monkey_id}/pages",
       body: {"title": question2.category.name},
-      response: {"id": page2_id}
+      responses: [{"id": page2_id}]
     )
 
     survey_monkey_mock(
       method: :post,
       url: "surveys/#{survey_monkey_id}/pages/#{page1_id}/questions",
       body: question1.survey_monkey_structure,
-      response: {"id": question1_id}
+      responses: [{"id": question1_id}]
     )
 
     survey_monkey_mock(
       method: :post,
       url: "surveys/#{survey_monkey_id}/pages/#{page2_id}/questions",
       body: question2.survey_monkey_structure,
-      response: {"id": question2_id}
+      responses: [{"id": question2_id}]
+    )
+
+    survey_monkey_mock(
+      method: :delete,
+      url: "surveys/#{survey_monkey_id}/pages/#{default_page}"
     )
 
     survey_count = Survey.count
@@ -144,7 +153,7 @@ class Admin::SurveysControllerTest < ActionDispatch::IntegrationTest
     survey_monkey_mock(
       method: :get,
       url: "surveys/#{survey.survey_monkey_id}/details",
-      response: {'title': survey.name}
+      responses: [{'title': survey.name}]
     )
 
     get "/admin/surveys/#{survey.id}", headers: authorized_headers
@@ -166,12 +175,13 @@ class Admin::SurveysControllerTest < ActionDispatch::IntegrationTest
     survey_monkey_mock(
       method: :get,
       url: "surveys/#{survey.survey_monkey_id}/details",
-      response: {"title": new_survey_name}
+      responses: [{"title": new_survey_name}]
     )
 
     survey_monkey_mock(
       method: :get,
-      url: "surveys/#{survey.survey_monkey_id}/pages"
+      url: "surveys/#{survey.survey_monkey_id}/pages",
+      responses: [{"data": [{"id": "PAGE"}]}]
     )
 
     survey_monkey_mock(
@@ -194,7 +204,7 @@ class Admin::SurveysControllerTest < ActionDispatch::IntegrationTest
     survey_monkey_mock(
       method: :get,
       url: "surveys/#{survey.survey_monkey_id}/details",
-      response: {"title": survey.name}
+      responses: [{"title": survey.name}]
     )
 
     question_id = "ID_FOR_QUESTION_#{question.id}"
@@ -202,9 +212,9 @@ class Admin::SurveysControllerTest < ActionDispatch::IntegrationTest
     survey_monkey_mock(
       method: :get,
       url: "surveys/#{survey.survey_monkey_id}/pages",
-      response: {"data": [
+      responses: [{"data": [
         {"id": page_id, "title": question.category.name}
-      ]}
+      ]}]
     )
 
     survey_monkey_mock(
@@ -231,13 +241,13 @@ class Admin::SurveysControllerTest < ActionDispatch::IntegrationTest
     survey_monkey_mock(
       method: :get,
       url: "surveys/#{survey.survey_monkey_id}/details",
-      response: {"title": survey.name}
+      responses: [{"title": survey.name}]
     )
 
     survey_monkey_mock(
       method: :get,
       url: "surveys/#{survey.survey_monkey_id}/pages",
-      response: {"data": [{"id": survey_question.survey_monkey_page_id}]}
+      responses: [{"data": [{"id": survey_question.survey_monkey_page_id}]}]
     )
 
     survey_monkey_mock(

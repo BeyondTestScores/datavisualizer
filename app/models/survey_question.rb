@@ -7,6 +7,7 @@ class SurveyQuestion < ApplicationRecord
   before_destroy :destroy_survey_monkey
 
   scope :for, -> (question) { where(question: question) }
+  scope :on_page, -> (page_id) { where(survey_monkey_page_id: page_id) }
 
   def create_survey_monkey
     survey.create_survey_monkey_question(self)

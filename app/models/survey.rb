@@ -85,6 +85,11 @@ class Survey < ApplicationRecord
     surveyMonkeyConnection.get("surveys/#{survey_monkey_id}/pages").body["data"]
   end
 
+  def remove_survey_monkey_page(page_id)
+    return {} if survey_monkey_id.blank?
+    surveyMonkeyConnection.delete("surveys/#{survey_monkey_id}/pages/#{page_id}")
+  end
+
   def update_survey_monkey(updates)
     return {} if survey_monkey_id.blank?
     surveyMonkeyConnection.patch("surveys/#{survey_monkey_id}", updates.to_json)
@@ -109,6 +114,7 @@ class Survey < ApplicationRecord
     )
 
     survey_question.update(survey_monkey_id: response.body['id'], survey_monkey_page_id: page["id"])
+    sync_with_survey_monkey
   end
 
   def update_survey_monkey_question(survey_question)
@@ -118,15 +124,25 @@ class Survey < ApplicationRecord
     response = surveyMonkeyConnection.delete(
       "surveys/#{survey_monkey_id}/pages/#{survey_question.survey_monkey_page_id}/questions/#{survey_question.survey_monkey_id}"
     )
+    sync_with_survey_monkey
   end
 
   def sync_with_survey_monkey
     details = survey_monkey_details
-    # pages = survey_monkey_pages
+    pages = survey_monkey_pages
     if name != details['title']
       update_survey_monkey({
         "title": name
       })
+    end
+
+    page_count = pages.length
+    pages.each do |page|
+      next if SurveyQuestion.on_page(page["id"]).present?
+      if page_count > 1 #need at least one page on survey monkey
+        remove_survey_monkey_page(page["id"])
+        page_count -= 1
+      end
     end
   end
 
