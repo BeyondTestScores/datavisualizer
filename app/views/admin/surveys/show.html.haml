@@ -1,7 +1,13 @@
 %h2= @survey.name
 
 %br
-%p= link_to "Survey Monkey", @survey.survey_monkey_details['summary_url'], target: '_blank'
+%p
+  - if (survey_monkey_details = @survey.survey_monkey_details).present?
+    = link_to "Survey Monkey", survey_monkey_details['summary_url'], target: '_blank'
+  - else
+    Survey Monkey Error
+
+
 
 %p
   = link_to("Edit Survey", edit_admin_survey_path(@survey))

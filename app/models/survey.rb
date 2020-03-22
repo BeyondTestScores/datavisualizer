@@ -1,6 +1,6 @@
 class Survey < ApplicationRecord
 
-  has_many :survey_questions
+  has_many :survey_questions, dependent: :destroy
   has_many :questions, through: :survey_questions
 
   validates :name, presence: true, length: { minimum: 1 }
@@ -76,17 +76,17 @@ class Survey < ApplicationRecord
   end
 
   def survey_monkey_details
-    return if survey_monkey_id.blank?
+    return {} if survey_monkey_id.blank?
     surveyMonkeyConnection.get("surveys/#{survey_monkey_id}/details").body
   end
 
   def survey_monkey_pages
-    return if survey_monkey_id.blank?
+    return {} if survey_monkey_id.blank?
     surveyMonkeyConnection.get("surveys/#{survey_monkey_id}/pages").body["data"]
   end
 
   def update_survey_monkey(updates)
-    return if survey_monkey_id.blank?
+    return {} if survey_monkey_id.blank?
     surveyMonkeyConnection.patch("surveys/#{survey_monkey_id}", updates.to_json)
   end
 

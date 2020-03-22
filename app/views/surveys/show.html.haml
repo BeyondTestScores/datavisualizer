@@ -5,6 +5,9 @@
   = @survey.name
 %p
   %b Survey monkey:
-  = link_to @survey.survey_monkey_id, @survey.survey_monkey_details[:summary_url], target: '_blank'
+  - if (suvey_monkey_details = @survey.survey_monkey_details).present?
+    = link_to @survey.survey_monkey_id, survey_monkey_details[:summary_url], target: '_blank'
+  - else
+    Survey Monkey Error
 
 = link_to 'Edit', admin_edit_survey_path(@survey)
