@@ -1,7 +1,7 @@
 class Survey < ApplicationRecord
 
   has_many :survey_questions, dependent: :destroy
-  has_many :questions, through: :survey_questions
+  has_many :questions, through: :survey_questions, dependent: :destroy
 
   validates :name, presence: true, length: { minimum: 1 }
 
@@ -115,7 +115,9 @@ class Survey < ApplicationRecord
   end
 
   def remove_survey_monkey_question(survey_question)
-
+    response = surveyMonkeyConnection.delete(
+      "surveys/#{survey_monkey_id}/pages/#{survey_question.survey_monkey_page_id}/questions/#{survey_question.survey_monkey_id}"
+    )
   end
 
   def sync_with_survey_monkey

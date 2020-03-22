@@ -4,7 +4,9 @@ class SurveyQuestion < ApplicationRecord
   belongs_to :question
 
   after_commit :create_survey_monkey, on: :create
-  after_commit :destroy_survey_monkey, on: :destroy
+  before_destroy :destroy_survey_monkey
+
+  scope :for, -> (question) { where(question: question) }
 
   def create_survey_monkey
     survey.create_survey_monkey_question(self)

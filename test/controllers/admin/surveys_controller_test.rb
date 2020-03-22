@@ -223,7 +223,10 @@ class Admin::SurveysControllerTest < ActionDispatch::IntegrationTest
   test "updating survey to remove a question" do
     survey = surveys(:two)
     question = questions(:one)
+    deleting_question = questions(:two)
+    survey_question = survey.survey_questions.for(deleting_question).first
     question_count = survey.questions.count
+    survey_question_count = SurveyQuestion.count
 
     survey_monkey_mock(
       method: :get,
@@ -231,24 +234,23 @@ class Admin::SurveysControllerTest < ActionDispatch::IntegrationTest
       response: {"title": survey.name}
     )
 
-    page_id = "PAGE"
     survey_monkey_mock(
       method: :get,
       url: "surveys/#{survey.survey_monkey_id}/pages",
-      response: {"data": [{"id": page_id}]}
+      response: {"data": [{"id": survey_question.survey_monkey_page_id}]}
     )
 
-    # survey_monkey_mock(
-    #   method: :post,
-    #   url: "surveys/#{survey.survey_monkey_id}/pages/#{page_id}/questions",
-    #   body: question.survey_monkey_structure
-    # )
+    survey_monkey_mock(
+      method: :delete,
+      url: "surveys/#{survey.survey_monkey_id}/pages/#{survey_question.survey_monkey_page_id}/questions/#{survey_question.survey_monkey_id}"
+    )
 
     patch admin_survey_url(survey), headers: authorized_headers, params: {
       survey: { question_ids: [question.id] }
     }
 
     assert_equal question_count - 1, survey.reload.questions.count
+    assert_equal survey_question_count - 1, SurveyQuestion.count
   end
 
   # test "should destroy survey" do

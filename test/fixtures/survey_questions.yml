@@ -3,7 +3,11 @@
 one:
   survey: two
   question: one
+  survey_monkey_id: 'QUESTION_TWO_SURVEY_ONE_SURVEY_MONKEY'
+  survey_monkey_page_id: 'PAGE_TWO_SURVEY_ONE_SURVEY_MONKEY'
 
 two:
   survey: two
   question: two
+  survey_monkey_id: 'QUESTION_TWO_SURVEY_TWO_SURVEY_MONKEY'
+  survey_monkey_page_id: 'PAGE_TWO_SURVEY_TWO_SURVEY_MONKEY'
