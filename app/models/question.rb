@@ -10,7 +10,7 @@ class Question < ApplicationRecord
   validates :option4, presence: true, length: { minimum: 1 }
   validates :option5, presence: true, length: { minimum: 1 }
 
-  # after_commit :sync_surveys
+  # after_commit :sync_surveys, on: :update
 
   def to_s
     text

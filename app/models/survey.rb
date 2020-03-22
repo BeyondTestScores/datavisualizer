@@ -7,7 +7,8 @@ class Survey < ApplicationRecord
 
   after_create :create_survey_monkey_survey
 
-  after_commit :sync_with_survey_monkey, except: :on_destroy
+  after_commit :sync_with_survey_monkey, on: :create
+  after_commit :sync_with_survey_monkey, on: :update
 
   before_destroy :delete_survey_monkey_survey
 
