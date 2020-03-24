@@ -160,33 +160,31 @@ class Survey < ApplicationRecord
       })
     end
 
-    # sm_pages = details['pages'] || []
-    # sm_page_count = pages.length
-    # sm_pages.each do |sm_page|
-    #   sm_questions = sm_page['questions']
-    #   survey_questions = survey_questions.for_page(sm_page['id']).joins(:question)
-    #   sm_questions.each do |sm_question|
-    #     survey_question = survey_questions.find do |sq|
-    #       sq.question.text == sm_question["headings"].first['heading']
-    #     end
-    #
-    #     if survey_question.nil?
-    #       surveyMonkeyConnection.delete(
-    #         "surveys/#{details['id']}/pages/#{sm_page['id']}/questions/#{sm_question['id']}"
-    #       )
-    #     else
-    #       survey_question.update(survey_monkey_id: sm_question['id'], survey_monkey_page_id: sm_page['id'])
-    #     end
-    #
-    #
-    #
-    #
-    #   next if SurveyQuestion.on_page(page["id"]).present?
-    #   if page_count > 1 #need at least one page on survey monkey
-    #     remove_survey_monkey_page(page["id"])
-    #     page_count -= 1
-    #   end
-    # end
+    sm_pages = details['pages'] || []
+    sm_page_count = sm_pages.length
+    sm_pages.each do |sm_page|
+      sm_questions = sm_page['questions']
+      on_page_sq = survey_questions.on_page(sm_page['id']).joins(:question)
+      sm_questions.each do |sm_question|
+        survey_question = on_page_sq.find do |sq|
+          sq.question.text == sm_question["headings"].first['heading']
+        end
+        
+        if survey_question.nil?
+          surveyMonkeyConnection.delete(
+            "surveys/#{details['id']}/pages/#{sm_page['id']}/questions/#{sm_question['id']}"
+          )
+        else
+          survey_question.update(survey_monkey_id: sm_question['id'], survey_monkey_page_id: sm_page['id'])
+        end
+      end
+
+      # next if SurveyQuestion.on_page(page["id"]).present?
+      # if page_count > 1 #need at least one page on survey monkey
+      #   remove_survey_monkey_page(page["id"])
+      #   page_count -= 1
+      # end
+    end
   end
 
 end

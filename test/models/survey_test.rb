@@ -50,6 +50,8 @@ class SurveyTest < ActiveSupport::TestCase
       responses: [details(survey: survey, survey_questions: [survey_questions(:two)])]
     )
 
+    assert false #THERE SHOULD BE A DELETE CALL TO SURVEY MONKEY HERE
+
     survey.sync_with_survey_monkey
   end
 
