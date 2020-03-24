@@ -169,7 +169,7 @@ class Survey < ApplicationRecord
         survey_question = on_page_sq.find do |sq|
           sq.question.text == sm_question["headings"].first['heading']
         end
-        
+
         if survey_question.nil?
           surveyMonkeyConnection.delete(
             "surveys/#{details['id']}/pages/#{sm_page['id']}/questions/#{sm_question['id']}"

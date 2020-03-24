@@ -42,22 +42,26 @@ class SurveyTest < ActiveSupport::TestCase
 
   test "survey monkey sync -- delete question" do
     survey = surveys(:two)
-    survey_questions(:one).delete
+    deleted = survey_questions(:one)
+    deleted.delete
 
     survey_monkey_mock(
       method: :get,
       url: "surveys/#{survey.survey_monkey_id}/details",
-      responses: [details(survey: survey, survey_questions: [survey_questions(:two)])]
+      responses: [details(survey: survey, survey_questions: [deleted, survey_questions(:two)])]
     )
 
-    assert false #THERE SHOULD BE A DELETE CALL TO SURVEY MONKEY HERE
+    survey_monkey_mock(
+      method: :delete,
+      url: "surveys/#{survey.survey_monkey_id}/pages/#{deleted.survey_monkey_page_id}/questions/#{deleted.survey_monkey_id}"
+    )
 
     survey.sync_with_survey_monkey
   end
 
   def details(survey: nil, survey_questions: [], default_page: false)
     return {} if survey.nil?
-    result = {"title": survey.name}
+    result = {"id": survey.survey_monkey_id, "title": survey.name}
 
     pages = []
     if default_page || survey_questions.empty?
