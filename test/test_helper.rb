@@ -14,7 +14,7 @@ class ActiveSupport::TestCase
 end
 
 module SurveyMonkeyHelper
-  def survey_monkey_mock(method: :get, url: "surveys", body: nil, responses: [])
+  def survey_monkey_mock(method: :get, url: "surveys", body: nil, responses: [], times: 1)
     with = {headers: {
       'Content-Type' => 'application/json',
       'Authorization' => "bearer #{Rails.application.credentials.dig(:surveymonkey)[:access_token]}"
@@ -22,10 +22,19 @@ module SurveyMonkeyHelper
 
     with[:body] = body.to_json if body != nil
 
-    stub = stub_request(method, "https://api.surveymonkey.com/v3/#{url}").with(with)
+    full_url = "https://api.surveymonkey.com/v3/#{url}"
+    stub = stub_request(method, full_url).with(with)
 
     responses.each do |response|
       stub.to_return(status: 200, body: response.to_json, headers: {'Content-Type'=>'application/json'}).then
+    end
+
+    return {method: method, url: full_url, times: times}
+  end
+
+  def assert_requests(requests)
+    requests.each do |request|
+      assert_requested request[:method], request[:url], times: request[:times]
     end
   end
 end

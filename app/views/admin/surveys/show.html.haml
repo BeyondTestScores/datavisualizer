@@ -7,8 +7,6 @@
   - else
     Survey Monkey Error
 
-
-
 %p
   = link_to("Edit Survey", edit_admin_survey_path(@survey))
   &nbsp; | &nbsp;
@@ -22,5 +20,6 @@
 
   - @survey.category_tree[:child_categories].each do |child_category|
     .category{data: {category_id: child_category[:category].id}}
-      = render "category_selector", category: child_category[:category]
+      = render "category_link", category: child_category[:category]
+      = render 'category_questions', category: child_category, template: "link"
       = render "child_categories", category: child_category, template: "link", show_questions: true

@@ -1,4 +1,10 @@
-%h2 New Category
+%h2
+  New
+  - if @category.parent_category.present?
+    Subcategory Under
+    = "\"#{@category.parent_category.name}\""
+  - else
+    Category
 
 %br
 

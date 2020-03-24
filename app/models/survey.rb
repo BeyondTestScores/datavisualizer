@@ -163,9 +163,9 @@ class Survey < ApplicationRecord
     sm_pages = details['pages'] || []
     sm_page_count = sm_pages.length
     sm_pages.each do |sm_page|
-      sm_questions = sm_page['questions']
-      next if sm_questions.blank?
-      
+      sm_questions = sm_page['questions'] || []
+
+      all_questions_removed = true
       on_page_sq = survey_questions.on_page(sm_page['id']).joins(:question)
       sm_questions.each do |sm_question|
         survey_question = on_page_sq.find do |sq|
@@ -177,9 +177,17 @@ class Survey < ApplicationRecord
             "surveys/#{details['id']}/pages/#{sm_page['id']}/questions/#{sm_question['id']}"
           )
         else
+          all_questions_removed = false
           survey_question.update(survey_monkey_id: sm_question['id'], survey_monkey_page_id: sm_page['id'])
         end
       end
+
+      if sm_questions.blank? || all_questions_removed
+        surveyMonkeyConnection.delete(
+          "surveys/#{details['id']}/pages/#{sm_page['id']}"
+        )
+      end
+
 
       # next if SurveyQuestion.on_page(page["id"]).present?
       # if page_count > 1 #need at least one page on survey monkey

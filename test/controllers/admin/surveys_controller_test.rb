@@ -28,17 +28,18 @@ class Admin::SurveysControllerTest < ActionDispatch::IntegrationTest
   end
 
   def test_create__requirements
+    requests = []
     survey_name = "New Survey For Test"
     survey_monkey_id = "SURVEY_MONKEY_ID"
 
-    survey_monkey_mock(
+    requests << survey_monkey_mock(
       method: :post,
       url: "surveys",
       body: {"title": survey_name},
       responses: [{"title": survey_name, "id": survey_monkey_id}]
     )
 
-    survey_monkey_mock(
+    requests << survey_monkey_mock(
       method: :get,
       url: "surveys/#{survey_monkey_id}/details",
       responses: [{'title': survey_name}]
@@ -53,7 +54,7 @@ class Admin::SurveysControllerTest < ActionDispatch::IntegrationTest
     default_page = "DEFAULT_PAGE" #survey monkey creates a page by default
     page1_id = "PAGE_FOR_CATEGORY1_#{question1.category.id}"
     page2_id = "PAGE_FOR_CATEGORY2_#{question2.category.id}"
-    survey_monkey_mock(
+    requests << survey_monkey_mock(
       method: :get,
       url: "surveys/#{survey_monkey_id}/pages",
       responses: [
@@ -65,35 +66,35 @@ class Admin::SurveysControllerTest < ActionDispatch::IntegrationTest
       ]
     )
 
-    survey_monkey_mock(
+    requests << survey_monkey_mock(
       method: :post,
       url: "surveys/#{survey_monkey_id}/pages",
       body: {"title": question1.category.name},
       responses: [{"id": page1_id}]
     )
 
-    survey_monkey_mock(
+    requests << survey_monkey_mock(
       method: :post,
       url: "surveys/#{survey_monkey_id}/pages",
       body: {"title": question2.category.name},
       responses: [{"id": page2_id}]
     )
 
-    survey_monkey_mock(
+    requests << survey_monkey_mock(
       method: :post,
       url: "surveys/#{survey_monkey_id}/pages/#{page1_id}/questions",
       body: question1.survey_monkey_structure,
       responses: [{"id": question1_id}]
     )
 
-    survey_monkey_mock(
+    requests << survey_monkey_mock(
       method: :post,
       url: "surveys/#{survey_monkey_id}/pages/#{page2_id}/questions",
       body: question2.survey_monkey_structure,
       responses: [{"id": question2_id}]
     )
 
-    survey_monkey_mock(
+    requests << survey_monkey_mock(
       method: :delete,
       url: "surveys/#{survey_monkey_id}/pages/#{default_page}"
     )
@@ -130,12 +131,15 @@ class Admin::SurveysControllerTest < ActionDispatch::IntegrationTest
       assert_not_empty sq.survey_monkey_id
       assert_not_empty sq.survey_monkey_page_id
     end
+
+    assert_requests requests
   end
 
   def test_show
+    requests = []
     survey = surveys(:two)
 
-    survey_monkey_mock(
+    requests << survey_monkey_mock(
       method: :get,
       url: "surveys/#{survey.survey_monkey_id}/details",
       responses: [{'title': survey.name}]
@@ -145,6 +149,8 @@ class Admin::SurveysControllerTest < ActionDispatch::IntegrationTest
 
     assert_select "h2", survey.name
     assert_select "a", survey.questions.first.text
+
+    assert_requests requests
   end
 
   test "should get edit" do
@@ -154,22 +160,24 @@ class Admin::SurveysControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should update survey" do
+    requests = []
+
     survey = surveys(:two)
     new_survey_name = "New Survey Name"
 
-    survey_monkey_mock(
+    requests << survey_monkey_mock(
       method: :get,
       url: "surveys/#{survey.survey_monkey_id}/details",
       responses: [{"title": new_survey_name}]
     )
 
-    survey_monkey_mock(
+    requests << survey_monkey_mock(
       method: :get,
       url: "surveys/#{survey.survey_monkey_id}/pages",
       responses: [{"data": [{"id": "PAGE"}]}]
     )
 
-    survey_monkey_mock(
+    requests << survey_monkey_mock(
       method: :patch,
       url: "surveys/#{survey.survey_monkey_id}",
       body: {"title": "New Survey Name"}
@@ -179,14 +187,18 @@ class Admin::SurveysControllerTest < ActionDispatch::IntegrationTest
       survey: { name: new_survey_name, survey_monkey_id: survey.survey_monkey_id }
     }
     assert_redirected_to admin_survey_url(survey)
+
+    assert_requests requests
   end
 
   test "updating survey to add another question" do
+    requests = []
+
     survey = surveys(:one)
     question = questions(:one)
     question_count = survey.questions.count
 
-    survey_monkey_mock(
+    requests << survey_monkey_mock(
       method: :get,
       url: "surveys/#{survey.survey_monkey_id}/details",
       responses: [{"title": survey.name}]
@@ -194,7 +206,7 @@ class Admin::SurveysControllerTest < ActionDispatch::IntegrationTest
 
     question_id = "ID_FOR_QUESTION_#{question.id}"
     page_id = "PAGE_FOR_CATEGORY_#{question.category.id}"
-    survey_monkey_mock(
+    requests << survey_monkey_mock(
       method: :get,
       url: "surveys/#{survey.survey_monkey_id}/pages",
       responses: [{"data": [
@@ -202,7 +214,7 @@ class Admin::SurveysControllerTest < ActionDispatch::IntegrationTest
       ]}]
     )
 
-    survey_monkey_mock(
+    requests << survey_monkey_mock(
       method: :post,
       url: "surveys/#{survey.survey_monkey_id}/pages/#{page_id}/questions",
       body: question.survey_monkey_structure
@@ -213,9 +225,13 @@ class Admin::SurveysControllerTest < ActionDispatch::IntegrationTest
     }
 
     assert_equal question_count + 1, survey.reload.questions.count
+
+    assert_requests requests
   end
 
   test "updating survey to remove a question" do
+    requests = []
+
     survey = surveys(:two)
     question = questions(:one)
     deleting_question = questions(:two)
@@ -223,19 +239,19 @@ class Admin::SurveysControllerTest < ActionDispatch::IntegrationTest
     question_count = survey.questions.count
     survey_question_count = SurveyQuestion.count
 
-    survey_monkey_mock(
+    requests << survey_monkey_mock(
       method: :get,
       url: "surveys/#{survey.survey_monkey_id}/details",
       responses: [{"title": survey.name}]
     )
 
-    survey_monkey_mock(
+    requests << survey_monkey_mock(
       method: :get,
       url: "surveys/#{survey.survey_monkey_id}/pages",
       responses: [{"data": [{"id": survey_question.survey_monkey_page_id}]}]
     )
 
-    survey_monkey_mock(
+    requests << survey_monkey_mock(
       method: :delete,
       url: "surveys/#{survey.survey_monkey_id}/pages/#{survey_question.survey_monkey_page_id}/questions/#{survey_question.survey_monkey_id}"
     )
@@ -246,6 +262,8 @@ class Admin::SurveysControllerTest < ActionDispatch::IntegrationTest
 
     assert_equal question_count - 1, survey.reload.questions.count
     assert_equal survey_question_count - 1, SurveyQuestion.count
+
+    assert_requests requests
   end
 
   # test "should destroy survey" do
