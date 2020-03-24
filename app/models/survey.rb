@@ -164,6 +164,8 @@ class Survey < ApplicationRecord
     sm_page_count = sm_pages.length
     sm_pages.each do |sm_page|
       sm_questions = sm_page['questions']
+      next if sm_questions.blank?
+      
       on_page_sq = survey_questions.on_page(sm_page['id']).joins(:question)
       sm_questions.each do |sm_question|
         survey_question = on_page_sq.find do |sq|

@@ -59,6 +59,36 @@ class SurveyTest < ActiveSupport::TestCase
     survey.sync_with_survey_monkey
   end
 
+  test "survey monkey updated when category deleted" do
+    survey = surveys(:two)
+    category = categories(:two)
+    survey_questions = category.questions.map { |q| q.survey_questions.for(survey) }.flatten
+
+    survey_questions.each do |sq|
+      survey_monkey_mock(
+        method: :delete,
+        url: "surveys/#{survey.survey_monkey_id}/pages/#{sq.survey_monkey_page_id}/questions/#{sq.survey_monkey_id}"
+      )
+    end
+
+    survey_monkey_mock(
+      method: :get,
+      url: "surveys/#{survey.survey_monkey_id}/details",
+      responses: [details(survey: survey)]
+    )
+
+    category.destroy
+  end
+
+  test "survey monkey updated when category renamed" do
+  end
+
+  test "survey monkey updated when question updated" do
+  end
+
+  test "survey monkey updated when question assigned to new category" do
+  end
+
   def details(survey: nil, survey_questions: [], default_page: false)
     return {} if survey.nil?
     result = {"id": survey.survey_monkey_id, "title": survey.name}
