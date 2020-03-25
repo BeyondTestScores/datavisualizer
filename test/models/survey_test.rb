@@ -2,8 +2,6 @@ require 'test_helper'
 
 class SurveyTest < ActiveSupport::TestCase
 
-  DEFAULT_PAGE_ID = 'DEFAULT'
-
   test "survey monkey sync -- deleted default survey monkey page" do
     requests = []
     survey = surveys(:two)
@@ -135,50 +133,7 @@ class SurveyTest < ActiveSupport::TestCase
 
   test 'survey monkey times out' do
     # stub_request(:any, 'www.example.net').to_timeout
-    assert false
-  end
-
-  def details(survey: nil, survey_questions: [], default_page: false)
-    return {} if survey.nil?
-    result = {"id": survey.survey_monkey_id, "title": survey.name}
-
-    pages = []
-    if default_page || survey_questions.empty?
-      pages << {"id": DEFAULT_PAGE_ID, "title": ""}
-    end
-
-    survey_questions.each do |survey_question|
-        page_id = survey_question.survey_monkey_page_id
-        id = survey_question.survey_monkey_id
-        question = survey_question.question
-        page_title = question.category.name
-
-        index = pages.index { |p| p["id"] == page_id }
-        if index.nil?
-          pages << {"id": page_id, "title": page_title, 'questions': []}
-          index = pages.length - 1
-        end
-
-        pages[index][:questions] << {
-          "id": id,
-          "headings": [{
-            "heading": question.text
-          }],
-          "answers": {
-            "choices": [
-              {"text": question.option1},
-              {"text": question.option2},
-              {"text": question.option3},
-              {"text": question.option4},
-              {"text": question.option5}
-            ]
-          }
-        }
-    end
-
-    result["pages"] = pages
-
-    return result
+    flunk("test for survey monkey timing out")
   end
 
 end

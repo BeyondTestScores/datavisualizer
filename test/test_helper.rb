@@ -14,6 +14,15 @@ class ActiveSupport::TestCase
 end
 
 module SurveyMonkeyHelper
+
+  DEFAULT_PAGE_ID = 'DEFAULT'
+
+  def assert_requests(requests)
+    requests.each do |request|
+      assert_requested request[:method], request[:url], body: request[:body], times: request[:times]
+    end
+  end
+
   def survey_monkey_mock(method: :get, url: "surveys", body: nil, responses: [], times: 1)
     with = {headers: {
       'Content-Type' => 'application/json',
@@ -29,13 +38,51 @@ module SurveyMonkeyHelper
       stub.to_return(status: 200, body: response.to_json, headers: {'Content-Type'=>'application/json'}).then
     end
 
-    return {method: method, url: full_url, times: times}
+    return {method: method, url: full_url, body: with[:body], times: times}
   end
 
-  def assert_requests(requests)
-    requests.each do |request|
-      assert_requested request[:method], request[:url], times: request[:times]
+  def details(survey: nil, survey_questions: nil, default_page: false)
+    return {} if survey.nil?
+    result = {"id": survey.survey_monkey_id, "title": survey.name}
+
+    survey_questions ||= survey.survey_questions
+    pages = []
+    if default_page || survey_questions.empty?
+      pages << {"id": DEFAULT_PAGE_ID, "title": ""}
     end
+
+    survey_questions.each do |survey_question|
+        page_id = survey_question.survey_monkey_page_id
+        id = survey_question.survey_monkey_id
+        question = survey_question.question
+        page_title = question.category.name
+
+        index = pages.index { |p| p["id"] == page_id }
+        if index.nil?
+          pages << {"id": page_id, "title": page_title, 'questions': []}
+          index = pages.length - 1
+        end
+
+        pages[index][:questions] << {
+          "id": id,
+          "headings": [{
+            "heading": question.text
+          }],
+          "answers": {
+            "choices": [
+              {"text": question.option1},
+              {"text": question.option2},
+              {"text": question.option3},
+              {"text": question.option4},
+              {"text": question.option5}
+            ]
+          }
+        }
+    end
+
+    result["pages"] = pages
+
+    return result
   end
 end
 
