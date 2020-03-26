@@ -150,7 +150,7 @@ class Survey < ApplicationRecord
       )
     end
 
-    if survey_question.question.changed?
+    if survey_question.question.previous_changes.keys.present?
       surveyMonkeyConnection.patch(
         "surveys/#{survey_monkey_id}/pages/#{page_id}/questions/#{question_id}",
         survey_question.question.survey_monkey_structure(1).to_json

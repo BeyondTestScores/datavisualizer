@@ -209,9 +209,74 @@ class SurveyTest < ActiveSupport::TestCase
   end
 
   test "survey monkey updated when question updated" do
+    requests = []
+
+    question = questions(:two)
+
+    existing_text = question.text
+    new_text = "New text"
+
+    question.update_column('text', new_text)
+    question.survey_questions.each do |survey_question|
+      survey = survey_question.survey
+
+      requests << survey_monkey_mock(
+        method: :patch,
+        url: "surveys/#{survey.survey_monkey_id}/pages/#{survey_question.survey_monkey_page_id}/questions/#{survey_question.survey_monkey_id}",
+        body: survey_question.question.survey_monkey_structure(1)
+      )
+
+      requests << survey_monkey_mock(
+        method: :get,
+        url: "surveys/#{survey.survey_monkey_id}/details",
+        responses: [details(survey: survey)]
+      )
+    end
+    question.update_column('text', existing_text)
+
+    question.update(text: new_text)
+
+    assert_requests(requests)
   end
 
   test "survey monkey updated when question assigned to new category" do
+    requests = []
+    
+    question = questions(:one)
+
+    existing_category_id = question.category_id
+    new_category_id = categories(:two).id
+
+    assert new_category_id != existing_category_id
+
+    question.update_column('category_id', new_category_id)
+    question.survey_questions.each do |survey_question|
+      survey = survey_question.survey
+
+      new_page_id = "PAGE_SURVEY_QUESTION_#{survey_question.id}_#{new_category_id}"
+      requests << survey_monkey_mock(
+        method: :post,
+        url: "surveys/#{survey.survey_monkey_id}/pages",
+        body: {"title": new_category.name},
+        responses: [{"id": new_page_id}]
+      )
+
+      requests << survey_monkey_mock(
+        method: :delete,
+        url: "surveys/#{survey.survey_monkey_id}/pages/#{survey_question.survey_monkey_page_id}/questions/#{survey_question.survey_monkey_id}"
+      )
+
+      requests << survey_monkey_mock(
+        method: :post,
+        url: "surveys/#{survey.survey_monkey_id}/pages/#{new_page_id}/questions",
+        body: question.survey_monkey_structure(1)
+      )
+    end
+    question.update_column('category_id', existing_category_id)
+
+    question.update(category_id: new_cateory_id)
+
+    assert_requests requests
   end
 
   test "survey monkey page doesn't exist" do
