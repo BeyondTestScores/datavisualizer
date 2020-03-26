@@ -8,7 +8,7 @@ class Survey < ApplicationRecord
   after_create :create_survey_monkey_survey
 
   after_commit :sync_with_survey_monkey, on: :create
-  after_commit :sync_with_survey_monkey, on: :update
+  after_update_commit :sync_with_survey_monkey
 
   before_destroy :delete_survey_monkey_survey
 
@@ -143,7 +143,14 @@ class Survey < ApplicationRecord
       )
 
       create_survey_monkey_question(survey_question)
-    else
+    elsif survey_question.question.category.name_previously_changed?
+      surveyMonkeyConnection.patch(
+        "surveys/#{survey_monkey_id}/pages/#{page_id}",
+        {"title": survey_question.question.category.name}.to_json
+      )
+    end
+
+    if survey_question.question.changed?
       surveyMonkeyConnection.patch(
         "surveys/#{survey_monkey_id}/pages/#{page_id}/questions/#{question_id}",
         survey_question.question.survey_monkey_structure(1).to_json
@@ -175,6 +182,16 @@ class Survey < ApplicationRecord
 
       all_questions_removed = true
       on_page_sq = survey_questions.on_page(sm_page['id']).joins(:question)
+
+      if on_page_sq.present?
+        category = on_page_sq.first.question.category
+        if category.name != sm_page["title"]
+          surveyMonkeyConnection.patch(
+            "surveys/#{details['id']}/pages/#{sm_page['id']}",
+            {title: category.name}.to_json
+          )
+        end
+      end
 
       sm_questions.each do |sm_question|
         survey_question = on_page_sq.find do |sq|

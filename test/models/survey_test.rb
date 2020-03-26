@@ -137,6 +137,75 @@ class SurveyTest < ActiveSupport::TestCase
   end
 
   test "survey monkey updated when category renamed" do
+    requests = []
+
+    category = categories(:two)
+    SurveyQuestion.skip_callback(:commit, :after, :create_survey_monkey, raise: false)
+    surveys(:one).survey_questions.create!(
+      question: questions(:two),
+      survey_monkey_id: "QUESTION_TWO_SURVEY_ONE_SURVEY_MONKEY",
+      survey_monkey_page_id: "PAGE_QUESTION_TWO_SURVEY_ONE_SURVEY_MONKEY"
+    )
+
+    existing_category_name = category.name
+    new_category_name = "New Category Name"
+
+    category.update_column('name', new_category_name)
+    survey_questions = category.questions.map(&:survey_questions).flatten
+    survey_questions.each do |sq|
+      survey = sq.survey
+      requests << survey_monkey_mock(
+        method: :patch,
+        url: "surveys/#{survey.survey_monkey_id}/pages/#{sq.survey_monkey_page_id}",
+        body: {"title": category.name}
+      )
+
+      requests << survey_monkey_mock(
+        method: :get,
+        url: "surveys/#{survey.survey_monkey_id}/details",
+        responses: [
+          details(survey: survey)
+        ]
+      )
+    end
+    category.update_column('name', existing_category_name)
+
+    category.update(name: new_category_name)
+
+    assert_requests(requests)
+
+    SurveyQuestion.set_callback(:commit, :after, :create_survey_monkey)
+  end
+
+  test "out of sync category name" do
+    requests = []
+
+    changed_on_survey_monkey = categories(:two)
+    existing_name = changed_on_survey_monkey.name
+
+    changed_on_survey_monkey.questions.each do |question|
+      question.survey_questions.each do |survey_question|
+        survey = survey_question.survey
+
+        changed_on_survey_monkey.update_column('name', "CHANGED CATEGORY NAME")
+        requests << survey_monkey_mock(
+          method: :get,
+          url: "surveys/#{survey.survey_monkey_id}/details",
+          responses: [details(survey: survey)]
+        )
+        changed_on_survey_monkey.update_column('name', existing_name)
+
+        requests << survey_monkey_mock(
+          method: :patch,
+          url: "surveys/#{survey.survey_monkey_id}/pages/#{survey_question.survey_monkey_page_id}",
+          body: {"title": existing_name}
+        )
+
+        survey.sync_with_survey_monkey
+      end
+    end
+
+    assert_requests(requests)
   end
 
   test "survey monkey updated when question updated" do

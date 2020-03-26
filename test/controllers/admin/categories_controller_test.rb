@@ -114,23 +114,49 @@ class Admin::CategoriesControllerTest < ActionDispatch::IntegrationTest
   end
 
   def test_update__updates_parent_category
+    requests = []
+
     category = categories(:two)
     new_parent_category = categories(:three)
     child_category_count = new_parent_category.child_categories.count
 
+    old_category_name = category.name
+    new_category_name = "Renamed Category"
+
     assert category.parent_category != new_parent_category
+
+    category.update_column('name', new_category_name)
+    category.questions.each do |question|
+      question.survey_questions.each do |survey_question|
+        survey = survey_question.survey
+        requests << survey_monkey_mock(
+          method: :patch,
+          url: "surveys/#{survey.survey_monkey_id}/pages/#{survey_question.survey_monkey_page_id}",
+          body: {title: new_category_name}
+        )
+
+        requests << survey_monkey_mock(
+          method: :get,
+          url: "surveys/#{survey.survey_monkey_id}/details",
+          responses: [details(survey: survey)]
+        )
+      end
+    end
+    category.update_column('name', old_category_name)
 
     patch "/admin/categories/#{category.slug}", headers: authorized_headers, params: {
       category: {
-        name: "Renamed Category",
+        name: new_category_name,
         parent_category_id: new_parent_category.id
       }
     }
 
     assert_equal child_category_count + 1, new_parent_category.child_categories.count
-    updated_category = Category.find_by_name("Renamed Category")
+    updated_category = Category.find_by_name(new_category_name)
     assert_equal new_parent_category, updated_category.parent_category
     # assert_equal "renamed-category", updated_category.slug
+
+    assert_requests requests
   end
 
   # Why is this crashing the tests?
