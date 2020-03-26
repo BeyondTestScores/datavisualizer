@@ -4,7 +4,7 @@ class SurveyQuestion < ApplicationRecord
   belongs_to :question
 
   after_commit :create_survey_monkey, on: :create
-  before_destroy :destroy_survey_monkey
+  after_destroy :destroy_survey_monkey
 
   scope :for, -> (question) { where(question: question) }
   scope :on_page, -> (page_id) { where(survey_monkey_page_id: page_id) }

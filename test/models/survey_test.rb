@@ -9,7 +9,7 @@ class SurveyTest < ActiveSupport::TestCase
     requests << survey_monkey_mock(
       method: :get,
       url: "surveys/#{survey.survey_monkey_id}/details",
-      responses: [details(survey: survey, survey_questions: survey.survey_questions)]
+      responses: [details(survey: survey, survey_questions: [])]
     )
 
     requests << survey_monkey_mock(
@@ -82,36 +82,58 @@ class SurveyTest < ActiveSupport::TestCase
       url: "surveys/#{survey.survey_monkey_id}/pages/#{deleted.survey_monkey_page_id}/questions/#{deleted.survey_monkey_id}"
     )
 
+    requests << survey_monkey_mock(
+      method: :delete,
+      url: "surveys/#{survey.survey_monkey_id}/pages/#{deleted.survey_monkey_page_id}"
+    )
+
     survey.sync_with_survey_monkey
     assert_requests(requests)
   end
 
-  test "survey monkey updated when category deleted (page and questions deleted)" do
+  test "survey monkey updated when category deleted (page and questions deleted on multiple surveys)" do
     requests = []
-    survey = surveys(:two)
     category = categories(:two)
-    survey_questions = category.questions.map { |q| q.survey_questions.for(survey) }.flatten
-
-    requests << survey_monkey_mock(
-      method: :delete,
-      url: "surveys/#{survey.survey_monkey_id}/pages/#{survey_questions.first.survey_monkey_page_id}"
+    SurveyQuestion.skip_callback(:commit, :after, :create_survey_monkey, raise: false)
+    surveys(:one).survey_questions.create!(
+      question: questions(:two),
+      survey_monkey_id: "QUESTION_TWO_SURVEY_ONE_SURVEY_MONKEY",
+      survey_monkey_page_id: "PAGE_QUESTION_TWO_SURVEY_ONE_SURVEY_MONKEY"
     )
 
+    survey_questions = category.questions.map(&:survey_questions).flatten
+    assert_equal 2, survey_questions.length
+
     survey_questions.each do |sq|
+      survey = sq.survey
       requests << survey_monkey_mock(
         method: :delete,
         url: "surveys/#{survey.survey_monkey_id}/pages/#{sq.survey_monkey_page_id}/questions/#{sq.survey_monkey_id}"
       )
-    end
 
-    requests << survey_monkey_mock(
-      method: :get,
-      url: "surveys/#{survey.survey_monkey_id}/details",
-      responses: [details(survey: survey)]
-    )
+      remaining_survey_questions = survey.survey_questions.select { |x| x.survey_monkey_id != sq.survey_monkey_id}
+      requests << survey_monkey_mock(
+        method: :get,
+        url: "surveys/#{survey.survey_monkey_id}/details",
+        responses: [
+          details(
+            survey: survey,
+            survey_questions: remaining_survey_questions,
+            pages: [{"id": sq.survey_monkey_page_id}]
+          )
+        ]
+      )
+
+      requests << survey_monkey_mock(
+        method: :delete,
+        url: "surveys/#{survey.survey_monkey_id}/pages/#{sq.survey_monkey_page_id}"
+      )
+    end
 
     category.destroy
     assert_requests(requests)
+
+    SurveyQuestion.set_callback(:commit, :after, :create_survey_monkey)
   end
 
   test "survey monkey updated when category renamed" do

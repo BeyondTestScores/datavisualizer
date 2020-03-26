@@ -41,47 +41,47 @@ module SurveyMonkeyHelper
     return {method: method, url: full_url, body: with[:body], times: times}
   end
 
-  def details(survey: nil, survey_questions: nil, default_page: false)
+  def details(survey: nil, survey_questions: nil, pages: nil, default_page: false)
     return {} if survey.nil?
     result = {"id": survey.survey_monkey_id, "title": survey.name}
 
     survey_questions ||= survey.survey_questions
-    pages = []
-    if default_page || survey_questions.empty?
+    pages ||= []
+    if default_page || (pages.empty? && survey_questions.empty?)
       pages << {"id": DEFAULT_PAGE_ID, "title": ""}
     end
 
     survey_questions.each do |survey_question|
-        page_id = survey_question.survey_monkey_page_id
-        id = survey_question.survey_monkey_id
-        question = survey_question.question
-        page_title = question.category.name
+      page_id = survey_question.survey_monkey_page_id
+      id = survey_question.survey_monkey_id
+      question = survey_question.question
+      page_title = question.category.name
 
-        index = pages.index { |p| p["id"] == page_id }
-        if index.nil?
-          pages << {"id": page_id, "title": page_title, 'questions': []}
-          index = pages.length - 1
-        end
+      index = pages.index { |p| p["id"] == page_id }
+      if index.nil?
+        pages << {"id": page_id, "title": page_title, 'questions': []}
+        index = pages.length - 1
+      end
 
-        pages[index][:questions] << {
-          "id": id,
-          "headings": [{
-            "heading": question.text
-          }],
-          "answers": {
-            "choices": [
-              {"text": question.option1},
-              {"text": question.option2},
-              {"text": question.option3},
-              {"text": question.option4},
-              {"text": question.option5}
-            ]
-          }
+      pages[index][:questions] << {
+        "id": id,
+        "headings": [{
+          "heading": question.text
+        }],
+        "answers": {
+          "choices": [
+            {"text": question.option1},
+            {"text": question.option2},
+            {"text": question.option3},
+            {"text": question.option4},
+            {"text": question.option5}
+          ]
         }
+      }
     end
 
     result["pages"] = pages
-
+    
     return result
   end
 end

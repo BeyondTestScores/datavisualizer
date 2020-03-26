@@ -204,20 +204,38 @@ class Admin::SurveysControllerTest < ActionDispatch::IntegrationTest
     question = questions(:one)
     question_count = survey.questions.count
 
-    requests << survey_monkey_mock(
-      method: :get,
-      url: "surveys/#{survey.survey_monkey_id}/details",
-      responses: [{"title": survey.name}]
-    )
-
     question_id = "ID_FOR_QUESTION_#{question.id}"
     page_id = "PAGE_FOR_CATEGORY_#{question.category.id}"
     requests << survey_monkey_mock(
       method: :get,
+      url: "surveys/#{survey.survey_monkey_id}/details",
+      responses: [
+        details(survey: survey),
+        details(
+          survey: survey,
+          survey_questions: [
+            SurveyQuestion.new(
+              question: question,
+              survey_monkey_id: question_id,
+              survey_monkey_page_id: page_id
+            )
+          ]
+        )
+      ],
+      times: 2
+    )
+
+    requests << survey_monkey_mock(
+      method: :get,
       url: "surveys/#{survey.survey_monkey_id}/pages",
-      responses: [{"data": [
-        {"id": page_id, "title": question.category.name}
-      ]}]
+      responses: [{"data": [{"id": DEFAULT_PAGE_ID}]}]
+    )
+
+    requests << survey_monkey_mock(
+      method: :post,
+      url: "surveys/#{survey.survey_monkey_id}/pages",
+      body: {"title": question.category.name},
+      responses: [{"id": page_id}]
     )
 
     requests << survey_monkey_mock(
@@ -225,6 +243,12 @@ class Admin::SurveysControllerTest < ActionDispatch::IntegrationTest
       url: "surveys/#{survey.survey_monkey_id}/pages/#{page_id}/questions",
       body: question.survey_monkey_structure
     )
+
+    requests << survey_monkey_mock(
+      method: :delete,
+      url: "surveys/#{survey.survey_monkey_id}/pages/#{DEFAULT_PAGE_ID}"
+    )
+
 
     patch admin_survey_url(survey), headers: authorized_headers, params: {
       survey: { question_ids: [question.id] }
@@ -246,20 +270,28 @@ class Admin::SurveysControllerTest < ActionDispatch::IntegrationTest
     survey_question_count = SurveyQuestion.count
 
     requests << survey_monkey_mock(
-      method: :get,
-      url: "surveys/#{survey.survey_monkey_id}/details",
-      responses: [{"title": survey.name}]
+      method: :delete,
+      url: "surveys/#{survey.survey_monkey_id}/pages/#{survey_question.survey_monkey_page_id}/questions/#{survey_question.survey_monkey_id}"
     )
 
+    remaining_survey_questions = survey_questions.select { |sq| sq.question_id != deleting_question.id }
     requests << survey_monkey_mock(
       method: :get,
-      url: "surveys/#{survey.survey_monkey_id}/pages",
-      responses: [{"data": [{"id": survey_question.survey_monkey_page_id}]}]
+      url: "surveys/#{survey.survey_monkey_id}/details",
+      responses: [
+        details(
+          survey: survey,
+          survey_questions: remaining_survey_questions,
+          pages: [{"id": survey_question.survey_monkey_page_id}]
+        ),
+        details(survey: survey, survey_questions: remaining_survey_questions)
+      ],
+      times: 2
     )
 
     requests << survey_monkey_mock(
       method: :delete,
-      url: "surveys/#{survey.survey_monkey_id}/pages/#{survey_question.survey_monkey_page_id}/questions/#{survey_question.survey_monkey_id}"
+      url: "surveys/#{survey.survey_monkey_id}/pages/#{survey_question.survey_monkey_page_id}"
     )
 
     patch admin_survey_url(survey), headers: authorized_headers, params: {
