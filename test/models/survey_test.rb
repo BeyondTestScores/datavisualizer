@@ -241,11 +241,13 @@ class SurveyTest < ActiveSupport::TestCase
 
   test "survey monkey updated when question assigned to new category" do
     requests = []
-    
+
     question = questions(:one)
 
-    existing_category_id = question.category_id
-    new_category_id = categories(:two).id
+    existing_category = question.category
+    existing_category_id = existing_category.id
+    new_category = categories(:two)
+    new_category_id = new_category.id
 
     assert new_category_id != existing_category_id
 
@@ -253,7 +255,24 @@ class SurveyTest < ActiveSupport::TestCase
     question.survey_questions.each do |survey_question|
       survey = survey_question.survey
 
-      new_page_id = "PAGE_SURVEY_QUESTION_#{survey_question.id}_#{new_category_id}"
+      existing_page_id = survey_question.survey_monkey_page_id
+      new_page_id = "NEW_PAGE_ID"
+
+      survey_question.update_column(:survey_monkey_page_id, new_page_id)
+
+      requests << survey_monkey_mock(
+        method: :delete,
+        url: "surveys/#{survey.survey_monkey_id}/pages/#{existing_page_id}/questions/#{survey_question.survey_monkey_id}"
+      )
+
+      requests << survey_monkey_mock(
+        method: :get,
+        url: "surveys/#{survey.survey_monkey_id}/pages",
+        responses: [
+          {"data": [{"id": existing_page_id, "title": existing_category.name}]}
+        ]
+      )
+
       requests << survey_monkey_mock(
         method: :post,
         url: "surveys/#{survey.survey_monkey_id}/pages",
@@ -262,19 +281,28 @@ class SurveyTest < ActiveSupport::TestCase
       )
 
       requests << survey_monkey_mock(
-        method: :delete,
-        url: "surveys/#{survey.survey_monkey_id}/pages/#{survey_question.survey_monkey_page_id}/questions/#{survey_question.survey_monkey_id}"
-      )
-
-      requests << survey_monkey_mock(
         method: :post,
         url: "surveys/#{survey.survey_monkey_id}/pages/#{new_page_id}/questions",
         body: question.survey_monkey_structure(1)
       )
+
+      requests << survey_monkey_mock(
+        method: :get,
+        url: "surveys/#{survey.survey_monkey_id}/details",
+        responses: [
+          details(survey: survey, pages: [{"id": existing_page_id, "title": existing_category.name}])
+        ]
+      )
+
+      requests << survey_monkey_mock(
+        method: :delete,
+        url: "surveys/#{survey.survey_monkey_id}/pages/#{existing_page_id}"
+      )
+      survey_question.update_column(:survey_monkey_page_id, existing_page_id)
     end
     question.update_column('category_id', existing_category_id)
 
-    question.update(category_id: new_cateory_id)
+    question.update(category_id: new_category_id)
 
     assert_requests requests
   end
