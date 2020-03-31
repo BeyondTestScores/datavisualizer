@@ -23,7 +23,7 @@ module SurveyMonkeyHelper
     end
   end
 
-  def survey_monkey_mock(method: :get, url: "surveys", body: nil, responses: [], times: 1)
+  def survey_monkey_mock(method: :get, url: "surveys", body: nil, responses: [], times: 1, times_out: false)
     with = {headers: {
       'Content-Type' => 'application/json',
       'Authorization' => "bearer #{Rails.application.credentials.dig(:surveymonkey)[:access_token]}"
@@ -36,6 +36,10 @@ module SurveyMonkeyHelper
 
     responses.each do |response|
       stub.to_return(status: 200, body: response.to_json, headers: {'Content-Type'=>'application/json'}).then
+    end
+
+    if times_out
+      stub.to_timeout
     end
 
     return {method: method, url: full_url, body: with[:body], times: times}

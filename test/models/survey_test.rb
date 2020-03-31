@@ -308,16 +308,83 @@ class SurveyTest < ActiveSupport::TestCase
   end
 
   test "survey monkey page doesn't exist" do
+    requests = []
 
+    survey = surveys(:two)
+
+    page_on_sm_not_local = "PAGE_ON_SM_NOT_LOCAL"
+
+    requests << survey_monkey_mock(
+      method: :get,
+      url: "surveys/#{survey.survey_monkey_id}/details",
+      responses: [
+        details(survey: survey, pages: [{"id": page_on_sm_not_local, "title": page_on_sm_not_local}])
+      ]
+    )
+
+    requests << survey_monkey_mock(
+      method: :delete,
+      url: "surveys/#{survey.survey_monkey_id}/pages/#{page_on_sm_not_local}"
+    )
+
+    survey.sync_with_survey_monkey
+
+    assert_requests requests
   end
 
   test "survey monkey question doesn't exist on page" do
+    requests = []
 
+    survey = surveys(:two)
+
+    question_on_sm_not_local = "QUESTION_ON_SM_NOT_LOCAL"
+    page_id = survey_questions.first.survey_monkey_page_id
+    category = survey_questions.first.question.category
+
+    survey_questions = survey.survey_questions.to_a
+    survey_questions << SurveyQuestion.new(
+      "survey_monkey_id": question_on_sm_not_local,
+      "survey_monkey_page_id": page_id,
+      question: Question.new(category: category)
+    )
+
+    requests << survey_monkey_mock(
+      method: :get,
+      url: "surveys/#{survey.survey_monkey_id}/details",
+      responses: [
+        details(survey: survey, survey_questions: survey_questions)
+      ]
+    )
+
+    requests << survey_monkey_mock(
+      method: :delete,
+      url: "surveys/#{survey.survey_monkey_id}/pages/#{page_id}/questions/#{question_on_sm_not_local}"
+    )
+
+    requests << survey_monkey_mock(
+      method: :delete,
+      url: "surveys/#{survey.survey_monkey_id}/pages/#{page_id}"
+    )
+
+    survey.sync_with_survey_monkey
+
+    assert_requests requests
   end
 
-  test 'survey monkey times out' do
-    # stub_request(:any, 'www.example.net').to_timeout
-    flunk("test for survey monkey timing out")
-  end
+  # test 'survey monkey times out' do
+  #   requests = []
+  #
+  #   survey = surveys(:two)
+  #
+  #   survey_monkey_mock(
+  #     method: :get,
+  #     url: "surveys/#{survey.survey_monkey_id}/details",
+  #     times_out: true
+  #   )
+  #
+  #   survey.sync_with_survey_monkey
+  #
+  #   assert_requests requests
+  # end
 
 end
