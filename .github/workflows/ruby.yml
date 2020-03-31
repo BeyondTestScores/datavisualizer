@@ -1,0 +1,109 @@
+name: Rails Unit & System Tests
+
+on:
+  push:
+    branches:
+      - MTA
+  pull_request:
+    branches:
+      - MTA
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    container:
+      image: ruby
+      options: --network-alias testHost
+
+    env:
+      RAILS_ENV: test
+      RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
+
+    services:
+      hub:
+        image: selenium/hub:3.141.59-gold
+
+      chrome:
+        image: selenium/node-chrome:3.141.59-gold
+        env:
+          HUB_HOST: hub
+          HUB_PORT: 4444
+
+      postgres:
+        image: postgres:12
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        ports:
+        - 5432:5432
+        # needed because the postgres container does not provide a healthcheck
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+
+    steps:
+    - uses: actions/checkout@v2
+
+    # - name: Set up Ruby 2.7
+    #   uses: actions/setup-ruby@v1
+    #   with:
+    #     ruby-version: 2.7
+
+    - name: Update apt-get
+      run: |
+        apt-get update -qq
+
+    - name: Install PostgreSQL 12 client
+      run: |
+        apt-get install -y nodejs postgresql-client
+
+    - name: Install RubyGems
+      run: |
+        apt-get install -y ruby-full
+
+    - name: Install Yarn
+      run: |
+        curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
+        echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
+        apt update
+        apt install -y yarn
+        yarn --version
+
+    - name: Install Zip
+      run: |
+        apt-get install zip
+
+    - name: Build App
+      env:
+        PGHOST: postgres
+        PGUSER: postgres
+        PGPASSWORD: postgres
+      run: |
+        gem install bundler:2.1.4
+        gem install nokogiri -v '1.10.8' --source 'https://rubygems.org/'
+        bundle install --jobs 4 --retry 3
+        rails db:setup
+        RAILS_ENV=test bundle exec rails assets:precompile
+
+    - name: Test App
+      env:
+        PGHOST: postgres
+        PGUSER: postgres
+        PGPASSWORD: postgres
+        SELENIUM_URL: "http://hub:4444/wd/hub"
+      run: |
+        rails test
+        rails test:system
+
+    - name: Zip Screenshots
+      if: failure()
+      run: |
+        zip -j screenshots.zip /__w/portal/portal/tmp/screenshots/*
+        ls
+
+    - uses: actions/upload-artifact@v1
+      if: failure()
+      with:
+        name: screenshots
+        path: screenshots.zip
