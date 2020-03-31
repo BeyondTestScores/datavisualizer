@@ -8,7 +8,7 @@ class Survey < ApplicationRecord
   after_create :create_survey_monkey_survey
 
   after_commit :sync_with_survey_monkey, on: :create
-  after_commit :sync_with_survey_monkey, on: :update
+  after_update_commit :sync_with_survey_monkey
 
   before_destroy :delete_survey_monkey_survey
 
@@ -96,6 +96,7 @@ class Survey < ApplicationRecord
   def remove_survey_monkey_page(page_id)
     return {} if survey_monkey_id.blank?
     surveyMonkeyConnection.delete("surveys/#{survey_monkey_id}/pages/#{page_id}")
+    sync_with_survey_monkey
   end
 
   def update_survey_monkey(updates)
@@ -105,7 +106,8 @@ class Survey < ApplicationRecord
 
   def create_survey_monkey_question(survey_question)
     page_title = survey_question.question.category.name
-    page = survey_monkey_pages.find do |p|
+    smp = survey_monkey_pages
+    page = smp.find do |p|
       p['title'] == page_title
     end
 
@@ -121,7 +123,14 @@ class Survey < ApplicationRecord
       survey_question.question.survey_monkey_structure(1).to_json
     )
 
-    survey_question.update(survey_monkey_id: response.body['id'], survey_monkey_page_id: page["id"])
+    smid = response.body['id']
+    if (survey_question.survey_monkey_id != smid || survey_question.survey_monkey_page_id != page["id"])
+      survey_question.update(
+        survey_monkey_id: response.body['id'],
+        survey_monkey_page_id: page["id"]
+      )
+    end
+
     sync_with_survey_monkey
   end
 
@@ -129,18 +138,27 @@ class Survey < ApplicationRecord
     page_id = survey_question.survey_monkey_page_id
     question_id = survey_question.survey_monkey_id
 
+    if survey_question.question.category.name_previously_changed?
+      surveyMonkeyConnection.patch(
+        "surveys/#{survey_monkey_id}/pages/#{page_id}",
+        {"title": survey_question.question.category.name}.to_json
+      )
+    end
+
     if survey_question.question.category_id_previously_changed?
       surveyMonkeyConnection.delete(
         "surveys/#{survey_monkey_id}/pages/#{page_id}/questions/#{question_id}"
       )
 
       create_survey_monkey_question(survey_question)
-    else
+      return
+    elsif survey_question.question.previous_changes.keys.present?
       surveyMonkeyConnection.patch(
         "surveys/#{survey_monkey_id}/pages/#{page_id}/questions/#{question_id}",
         survey_question.question.survey_monkey_structure(1).to_json
       )
     end
+
     sync_with_survey_monkey
   end
 
@@ -153,19 +171,50 @@ class Survey < ApplicationRecord
 
   def sync_with_survey_monkey
     details = survey_monkey_details
-    pages = survey_monkey_pages
+
     if name != details['title']
       update_survey_monkey({
         "title": name
       })
     end
 
-    page_count = pages.length
-    pages.each do |page|
-      next if SurveyQuestion.on_page(page["id"]).present?
-      if page_count > 1 #need at least one page on survey monkey
-        remove_survey_monkey_page(page["id"])
-        page_count -= 1
+    sm_pages = details['pages'] || []
+    sm_page_count = sm_pages.length
+    sm_pages.each do |sm_page|
+      sm_questions = sm_page['questions'] || []
+
+      all_questions_removed = true
+      on_page_sq = survey_questions.on_page(sm_page['id']).joins(:question)
+
+      if on_page_sq.present?
+        category = on_page_sq.first.question.category
+        if category.name != sm_page["title"]
+          surveyMonkeyConnection.patch(
+            "surveys/#{details['id']}/pages/#{sm_page['id']}",
+            {title: category.name}.to_json
+          )
+        end
+      end
+
+      sm_questions.each do |sm_question|
+        survey_question = on_page_sq.find do |sq|
+          sq.question.text == sm_question["headings"].first['heading']
+        end
+
+        if survey_question.nil?
+          surveyMonkeyConnection.delete(
+            "surveys/#{details['id']}/pages/#{sm_page['id']}/questions/#{sm_question['id']}"
+          )
+        else
+          all_questions_removed = false
+          survey_question.update(survey_monkey_id: sm_question['id'], survey_monkey_page_id: sm_page['id'])
+        end
+      end
+
+      if sm_questions.blank? || all_questions_removed
+        surveyMonkeyConnection.delete(
+          "surveys/#{details['id']}/pages/#{sm_page['id']}"
+        )
       end
     end
   end
