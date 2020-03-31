@@ -2,7 +2,7 @@
 
 %br
 %p
-  - if (survey_monkey_details = @survey.survey_monkey_details).present?
+  - if (survey_monkey_details = @survey.survey_monkey_details).present? && survey_monkey_details['summary_url'].present?
     = link_to "Survey Monkey", survey_monkey_details['summary_url'], target: '_blank'
   - else
     Survey Monkey Error

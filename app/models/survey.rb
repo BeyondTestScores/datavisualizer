@@ -53,7 +53,7 @@ class Survey < ApplicationRecord
     Faraday.new('https://api.surveymonkey.com/v3') do |conn|
       conn.adapter Faraday.default_adapter
       conn.response :json, :content_type => /\bjson$/
-      conn.headers['Authorization'] = "bearer #{Rails.application.credentials.dig(:surveymonkey)[:access_token]}"
+      conn.headers['Authorization'] = "bearer #{Rails.application.credentials.dig(Rails.env.to_sym)[:surveymonkey][:access_token]}"
       conn.headers['Content-Type'] = 'application/json'
     end
   end
