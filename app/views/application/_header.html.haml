@@ -4,3 +4,6 @@
     = link_to("(admin home)", admin_root_path, class: 'navbar-brand')
     %button.navbar-toggler{"aria-controls" => "navbarSupportedContent", "aria-expanded" => "false", "aria-label" => "Toggle navigation", "data-target" => "#navbarSupportedContent", "data-toggle" => "collapse", :type => "button"}
       %span.navbar-toggler-icon
+
+%ol.breadcrumb.mt-3
+  = render_breadcrumbs :tag => :li, :separator => "&nbsp;&nbsp;&nbsp;>&nbsp;&nbsp;&nbsp;"

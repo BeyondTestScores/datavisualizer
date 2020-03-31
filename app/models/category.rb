@@ -22,4 +22,15 @@ class Category < ApplicationRecord
     questions.map(&:sync_surveys)
   end
 
+  def path(include_self: false)
+    parents = []
+    parents << self if include_self
+    pc = parent_category
+    while pc.present?
+      parents << pc
+      pc = pc.parent_category
+    end
+    parents.reverse
+  end
+
 end

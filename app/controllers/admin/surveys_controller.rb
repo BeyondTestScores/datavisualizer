@@ -6,6 +6,8 @@ class Admin::SurveysController < Admin::AdminController
   end
 
   def new
+    add_breadcrumb "New Survey"
+
     @survey = Survey.new
   end
 

@@ -2,15 +2,23 @@ class Admin::CategoriesController < Admin::AdminController
 
   before_action :set_category, only: [:show, :edit, :update, :destroy]
   before_action :set_parent_categories, only: [:new, :edit]
+  before_action :set_path, only: [:show, :edit]
 
   def index
   end
 
   def show
+    add_breadcrumb @category.name
   end
 
   def new
-    @category = Category.new(parent_category_id: params[:parent_category_id])
+    parent_category = Category.where(id: params[:parent_category_id]).first
+
+    if parent_category.present?
+      parent_category.path(include_self: true).each { |pc| add_breadcrumb pc.name, [:admin, pc] }
+    end
+    add_breadcrumb "New #{parent_category.present? ? 'Subcategory' : 'Category'}"
+    @category = Category.new(parent_category: parent_category)
   end
 
   def create
@@ -24,6 +32,8 @@ class Admin::CategoriesController < Admin::AdminController
   end
 
   def edit
+    add_breadcrumb @category.name, [:admin, @category]
+    add_breadcrumb "Edit"
   end
 
   def update
@@ -47,6 +57,10 @@ class Admin::CategoriesController < Admin::AdminController
   end
 
   private
+  def set_path
+    @category.path.each { |pc| add_breadcrumb pc.name, [:admin, pc] }
+  end
+
   def set_parent_categories
     @parent_categories = Category.all.sort
   end
