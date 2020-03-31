@@ -3,6 +3,7 @@ class Admin::SurveysController < Admin::AdminController
   before_action :set_survey, only: [:show, :edit, :update, :destroy]
 
   def show
+    add_breadcrumb @survey.name
   end
 
   def new
@@ -21,6 +22,8 @@ class Admin::SurveysController < Admin::AdminController
   end
 
   def edit
+    add_breadcrumb @survey.name, [:admin, @survey]
+    add_breadcrumb "Edit"
   end
 
   def update

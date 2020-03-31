@@ -2,12 +2,22 @@ class Admin::QuestionsController < Admin::AdminController
 
   before_action :set_question, only: [:show, :edit, :update]
   before_action :set_categories, only: [:new, :edit]
+  before_action :set_path, only: [:show, :edit]
 
   def show
+    add_breadcrumb @question.text.truncate(50)
   end
 
   def new
-    @question = Question.new(category_id: params[:category_id])
+    category = Category.where(id: params[:category_id]).first
+
+    if (category)
+      category.path(include_self: true).each { |pc| add_breadcrumb pc.name, [:admin, pc] }
+    end
+
+    add_breadcrumb "New Question"
+
+    @question = Question.new(category: category)
   end
 
   def create
@@ -21,6 +31,8 @@ class Admin::QuestionsController < Admin::AdminController
   end
 
   def edit
+    add_breadcrumb @question.text.truncate(50), [:admin, @question]
+    add_breadcrumb "Edit"
   end
 
   # PATCH/PUT /admin/questions/1
@@ -49,6 +61,11 @@ class Admin::QuestionsController < Admin::AdminController
 
 
   private
+  def set_path
+    return if @question.try(:category).nil?
+    @question.category.path(include_self: true).each { |pc| add_breadcrumb pc.name, [:admin, pc] }
+  end
+
   def set_categories
     @categories = Category.all.sort
   end
