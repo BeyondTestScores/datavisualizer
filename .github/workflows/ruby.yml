@@ -94,16 +94,3 @@ jobs:
         SELENIUM_URL: "http://hub:4444/wd/hub"
       run: |
         rails test
-        rails test:system
-
-    - name: Zip Screenshots
-      if: failure()
-      run: |
-        zip -j screenshots.zip /__w/portal/portal/tmp/screenshots/*
-        ls
-
-    - uses: actions/upload-artifact@v1
-      if: failure()
-      with:
-        name: screenshots
-        path: screenshots.zip
