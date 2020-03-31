@@ -26,7 +26,7 @@ module SurveyMonkeyHelper
   def survey_monkey_mock(method: :get, url: "surveys", body: nil, responses: [], times: 1, times_out: false)
     with = {headers: {
       'Content-Type' => 'application/json',
-      'Authorization' => "bearer #{Rails.application.credentials.dig(:surveymonkey)[:access_token]}"
+      'Authorization' => "bearer #{Rails.application.credentials.dig(:test)[:surveymonkey][:access_token]}"
     }}
 
     with[:body] = body.to_json if body != nil
