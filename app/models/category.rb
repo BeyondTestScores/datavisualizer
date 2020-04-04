@@ -33,4 +33,8 @@ class Category < ApplicationRecord
     parents.reverse
   end
 
+  def all_questions
+    questions.to_a + child_categories.map(&:all_questions).flatten.uniq
+  end
+
 end

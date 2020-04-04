@@ -1,7 +1,9 @@
 ENV['RAILS_ENV'] ||= 'test'
 require_relative '../config/environment'
 require 'rails/test_help'
+require 'capybara/rails'
 require 'webmock/minitest'
+require 'capybara/webmock'
 
 class ActiveSupport::TestCase
   # Run tests in parallel with specified workers
@@ -45,17 +47,13 @@ module SurveyMonkeyHelper
     return {method: method, url: full_url, body: with[:body], times: times}
   end
 
-  def details(survey: nil, survey_questions: nil, pages: nil, default_page: false)
-    return {} if survey.nil?
-    result = {"id": survey.survey_monkey_id, "title": survey.name}
-
-    survey_questions ||= survey.survey_questions
+  def pages(survey_questions: nil, pages: nil, default_page: false)
     pages ||= []
     if default_page || (pages.empty? && survey_questions.empty?)
       pages << {"id": DEFAULT_PAGE_ID, "title": ""}
     end
 
-    survey_questions.each do |survey_question|
+    (survey_questions || []).each do |survey_question|
       page_id = survey_question.survey_monkey_page_id
       id = survey_question.survey_monkey_id
       question = survey_question.question
@@ -83,8 +81,18 @@ module SurveyMonkeyHelper
         }
       }
     end
+    pages
+  end
 
-    result["pages"] = pages
+  def details(survey: nil, survey_questions: nil, pages: nil, default_page: false)
+    return {} if survey.nil?
+    result = {"id": survey.survey_monkey_id, "title": survey.name}
+
+    result["pages"] = pages(
+      survey_questions: survey_questions || survey.survey_questions,
+      pages: pages,
+      default_page: default_page
+    )
 
     return result
   end

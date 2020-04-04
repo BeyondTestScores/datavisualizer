@@ -45,4 +45,22 @@ Rails.application.configure do
 
   # Raises error for missing translations.
   # config.action_view.raise_on_missing_translations = true
+
+  Capybara.javascript_driver = :capybara_webmock_chrome
+  # Capybara.javascript_driver = :capybara_webmock_chrome_headless
+
+  Capybara::Webmock.port_number = 8200
+  WebMock.disable_net_connect!(allow_localhost: true, allow: ['chromedriver.storage.googleapis.com'])
+
+  if ENV['SELENIUM_URL']
+    Capybara.run_server = true
+
+    net = Socket.ip_address_list.detect{|addr| addr.ipv4_private? }
+    ip = net.nil? ? 'localhost' : net.ip_address
+    config.domain = ip
+    config.action_mailer.default_url_options = { :host => config.domain }
+
+    Capybara.server_port = 8200
+    Capybara.server_host = ip
+  end
 end
