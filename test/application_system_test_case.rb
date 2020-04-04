@@ -25,7 +25,7 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
       Capybara.app_host = "http://#{ip}:8200"
     end
 
-    WebMock.disable_net_connect!(allow_localhost: true, allow: ['hub:4444', 'chromedriver.storage.googleapis.com'])
+    WebMock.disable_net_connect!(allow_localhost: true, allow: ['hub:4444', '172.18.0.2:8200', 'chromedriver.storage.googleapis.com'])
 
     # Capybara::Webmock.start
   end
