@@ -19,7 +19,7 @@ class Category < ApplicationRecord
   end
 
   def sync_surveys
-    questions.map(&:sync_surveys)
+    all_questions.map(&:sync_surveys)
   end
 
   def path(include_self: false)
