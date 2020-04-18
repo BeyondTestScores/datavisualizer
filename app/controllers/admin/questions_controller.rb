@@ -23,7 +23,9 @@ class Admin::QuestionsController < Admin::AdminController
   def create
     @question = Question.new(question_params)
     if @question.save
-      redirect_to [:admin, @question]
+      respond_to do |format|
+        format.html { redirect_to [:admin, @question], notice: 'Question was successfully created.' }
+      end
     else
       @categories = Category.all.sort
       render :new

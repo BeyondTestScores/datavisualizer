@@ -1,3 +1,12 @@
+.schools
+  %h3 Schools
+  %p Please add all of the schools that will be surveyed.
+  - School.order(:name).all.each do |school|
+    %p= link_to school, [:admin, school]
+  %p
+    %a= link_to "+ Create New School", new_admin_school_path
+
+
 .tree.py-3
   %h3 Website Tree
   %p
