@@ -1,9 +1,4 @@
 .category-tree
-  %h4
-    All Categories
-    - if local_assigns[:show_questions]
-      and Questions
-
   - Category.root.each do |c|
     .category{data: {category_id: c.id}}
       = render "category_#{template}", category: c

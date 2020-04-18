@@ -1,24 +1,28 @@
-%h2 "Empowering Communities with Data" Admin Home
+.tree.py-3
+  %h3 Website Tree
+  %p
+    This tree represents the categories, survey questions, and administrative measures
+    that will display on the website that is visible to the public.
 
-%br
+  = render 'category_tree', template: "link", show_questions: true
 
-%p
-  %a= link_to "+ Create New Category", new_admin_category_path
-%p
-  %a= link_to "+ Create New Question", new_admin_question_path
+.add.py-3
+  %h3 Add To Tree
+  %p
+    To add to this tree create new categories, questions, and administrative measures.
+  %p
+    %a= link_to "+ Create New Category", new_admin_category_path
+  %p
+    %a= link_to "+ Create New Question", new_admin_question_path
+  %p
+    %a= link_to "+ Create New Administrative Measure", new_admin_question_path
 
-%br
 
-%h3 Surveys
-
-%p
-  %a=link_to "+ Create New Survey", new_admin_survey_path
+-# %p
+-#   %a=link_to "+ Create New Survey", new_admin_survey_path
 
 .surveys
+  %h3 Surveys
+  %p The following surveys have been automatically generated on Survey Monkey.
   - Survey.all.each do |survey|
     %p= link_to survey, [:admin, survey]
-
-%br
-%br
-
-= render 'category_tree', template: "link", show_questions: true
