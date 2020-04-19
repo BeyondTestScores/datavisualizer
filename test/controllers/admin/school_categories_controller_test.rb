@@ -30,7 +30,7 @@ class Admin::SchoolCategoriesControllerTest < ActionDispatch::IntegrationTest
 
   test "should update school_category" do
     patch admin_school_category_url(@school_category), params: { school_category: { nonlikert: @school_category.nonlikert } }, headers: authorized_headers
-    assert_redirected_to admin_school_category_url(@school_category)
+    assert_redirected_to [:admin, @school_category.category]
   end
 
   test "should destroy school_category" do

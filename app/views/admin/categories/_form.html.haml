@@ -6,7 +6,7 @@
         = pluralize(@category.errors.count, "error")
         prohibited
         this
-        = category.administrative_measure? ? 'administrative measure' : 'category'
+        = @category.administrative_measure? ? 'administrative measure' : 'category'
         from being saved:
       %ul
         - @category.errors.full_messages.each do |msg|
