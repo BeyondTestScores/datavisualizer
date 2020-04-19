@@ -25,3 +25,11 @@ four:
   blurb: A child's child
   description: A child category has this as it's child category
   parent_category: two
+
+administrative_measure:
+  name: Administrative Measure
+  slug: administrative-measure
+  blurb: An administrative measure category
+  description: This category is an administrative measure.
+  parent_category: two
+  administrative_measure: true

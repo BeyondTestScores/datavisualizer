@@ -1,10 +1,16 @@
 %h2
   New
-  - if @category.parent_category.present?
-    Subcategory Under
-    = "\"#{@category.parent_category.name}\""
+  - if @category.administrative_measure?
+    Administrative Measure
+  - elsif @category.parent_category.present?
+    Subcategory
   - else
-    Category
+    Category  
+
+  - if @category.parent_category.present?
+    Under
+    = "\"#{@category.parent_category.name}\""
+
 
 %br
 

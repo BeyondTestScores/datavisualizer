@@ -18,7 +18,7 @@ class Admin::CategoriesController < Admin::AdminController
       parent_category.path(include_self: true).each { |pc| add_breadcrumb pc.name, [:admin, pc] }
     end
     add_breadcrumb "New #{parent_category.present? ? 'Subcategory' : 'Category'}"
-    @category = Category.new(parent_category: parent_category)
+    @category = Category.new(parent_category: parent_category, administrative_measure: params[:administrative_measure])
   end
 
   def create
@@ -68,7 +68,7 @@ class Admin::CategoriesController < Admin::AdminController
   end
 
   def category_params
-    params.require(:category).permit(:name, :blurb, :descrtiption, :parent_category_id)
+    params.require(:category).permit(:name, :blurb, :descrtiption, :parent_category_id, :administrative_measure)
   end
 
   def set_category

@@ -8,6 +8,7 @@ class Category < ApplicationRecord
 
   validates :name, presence: true, length: { minimum: 1 }
 
+  after_create :create_school_categories_for_administrative_measure
   after_update_commit :sync_surveys
 
   include FriendlyId
@@ -36,6 +37,15 @@ class Category < ApplicationRecord
 
   def all_questions
     questions.to_a + child_categories.map(&:all_questions).flatten.uniq
+  end
+
+  private
+
+  def create_school_categories_for_administrative_measure
+    return unless administrative_measure?
+    School.all.each do |school|
+      school_categories.create(school: school)
+    end
   end
 
 end

@@ -6,14 +6,10 @@ one:
   response_count: 1
   answer_index_total: 1
   zscore: 1.5
-  nonlikert: 1.5
   year: 2020
 
-two:
-  category: two
+administrative_measure:
+  category: administrative_measure
   school: one
-  response_count: 1
-  answer_index_total: 1
-  zscore: 1.5
   nonlikert: 1.5
   year: 2020

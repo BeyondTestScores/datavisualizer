@@ -4,7 +4,8 @@ class SchoolCategory < ApplicationRecord
   belongs_to :school
 
   def name(category_or_school)
-    "Value For #{try(category_or_school).try(:name)}"
+    text = category_or_school.blank? ? "#{category} at #{school}" : try(category_or_school)
+    "Value For #{text}"
   end
 
 end

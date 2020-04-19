@@ -5,7 +5,9 @@
       %h2
         = pluralize(@category.errors.count, "error")
         prohibited
-        this category from being saved:
+        this
+        = category.administrative_measure? ? 'administrative measure' : 'category'
+        from being saved:
       %ul
         - @category.errors.full_messages.each do |msg|
           %li= msg
@@ -14,6 +16,7 @@
   = f.text_field :name
   = f.text_field :blurb
   = f.text_area :description
+  = f.hidden_field :administrative_measure
   = f.select :parent_category_id, @parent_categories.map { |pc| [pc.name, pc.id] }, { include_blank: true }, {class: 'category-selector-target'}
   %p Or click a category in the tree below to select it as the parent.
   = render "category_tree", template: "selector"

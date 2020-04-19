@@ -31,7 +31,7 @@ class Admin::SchoolCategoriesController < Admin::AdminController
   def update
     respond_to do |format|
       if @school_category.update(school_category_params)
-        format.html { redirect_to [:admin, @school_category], notice: 'Administrative measure was successfully updated.' }
+        format.html { redirect_to [:admin, @school_category.category], notice: "#{@school_category.name(:school)} was successfully updated." }
         # format.json { render :show, status: :ok, location: @school_category }
       else
         format.html { render :edit }

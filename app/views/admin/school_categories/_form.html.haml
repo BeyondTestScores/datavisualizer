@@ -11,7 +11,7 @@
           %li= msg
 
 
-  %p= "What is the value for \"#{@school_category.category}\" at #{@school_category.school}?"
+  %p= "What is the #{@school_category.to_s.downcase}?"
 
   = f.text_field :nonlikert
 

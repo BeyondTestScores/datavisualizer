@@ -34,6 +34,16 @@
     - @category.questions.each do |question|
       %p= link_to question, [:admin,question]
 
+- if @category.administrative_measure? && @category.school_categories.present?
+  %br
+  %b Administrative Values For Each School:
+
+  %ul
+    - @category.school_categories.each do |school_category|
+      - missing = school_category.nonlikert.blank?
+      - value = "#{school_category.name(:school)}: #{missing ? 'Missing' : school_category.nonlikert}"
+      %li= link_to value, edit_admin_school_category_path(school_category), class: missing ? "" : "error"
+
 %br
 
 %p= link_to "+ Add A Subcategory", new_admin_category_path(parent_category_id: @category.id)
