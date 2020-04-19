@@ -174,7 +174,7 @@ class Admin::QuestionsControllerTest < ActionDispatch::IntegrationTest
         url: "surveys/#{survey_monkey_id}/details",
         responses: [details(survey: survey)]
       )
-      
+
     end
     question.update_column("text", old_question_text)
     question.update_column("category_id", old_category.id)
@@ -192,20 +192,49 @@ class Admin::QuestionsControllerTest < ActionDispatch::IntegrationTest
     assert_requests requests
   end
 
-  # Why is this crashing the tests?
-  # def test_destroy__doesnt_destroy_category
-  #   category_count = Category.count
-  #   category = categories(:two)
-  #   assert_equal 1, category.questions.count
-  #   question_count = Question.count
-  #
-  #   delete admin_question_url(question), headers: authorized_headers
-  #   # assert_redirected_to admin_root_path
-  #   # assert_select h3, "Question was successfully destroyed."
-  #
-  #   assert_equal category_count, Category.count
-  #   assert_equal question_count - 1, category.questions.count
-  # end
+  def test_destroy__doesnt_destroy_category
+    requests = []
+
+    category_count = Category.count
+    question_count = Question.count
+
+    category = categories(:two)
+    assert_equal 1, category.questions.count
+    question = category.questions.first
+
+    question.survey_questions.each do |sq|
+      survey = sq.survey
+
+      requests << survey_monkey_mock(
+        method: :delete,
+        url: "surveys/#{survey.survey_monkey_id}/pages/#{sq.survey_monkey_page_id}/questions/#{sq.survey_monkey_id}"
+      )
+
+      requests << survey_monkey_mock(
+        method: :get,
+        url: "surveys/#{survey.survey_monkey_id}/details",
+        responses: [details(
+          survey: survey,
+          survey_questions: [],
+          pages: [{"id": sq.survey_monkey_page_id}]
+        )]
+      )
+
+      requests << survey_monkey_mock(
+        method: :delete,
+        url: "surveys/#{survey.survey_monkey_id}/pages/#{sq.survey_monkey_page_id}"
+      )
+    end
+
+    delete admin_question_url(question), headers: authorized_headers
+    assert_redirected_to admin_root_path
+
+    assert_equal category_count, Category.count
+    assert_equal question_count - 1, Question.count
+    assert_equal 0, category.reload.questions.count
+
+    assert_requests requests
+  end
 
 
   # def test_index

@@ -150,18 +150,46 @@ class Admin::CategoriesControllerTest < ActionDispatch::IntegrationTest
     assert_requests requests
   end
 
-  # Why is this crashing the tests?
-  # def test_destroy__also_destroys_questions
-  #   category_count = Category.count
-  #   category = categories(:two)
-  #   assert_equal 1, category.questions.count
-  #   question_count = Question.count
-  #
-  #   delete admin_category_url(category), headers: authorized_headers
-  #   # assert_redirected_to admin_root_path
-  #   # assert_select h3, "Category was successfully destroyed."
-  #
-  #   assert_equal category_count - 1, Category.count
-  #   assert_equal question_count - 1, Question.count
-  # end
+  def test_destroy__also_destroys_questions
+    requests = []
+
+    category_count = Category.count
+    category = categories(:two)
+    assert_equal 1, category.questions.count
+    question_count = Question.count
+
+    category.questions.each do |question|
+      question.survey_questions.each do |sq|
+        survey = sq.survey
+
+        requests << survey_monkey_mock(
+          method: :delete,
+          url: "surveys/#{survey.survey_monkey_id}/pages/#{sq.survey_monkey_page_id}/questions/#{sq.survey_monkey_id}"
+        )
+
+        requests << survey_monkey_mock(
+          method: :get,
+          url: "surveys/#{survey.survey_monkey_id}/details",
+          responses: [details(
+            survey: survey,
+            survey_questions: [],
+            pages: [{"id": sq.survey_monkey_page_id}]
+          )]
+        )
+
+        requests << survey_monkey_mock(
+          method: :delete,
+          url: "surveys/#{survey.survey_monkey_id}/pages/#{sq.survey_monkey_page_id}"
+        )
+      end
+    end
+
+    delete admin_category_url(category), headers: authorized_headers
+    assert_redirected_to admin_root_path
+
+    assert_equal category_count - 2, Category.count # category and it's child category
+    assert_equal question_count - 1, Question.count
+
+    assert_requests requests
+  end
 end

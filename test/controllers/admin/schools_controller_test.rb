@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class SchoolsControllerTest < ActionDispatch::IntegrationTest
+class Admin::SchoolsControllerTest < ActionDispatch::IntegrationTest
   setup do
     @school = schools(:one)
   end

@@ -4,6 +4,7 @@ class Category < ApplicationRecord
   has_many :questions, dependent: :destroy
   belongs_to :parent_category, class_name: 'Category', foreign_key: :parent_category_id, optional: true
   has_many :child_categories, class_name: 'Category', foreign_key: :parent_category_id, dependent: :destroy
+  has_many :school_categories, dependent: :destroy
 
   validates :name, presence: true, length: { minimum: 1 }
 

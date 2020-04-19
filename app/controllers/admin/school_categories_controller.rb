@@ -1,9 +1,9 @@
-class Admin::School_categoryCategoriesController < Admin::AdminController
+class Admin::SchoolCategoriesController < Admin::AdminController
 
   before_action :set_school_category, only: [:show, :edit, :update, :destroy]
 
   def show
-    add_breadcrumb @school_category.name
+    add_breadcrumb @school_category.name(:school)
   end
 
   def new
@@ -24,7 +24,7 @@ class Admin::School_categoryCategoriesController < Admin::AdminController
   end
 
   def edit
-    add_breadcrumb @school_category.name, [:admin, @school_category]
+    add_breadcrumb @school_category.name(:school), [:admin, @school_category]
     add_breadcrumb "Edit"
   end
 
@@ -52,7 +52,7 @@ class Admin::School_categoryCategoriesController < Admin::AdminController
 
   private
   def school_category_params
-    params.require(:school_category).permit(:nonlikert)
+    params.require(:school_category).permit(:nonlikert, :category_id, :school_id)
   end
 
   def set_school_category
