@@ -2,15 +2,6 @@ require 'test_helper'
 
 class Admin::CategoriesControllerTest < ActionDispatch::IntegrationTest
 
-  def authorized_headers
-    return {
-      Authorization: ActionController::HttpAuthentication::Basic.encode_credentials(
-        Rails.application.credentials.test[:authentication][:admin][:username],
-        Rails.application.credentials.test[:authentication][:admin][:password]
-      )
-    }
-  end
-
   def test_authentication
     # get the admin page
     get "/admin/categories/new"

@@ -52,7 +52,7 @@ class Admin::SchoolsController < Admin::AdminController
 
   private
   def school_params
-    params.require(:school).permit(:name, :school_monkey_id, question_ids: [])
+    params.require(:school).permit(:name, :description)
   end
 
   def set_school

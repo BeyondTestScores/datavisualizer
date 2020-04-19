@@ -7,23 +7,13 @@ class Admin::HomeControllerTest < ActionDispatch::IntegrationTest
     assert_equal 401, status
 
     # post the login and follow through to the home page
-    get "/admin", headers: {
-      Authorization: ActionController::HttpAuthentication::Basic.encode_credentials(
-        Rails.application.credentials.test[:authentication][:admin][:username],
-        Rails.application.credentials.test[:authentication][:admin][:password]
-      )
-    }
+    get "/admin", headers: authorized_headers
     assert_equal "/admin", path
   end
 
   def test_index_links_to_create_new_category
-    get "/admin", headers: {
-      Authorization: ActionController::HttpAuthentication::Basic.encode_credentials(
-        Rails.application.credentials.test[:authentication][:admin][:username],
-        Rails.application.credentials.test[:authentication][:admin][:password]
-      )
-    }
-    assert_select "a", "+ Create New Survey", :href => /admin\/surveys\/new/
+    get "/admin", headers: authorized_headers
+    assert_select "a", "+ Create New School", :href => /admin\/schools\/new/
     assert_select "a", "+ Create New Category", :href => /admin\/categories\/new/
     assert_select "a", "+ Create New Question", :href => /admin\/questions\/new/
   end

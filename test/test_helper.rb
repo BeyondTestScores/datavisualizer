@@ -98,12 +98,25 @@ module SurveyMonkeyHelper
   end
 end
 
+module AuthHelper
+  def authorized_headers
+    return {
+      Authorization: ActionController::HttpAuthentication::Basic.encode_credentials(
+        Rails.application.credentials.test[:authentication][:admin][:username],
+        Rails.application.credentials.test[:authentication][:admin][:password]
+      )
+    }
+  end
+end
+
 class ActionDispatch::IntegrationTest
   include SurveyMonkeyHelper
+  include AuthHelper
 end
 
 class ActiveSupport::TestCase
   include SurveyMonkeyHelper
+  include AuthHelper
 end
 
 
