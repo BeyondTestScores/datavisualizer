@@ -23,7 +23,6 @@ ActiveRecord::Schema.define(version: 2020_04_18_214620) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.string "slug"
-    t.float "nonlikert"
     t.index ["slug"], name: "index_categories_on_slug", unique: true
   end
 
