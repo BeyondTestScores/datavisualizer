@@ -15,6 +15,7 @@ class Category < ApplicationRecord
   friendly_id :name, :use => [:slugged]
 
   scope :root, -> { where(parent_category: nil) }
+  scope :administrative_measure, -> { where(administrative_measure: true) }
 
   def to_s
     name

@@ -13,3 +13,8 @@ administrative_measure:
   school: one
   nonlikert: 1.5
   year: 2020
+
+administrative_measure2:
+  category: administrative_measure
+  school: two
+  year: 2020

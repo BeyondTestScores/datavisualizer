@@ -1,3 +1,13 @@
+.missing
+  %h3.error Missing
+  %p The following items are missing or incomplete.
+  %ul
+    - SchoolCategory.missing_administrative_measure.each do |school_category|
+      %li
+        = "#{school_category.name} is missing:"
+        = link_to "Fix it >", edit_admin_school_category_path(school_category), class: 'error'
+
+
 .schools
   %h3 Schools
   %p Please add all of the schools that will be surveyed.
