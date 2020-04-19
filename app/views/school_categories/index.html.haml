@@ -1,0 +1,33 @@
+%h1 Listing school_categories
+
+%table
+  %thead
+    %tr
+      %th Category
+      %th School
+      %th Response count
+      %th Answer index total
+      %th Zscore
+      %th Nonlikert
+      %th Year
+      %th
+      %th
+      %th
+
+  %tbody
+    - @school_categories.each do |school_category|
+      %tr
+        %td= school_category.category
+        %td= school_category.school
+        %td= school_category.response_count
+        %td= school_category.answer_index_total
+        %td= school_category.zscore
+        %td= school_category.nonlikert
+        %td= school_category.year
+        %td= link_to 'Show', school_category
+        %td= link_to 'Edit', edit_school_category_path(school_category)
+        %td= link_to 'Destroy', school_category, method: :delete, data: { confirm: 'Are you sure?' }
+
+%br
+
+= link_to 'New School category', new_school_category_path

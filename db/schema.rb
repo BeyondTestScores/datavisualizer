@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_04_18_214620) do
+ActiveRecord::Schema.define(version: 2020_04_19_004719) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -50,6 +50,20 @@ ActiveRecord::Schema.define(version: 2020_04_18_214620) do
     t.index ["category_id"], name: "index_questions_on_category_id"
   end
 
+  create_table "school_categories", force: :cascade do |t|
+    t.bigint "category_id", null: false
+    t.bigint "school_id", null: false
+    t.integer "response_count"
+    t.integer "answer_index_total"
+    t.float "zscore"
+    t.float "nonlikert"
+    t.string "year"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["category_id"], name: "index_school_categories_on_category_id"
+    t.index ["school_id"], name: "index_school_categories_on_school_id"
+  end
+
   create_table "schools", force: :cascade do |t|
     t.string "name"
     t.text "description"
@@ -76,6 +90,8 @@ ActiveRecord::Schema.define(version: 2020_04_18_214620) do
   end
 
   add_foreign_key "questions", "categories"
+  add_foreign_key "school_categories", "categories"
+  add_foreign_key "school_categories", "schools"
   add_foreign_key "survey_questions", "questions"
   add_foreign_key "survey_questions", "surveys"
 end

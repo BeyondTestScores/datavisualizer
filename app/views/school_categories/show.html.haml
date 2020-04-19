@@ -1,0 +1,27 @@
+%p#notice= notice
+
+%p
+  %b Category:
+  = @school_category.category
+%p
+  %b School:
+  = @school_category.school
+%p
+  %b Response count:
+  = @school_category.response_count
+%p
+  %b Answer index total:
+  = @school_category.answer_index_total
+%p
+  %b Zscore:
+  = @school_category.zscore
+%p
+  %b Nonlikert:
+  = @school_category.nonlikert
+%p
+  %b Year:
+  = @school_category.year
+
+= link_to 'Edit', edit_school_category_path(@school_category)
+\|
+= link_to 'Back', school_categories_path

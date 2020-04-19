@@ -2,10 +2,12 @@
 
 Rails.application.routes.draw do
 
-  resources :schools, only: [:show]
-  resources :surveys, only: [:show]
-  resources :questions, only: [:show]
-  resources :categories, only: [:show]
+  resources :schools, only: [:show] do
+    resources :school_categories, only: [:show]
+  end
+  # resources :surveys, only: [:show]
+  # resources :questions, only: [:show]
+  # resources :categories, only: [:show]
 
   get 'welcome/index'
   root 'welcome#index'
@@ -15,6 +17,7 @@ Rails.application.routes.draw do
     resources :schools
     resources :surveys
     resources :categories
+    resources :school_categories
     resources :questions
   end
 
