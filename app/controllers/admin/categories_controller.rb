@@ -18,7 +18,10 @@ class Admin::CategoriesController < Admin::AdminController
       parent_category.path(include_self: true).each { |pc| add_breadcrumb pc.name, [:admin, pc] }
     end
     add_breadcrumb "New #{parent_category.present? ? 'Subcategory' : 'Category'}"
-    @category = Category.new(parent_category: parent_category, administrative_measure: params[:administrative_measure])
+    @category = Category.new(
+      parent_category: parent_category,
+      administrative_measure: params[:administrative_measure] || false
+    )
   end
 
   def create

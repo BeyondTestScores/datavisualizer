@@ -1,11 +1,18 @@
-.missing
-  %h3.error Missing
-  %p The following items are missing or incomplete.
-  %ul
-    - SchoolCategory.missing_administrative_measure.each do |school_category|
-      %li
-        = "#{school_category.name} is missing:"
-        = link_to "Fix it >", edit_admin_school_category_path(school_category), class: 'error'
+- missing_administrative_measure = SchoolCategory.missing_administrative_measure
+- incomplete_category = Category.incomplete
+- unless missing_administrative_measure.empty? && incomplete_category.empty?
+  .missing
+    %h3.error Missing
+    %p The following items are missing or incomplete.
+    %ul
+      - missing_administrative_measure.each do |school_category|
+        %li{class: "school_category-#{school_category.id}"}
+          = "#{school_category.name} is missing:"
+          = link_to "Fix administrative measure >", edit_admin_school_category_path(school_category), class: 'error'
+      - incomplete_category.each do |category|
+        %li{class: "category-#{category.id}"}
+          = "#{category} needs a subcategory, questions, or an administrative measure:"
+          = link_to "Fix category >", admin_category_path(category), class: 'error'
 
 
 .schools

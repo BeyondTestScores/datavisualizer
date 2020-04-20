@@ -15,6 +15,26 @@ class CategoriesTest < ApplicationSystemTestCase
     assert_text "Parent Category: Category Four"
   end
 
+  test "creating an administrative measure" do
+    visit_admin admin_root_path
+
+    click_text categories(:four).name
+
+    click_on "+ Add An Administrative Measure To This Category"
+
+    admin_measure_name = "New Admin Measure"
+    fill_in "Name", with: admin_measure_name
+
+    click_on "Create"
+
+    assert_text admin_measure_name
+    assert_text categories(:four).name
+
+    School.all.each do |school|
+      assert_text school.name
+    end
+  end
+
   test "deleting a category" do
     requests = []
 

@@ -23,7 +23,7 @@ ActiveRecord::Schema.define(version: 2020_04_19_131804) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.string "slug"
-    t.boolean "administrative_measure", default: false
+    t.boolean "administrative_measure", default: false, null: false
     t.index ["slug"], name: "index_categories_on_slug", unique: true
   end
 

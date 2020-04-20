@@ -39,7 +39,9 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     visit "http://#{credentials[:username]}:#{credentials[:password]}@#{Capybara.current_session.server.host}:#{Capybara.current_session.server.port}#{path}"
   end
 
-  def click_text(text)
-    page.find_all(:xpath, "//*[normalize-space(text())='#{text}']").first.click
+  def click_text(text, base=page)
+    assert_text text
+    puts base.inspect
+    base.find_all(:xpath, "//*[normalize-space(text())='#{text}']").first.try(:click)
   end
 end

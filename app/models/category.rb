@@ -16,6 +16,7 @@ class Category < ApplicationRecord
 
   scope :root, -> { where(parent_category: nil) }
   scope :administrative_measure, -> { where(administrative_measure: true) }
+  scope :incomplete, -> { where(administrative_measure: false).includes(:questions, :child_categories).where(questions: { id: nil }).where(child_categories_categories: { id: nil }) }
 
   def to_s
     name

@@ -48,6 +48,7 @@
 
 %p= link_to "+ Add A Subcategory", new_admin_category_path(parent_category_id: @category.id)
 %p= link_to "+ Add A Question To This Category", new_admin_question_path(category_id: @category.id)
+%p= link_to "+ Add An Administrative Measure To This Category", new_admin_category_path(parent_category_id: @category.id, administrative_measure: true)
 
 %br
 %br

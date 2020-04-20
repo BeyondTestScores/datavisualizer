@@ -38,12 +38,40 @@ class CategoryTest < ActiveSupport::TestCase
     questions << subsubcatgory.questions.create(text: "subsubcatgory2 question2")
   end
 
-  # Why is this crashing the tests?
-  # def test_delete_also_deletes_questions
-  #   category = categories(:two)
-  #   question_count = Question.count
-  #   category.destroy
-  #   assert_equal question.count - 1, Question.count
-  # end
+  def test_delete_also_deletes_questions
+
+
+    category = categories(:two)
+    question_count = Question.count
+    category.destroy
+    assert_equal question.count - 1, Question.count
+  end
+
+  def test_incomplete
+    incomplete = Category.incomplete.to_a
+    assert incomplete.include?(categories(:three))
+    assert incomplete.include?(categories(:four))
+    assert_not incomplete.include?(categories(:administrative_measure))
+
+    categories(:three).questions.create(
+      text: "Question?",
+      option1: "Option 1",
+      option2: "Option 2",
+      option3: "Option 3",
+      option4: "Option 4",
+      option5: "Option 5"
+    )
+    assert_equal 1, categories(:three).questions.count
+
+    incomplete = Category.incomplete.to_a
+    assert_not incomplete.include?(categories(:three))
+    assert incomplete.include?(categories(:four))
+
+    categories(:four).child_categories.create(administrative_measure: true, name: 'An Administrative Measure')
+
+    incomplete = Category.incomplete.to_a
+    assert_not incomplete.include?(categories(:three))
+    assert_not incomplete.include?(categories(:four))
+  end
 
 end
