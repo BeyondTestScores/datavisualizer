@@ -22,6 +22,10 @@ class Category < ApplicationRecord
     name
   end
 
+  def classification
+    administrative_measure? ? 'Administrative measure' : 'Category'
+  end
+
   def sync_surveys
     all_questions.map(&:sync_surveys)
   end

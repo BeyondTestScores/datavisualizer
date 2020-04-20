@@ -28,7 +28,7 @@ class Admin::CategoriesController < Admin::AdminController
     @category = Category.new(category_params)
     if @category.save
       respond_to do |format|
-        format.html { redirect_to [:admin, @category], notice: 'Category was successfully created.' }
+        format.html { redirect_to [:admin, @category], notice: "#{@category.classification} was successfully created." }
       end
     else
       @parent_categories = Category.all.sort

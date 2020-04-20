@@ -1,9 +1,9 @@
 %h2= @category.name
 
 %p
-  = link_to "Edit Category", edit_admin_category_path(@category)
+  = link_to "Edit #{@category.classification}", edit_admin_category_path(@category)
   &nbsp; | &nbsp;
-  = link_to "Delete Category", [:admin, @category],  method: :delete, data: { confirm: 'Are you sure you want to delete this category?' }
+  = link_to "Delete #{@category.classification}", [:admin, @category],  method: :delete, data: { confirm: "Are you sure you want to delete this #{@category.classification}?" }
 
 %p
   %b Slug:
@@ -36,22 +36,28 @@
 
 - if @category.administrative_measure? && @category.school_categories.present?
   %br
-  %b Administrative Values For Each School:
+  %h4 Administrative Values For Each School:
 
   %ul
     - @category.school_categories.each do |school_category|
       - missing = school_category.nonlikert.blank?
-      - value = "#{school_category.name(:school)}: #{missing ? 'Missing' : school_category.nonlikert}"
-      %li= link_to value, edit_admin_school_category_path(school_category), class: missing ? "" : "error"
+      - value = "#{missing ? 'Missing' : school_category.nonlikert}"
+      %li
+        %b= "#{school_category.name(:school)}:"
+        = value
+        &nbsp;
+        &nbsp;
+        = link_to missing ? 'Fix it >' : 'edit', edit_admin_school_category_path(school_category), class: missing ? "error": ""
 
 %br
 
-%p= link_to "+ Add A Subcategory", new_admin_category_path(parent_category_id: @category.id)
-%p= link_to "+ Add A Question To This Category", new_admin_question_path(category_id: @category.id)
-%p= link_to "+ Add An Administrative Measure To This Category", new_admin_category_path(parent_category_id: @category.id, administrative_measure: true)
+- unless @category.administrative_measure?
+  %p= link_to "+ Add A Subcategory", new_admin_category_path(parent_category_id: @category.id)
+  %p= link_to "+ Add A Question To This Category", new_admin_question_path(category_id: @category.id)
+  %p= link_to "+ Add An Administrative Measure To This Category", new_admin_category_path(parent_category_id: @category.id, administrative_measure: true)
 
-%br
-%br
+  %br
+  %br
 %br
 
 = render 'category_tree', template: "link", show_questions: true
