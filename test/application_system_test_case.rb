@@ -41,7 +41,6 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
 
   def click_text(text, base=page)
     assert_text text
-    puts base.inspect
     base.find_all(:xpath, "//*[normalize-space(text())='#{text}']").first.try(:click)
   end
 end

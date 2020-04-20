@@ -39,12 +39,45 @@ class CategoryTest < ActiveSupport::TestCase
   end
 
   def test_delete_also_deletes_questions
-
+    requests = []
 
     category = categories(:two)
     question_count = Question.count
+
+    all_questions = category.all_questions
+    all_survey_questions = all_questions.map(&:survey_questions).flatten.uniq
+    deleted_survey_questions = []
+    all_survey_questions.each do |survey_question|
+      deleted_survey_questions << survey_question
+      survey = survey_question.survey
+
+      requests << survey_monkey_mock(
+        method: :delete,
+        url: "surveys/#{survey.survey_monkey_id}/pages/#{survey_question.survey_monkey_page_id}/questions/#{survey_question.survey_monkey_id}"
+      )
+
+      requests << survey_monkey_mock(
+        method: :get,
+        url: "surveys/#{survey.survey_monkey_id}/details",
+        responses: [
+          details(
+            survey: survey,
+            survey_questions: survey.survey_questions - deleted_survey_questions,
+            pages: [{"id": survey_question.survey_monkey_page_id, "title": category.name}]
+          )
+        ]
+      )
+
+      requests << survey_monkey_mock(
+        method: :delete,
+        url: "surveys/#{survey.survey_monkey_id}/pages/#{survey_question.survey_monkey_page_id}"
+      )
+    end
+
     category.destroy
-    assert_equal question.count - 1, Question.count
+    assert_equal question_count - 1, Question.count
+
+    assert_requests requests
   end
 
   def test_incomplete
