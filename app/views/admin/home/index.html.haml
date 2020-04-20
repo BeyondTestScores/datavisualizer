@@ -15,9 +15,9 @@
           = link_to "Fix category >", admin_category_path(category), class: 'error'
 
 
-.schools
+.schools.py-3
   %h3 Schools
-  %p Please add all of the schools that will be surveyed.
+  %p Please add all of the school communities that will be surveyed.
   - School.order(:name).all.each do |school|
     %p= link_to school, [:admin, school]
   %p
@@ -47,8 +47,11 @@
 -# %p
 -#   %a=link_to "+ Create New Survey", new_admin_survey_path
 
-.surveys
+.surveys.py-3
   %h3 Surveys
-  %p The following surveys have been automatically generated on Survey Monkey.
-  - Survey.all.each do |survey|
-    %p= link_to survey, [:admin, survey]
+  - if Survey.count > 0
+    %p The following surveys have been automatically generated on Survey Monkey.
+    - Survey.all.each do |survey|
+      %p= link_to survey, [:admin, survey]
+  - else
+    %p Surveys will be automatically generated for you based on the questions you add to the tree above.

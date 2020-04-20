@@ -29,7 +29,7 @@ class SchoolCategoriesTest < ApplicationSystemTestCase
     administrative_measure = categories(:administrative_measure)
     click_text administrative_measure
 
-    click_on school_categories(:administrative_measure).name(:school)
+    click_on 'edit', match: :first
 
     fill_in "Nonlikert", with: 3
     click_on "Update"

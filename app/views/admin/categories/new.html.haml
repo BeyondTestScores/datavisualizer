@@ -5,11 +5,13 @@
   - elsif @category.parent_category.present?
     Subcategory
   - else
-    Category  
+    Category
 
   - if @category.parent_category.present?
+    - level = @category.path.length
     Under
-    = "\"#{@category.parent_category.name}\""
+    = "\"#{@category.parent_category.name}\" (Category Level #{level})"
+
 
 
 %br

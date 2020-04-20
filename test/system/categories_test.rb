@@ -33,6 +33,10 @@ class CategoriesTest < ApplicationSystemTestCase
     School.all.each do |school|
       assert_text school.name
     end
+
+    assert_no_text "+ Add A Category Under This Category"
+    assert_no_text "+ Add A Question To This Category"
+    assert_no_text "+ Add An Administrative Measure To This Category"
   end
 
   test "deleting a category" do
