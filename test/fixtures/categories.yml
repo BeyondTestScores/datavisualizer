@@ -33,3 +33,11 @@ administrative_measure:
   description: This category is an administrative measure.
   parent_category: two
   administrative_measure: true
+
+administrative_measure2:
+  name: Administrative Measure2
+  slug: administrative-measure2
+  blurb: Another administrative measure category
+  description: This category is another administrative measure.
+  parent_category: two
+  administrative_measure: true

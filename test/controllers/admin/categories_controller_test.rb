@@ -187,7 +187,7 @@ class Admin::CategoriesControllerTest < ActionDispatch::IntegrationTest
     delete admin_category_url(category), headers: authorized_headers
     assert_redirected_to admin_root_path
 
-    assert_equal category_count - 3, Category.count # category and it's child categories
+    assert_equal category_count - 4, Category.count # category and it's child categories
     assert_equal question_count - 1, Question.count
 
     assert_requests requests
