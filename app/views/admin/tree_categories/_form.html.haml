@@ -12,13 +12,14 @@
           %li= msg
 
   = f.fields_for :category do |ff|
-    = f.text_field :name
-    = f.text_field :blurb
-    = f.text_area :description
-    = f.hidden_field :administrative_measure
-    = f.select :parent_tree_category_id, @parent_tree_categories.map { |pc| [pc.name, pc.id] }, { include_blank: true }, {class: 'category-selector-target'}
-    %p Or click a category in the tree below to select it as the parent.
-    = render "tree", template: "selector"
+    = ff.text_field :name
+    = ff.text_field :blurb
+    = ff.text_area :description
+    = ff.hidden_field :administrative_measure
+
+  = f.select :parent_tree_category_id, @parent_tree_categories.map { |pc| [pc.name, pc.id] }, { label: "Parent Category (optional)", include_blank: true }, {class: 'tree-category-selector-target'}
+  %p Or click a category in the tree below to select it as the parent.
+  = render "tree", template: "selector"
 
   %br
   %p= f.submit @tree_category.new_record? ? "Create" : "Update"

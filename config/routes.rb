@@ -15,7 +15,9 @@ Rails.application.routes.draw do
   namespace :admin do
     root 'home#index'
     resources :trees do
-      resources :categories, controller: 'tree_categories'
+      resources :categories, controller: 'tree_categories' do
+        resources :questions, controller: 'tree_category_questions'
+      end
     end
 
     resources :schools

@@ -23,6 +23,14 @@ class TreeCategory < ApplicationRecord
     category.name
   end
 
+  def classification
+    category.classification
+  end
+
+  def to_s
+    name
+  end
+
   def all_tree_category_questions
     tree_category_questions.to_a + child_tree_categories.map(&:all_questions).flatten.uniq
   end

@@ -1,4 +1,4 @@
-class Admin::QuestionsController < Admin::AdminController
+class Admin::TreeCategoryQuestionsController < Admin::AdminController
 
   before_action :set_question, only: [:show, :edit, :update, :destroy]
   before_action :set_categories, only: [:new, :edit]

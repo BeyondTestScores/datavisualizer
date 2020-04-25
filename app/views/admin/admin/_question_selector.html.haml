@@ -1,4 +1,4 @@
-.question-selector{data: {question_id: question.id}}
+.tree-category-question-selector{data: {tree_category_question_id: question.id}}
   = check_box_tag "question-#{question.id}", question.id, @survey.try(:has_question, question)
   &nbsp;
   %a= question

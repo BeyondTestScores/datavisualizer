@@ -2,6 +2,7 @@ class Admin::TreeCategoriesController < Admin::AdminController
 
   before_action :set_tree
   before_action :set_category, only: [:show, :edit, :update, :destroy]
+  before_action :set_tree_category, only: [:show, :edit, :update, :destroy]
   before_action :set_parent_tree_categories, only: [:new, :edit]
   before_action :set_path, only: [:show, :edit]
 
@@ -13,39 +14,39 @@ class Admin::TreeCategoriesController < Admin::AdminController
   end
 
   def new
-    parent_tree_category = TreeCategory.where(id: params[:parent_tree_category_id]).first
+    parent_tree_category = @tree.tree_categories.where(id: params[:parent_tree_category_id]).first
 
     if parent_tree_category.present?
-      parent_tree_category.path(include_self: true).each { |ptc| add_breadcrumb ptc.name, [:admin, ptc] }
+      parent_tree_category.path(include_self: true).each { |ptc| add_breadcrumb ptc.name, [:admin, ptc.tree, ptc.category] }
     end
     add_breadcrumb "New #{parent_tree_category.present? ? 'Subcategory' : 'Category'}"
-    @tree_category = TreeCategory.new(
+    @tree_category = @tree.tree_categories.new(
       parent_tree_category: parent_tree_category,
       category: Category.new(administrative_measure: params[:administrative_measure] || false)
     )
   end
 
   def create
-    @category = Category.new(category_params)
-    if @category.save
+    @tree_category = @tree.tree_categories.new(tree_category_params)
+    if @tree_category.save
       respond_to do |format|
-        format.html { redirect_to [:admin, @category], notice: "#{@category.classification} was successfully created." }
+        format.html { redirect_to [:admin, @tree, @tree_category.category], notice: "#{@tree_category.classification} was successfully created." }
       end
     else
-      @parent_categories = Category.all.sort
+      @parent_tree_categories = @tree.tree_categories.all.sort
       render :new
     end
   end
 
   def edit
-    add_breadcrumb @category.name, [:admin, @category]
+    add_breadcrumb @category.name, [:admin, @tree, @category]
     add_breadcrumb "Edit"
   end
 
   def update
     respond_to do |format|
-      if @category.update(category_params)
-        format.html { redirect_to [:admin, @category], notice: 'Category was successfully updated.' }
+      if @tree_category.update(tree_category_params)
+        format.html { redirect_to [:admin, @tree, @category], notice: 'Category was successfully updated.' }
         # format.json { render :show, status: :ok, location: @category }
       else
         format.html { render :edit }
@@ -64,15 +65,19 @@ class Admin::TreeCategoriesController < Admin::AdminController
 
   private
   def set_path
-    @category.path.each { |pc| add_breadcrumb pc.name, [:admin, pc] }
+    @tree_category.path.each { |ptc| add_breadcrumb ptc.name, [:admin, ptc.tree, ptc.category] }
   end
 
   def set_parent_tree_categories
-    @parent_tree_categories = TreeCategory.joins(:category).all.sort(&:name)
+    @parent_tree_categories = @tree.tree_categories.all.sort
   end
 
-  def category_params
-    params.require(:category).permit(:name, :blurb, :descrtiption, :parent_category_id, :administrative_measure)
+  def tree_category_params
+    params.require(:tree_category).permit(:parent_tree_category_id, category_attributes: [:name, :blurb, :description, :administrative_measure])
+  end
+
+  def set_tree_category
+    @tree_category = @tree.tree_categories.where(category: @category).first
   end
 
   def set_category
@@ -81,5 +86,6 @@ class Admin::TreeCategoriesController < Admin::AdminController
 
   def set_tree
     @tree = Tree.friendly.find(params[:tree_id])
+    add_breadcrumb @tree, [:admin, @tree]
   end
 end

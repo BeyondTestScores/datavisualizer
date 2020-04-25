@@ -1,7 +1,7 @@
 .tree
   - TreeCategory.root.each do |tc|
-    .category{data: {category_id: tc.id}}
-      = render "category_#{template}", category: tc
+    .tree-category{data: {tree_category_id: tc.id}}
+      = render "category_#{template}", tree_category: tc
       - if local_assigns[:show_questions]
-        = render 'category_questions', category: tc, template: template
-      = render "child_categories", category: tc, template: template, show_questions: local_assigns[:show_questions]
+        = render 'category_questions', tree_category: tc, template: template
+      = render "child_categories", tree_category: tc, template: template, show_questions: local_assigns[:show_questions]

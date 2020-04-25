@@ -12,7 +12,7 @@
       - incomplete_tree_categories.each do |tree_category|
         %li{class: "tree_category-#{tree_category.id}"}
           = "#{tree_category} needs a subcategory, questions, or an administrative measure:"
-          = link_to "Fix category >", admin_tree_category_path(tree_category), class: 'error'
+          = link_to "Fix category >", [:admin, tree_category.tree, tree_category.category], class: 'error'
 
 
 .schools.py-3
