@@ -1,16 +1,16 @@
 %h2
   New
-  - if @category.administrative_measure?
+  - if @tree_category.administrative_measure?
     Administrative Measure
-  - elsif @category.parent_category.present?
+  - elsif @tree_category.parent_tree_category.present?
     Subcategory
   - else
     Category
 
-  - if @category.parent_category.present?
-    - level = @category.path.length
+  - if @tree_category.parent_tree_category.present?
+    - level = @tree_category.path.length
     Under
-    = "\"#{@category.parent_category.name}\" (Category Level #{level})"
+    = "\"#{@tree_category.parent_tree_category.name}\" (Category Level #{level})"
 
 %br
 

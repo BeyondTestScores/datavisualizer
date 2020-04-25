@@ -3,7 +3,7 @@ class SchoolTreeCategory < ApplicationRecord
   belongs_to :tree_category
   belongs_to :school
 
-  scope :missing_administrative_measure, -> { where(nonlikert: [nil, '']).joins(:category).merge(Category.administrative_measure) }
+  scope :missing_administrative_measure, -> { where(nonlikert: [nil, '']).joins(tree_category: :category).merge(Category.administrative_measure) }
 
   def to_s
     name

@@ -12,15 +12,35 @@ class TreeCategory < ApplicationRecord
 
   accepts_nested_attributes_for :category
 
-  scope :root, -> { where(parent_category: nil) }
-  scope :incomplete, -> { where(administrative_measure: false).includes(:questions, :child_categories).where(questions: { id: nil }).where(child_categories_categories: { id: nil }) }
+  default_scope { joins(:tree, :category) }
+
+  scope :root, -> { where(parent_tree_category: nil) }
+  scope :incomplete, -> { joins(:category).merge(Category.not_administrative_measure).includes(:tree_category_questions, :child_tree_categories).where(tree_category_questions: { id: nil }).where(child_tree_categories_tree_categories: { id: nil }) }
 
   after_create :create_school_tree_categories_for_administrative_measure
+
+  def name
+    category.name
+  end
 
   def all_tree_category_questions
     tree_category_questions.to_a + child_tree_categories.map(&:all_questions).flatten.uniq
   end
 
+  def administrative_measure?
+    category.administrative_measure?
+  end
+
+  def path(include_self: false)
+    parents = []
+    parents << self if include_self
+    ptc = parent_tree_category
+    while ptc.present?
+      parents << ptc
+      ptc = ptc.parent_tree_category
+    end
+    parents.reverse
+  end
 
   private
 

@@ -1,6 +1,6 @@
 - missing_administrative_measure = SchoolTreeCategory.missing_administrative_measure
 - incomplete_tree_categories = TreeCategory.incomplete
-- unless missing_administrative_measure.empty? && incomplete_category.empty?
+- unless missing_administrative_measure.empty? && incomplete_tree_categories.empty?
   .missing
     %h3.error Missing
     %p The following items are missing or incomplete.
@@ -28,5 +28,8 @@
   %h3 Website Trees
   %p Each tree represents a years worth of data on the website.
 
-  - @trees.each do |tree|
+  - Tree.all.order(created_at: :desc).each do |tree|
     = link_to tree, [:admin, tree]
+
+  %p
+    %a= link_to "+ Create New Tree", new_admin_tree_path

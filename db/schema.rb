@@ -113,6 +113,8 @@ ActiveRecord::Schema.define(version: 2020_04_18_214620) do
     t.string "name"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.string "slug"
+    t.index ["slug"], name: "index_trees_on_slug", unique: true
   end
 
   add_foreign_key "school_tree_categories", "schools"
