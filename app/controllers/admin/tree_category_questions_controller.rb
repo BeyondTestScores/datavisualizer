@@ -1,39 +1,44 @@
 class Admin::TreeCategoryQuestionsController < Admin::AdminController
 
+  before_action :set_tree
+  before_action :set_category
+  before_action :set_tree_category
   before_action :set_question, only: [:show, :edit, :update, :destroy]
-  before_action :set_categories, only: [:new, :edit]
+  before_action :set_tree_category_question, only: [:show, :edit, :update, :destroy]
+  before_action :set_tree_categories, only: [:new, :edit]
   before_action :set_path, only: [:show, :edit]
 
   def show
-    add_breadcrumb @question.text.truncate(50)
+    add_breadcrumb @tree_category_question.to_s.truncate(50)
   end
 
   def new
-    category = Category.where(id: params[:category_id]).first
-
-    if (category)
-      category.path(include_self: true).each { |pc| add_breadcrumb pc.name, [:admin, pc] }
+    @tree_category.path(include_self: true).each do |ptc|
+      add_breadcrumb ptc.name, [:admin, ptc.tree, ptc.category]
     end
 
     add_breadcrumb "New Question"
 
-    @question = Question.new(category: category)
+    @tree_category_question = @tree_category.tree_category_questions.new(
+      tree_category: @tree_category,
+      question: Question.new
+    )
   end
 
   def create
-    @question = Question.new(question_params)
-    if @question.save
+    @tree_category_question = @tree_category.tree_category_questions.new(tree_category_question_params)
+    if @tree_category_question.save
       respond_to do |format|
-        format.html { redirect_to [:admin, @question], notice: 'Question was successfully created.' }
+        format.html { redirect_to [:admin, @tree, @category, @tree_category_question.question], notice: 'Question was successfully created.' }
       end
     else
-      @categories = Category.all.sort
+      set_tree_categories
       render :new
     end
   end
 
   def edit
-    add_breadcrumb @question.text.truncate(50), [:admin, @question]
+    add_breadcrumb @tree_category_question.text.truncate(50), [:admin, @question]
     add_breadcrumb "Edit"
   end
 
@@ -64,20 +69,37 @@ class Admin::TreeCategoryQuestionsController < Admin::AdminController
 
   private
   def set_path
-    return if @question.try(:category).nil?
-    @question.category.path(include_self: true).each { |pc| add_breadcrumb pc.name, [:admin, pc] }
+    path = @tree_category.path(include_self: true)
+    path.each { |ptc| add_breadcrumb ptc.name, [:admin, ptc.tree, ptc.category] }
   end
 
-  def set_categories
-    @categories = Category.all.sort
+  def set_tree_categories
+    @tree_categories = @tree.tree_categories.sort
   end
 
-  def question_params
-    params.require(:question).permit(:text, :option1, :option2, :option3, :option4, :option5, :category_id)
+  def tree_category_question_params
+    params.require(:tree_category_question).permit(:tree_category_id, question_attributes: [:text, :option1, :option2, :option3, :option4, :option5])
+  end
+
+  def set_tree_category_question
+    @tree_category_question = @tree_category.tree_category_questions.for(@question).first
   end
 
   def set_question
     @question = Question.find(params[:id])
+  end
+
+  def set_tree_category
+    @tree_category = @tree.tree_categories.for(@category).first
+  end
+
+  def set_category
+    @category = Category.friendly.find(params[:category_id])
+  end
+
+  def set_tree
+    @tree = Tree.friendly.find(params[:tree_id])
+    add_breadcrumb @tree, [:admin, @tree]
   end
 
 end

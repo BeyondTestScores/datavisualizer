@@ -1,0 +1,21 @@
+= bootstrap_form_with model: [:admin, @tree_category_question], local: true do |f|
+
+  - if @tree_category_question.errors.any?
+    #error_explanation
+      %h2
+        = pluralize(@tree_category_question.errors.count, "error")
+        prohibited
+        this question from being saved:
+      %ul
+        - @tree_category_question.errors.full_messages.each do |msg|
+          %li= msg
+
+  = f.fields_for :question do |ff|
+    = ff.text_field :text
+    - 5.times do |i|
+      = ff.text_field "option#{i + 1}"
+
+  = f.select :tree_category_id, @tree_categories.map { |c| [c.name, c.id] }, { label: "Category", include_blank: true }, { class: 'tree-category-selector-target' }
+  = render "tree", template: "selector"
+
+  %p.mt-3= f.submit @tree_category_question.new_record? ? "Create" : "Update"

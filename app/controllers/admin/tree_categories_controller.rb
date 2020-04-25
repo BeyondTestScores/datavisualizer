@@ -33,7 +33,7 @@ class Admin::TreeCategoriesController < Admin::AdminController
         format.html { redirect_to [:admin, @tree, @tree_category.category], notice: "#{@tree_category.classification} was successfully created." }
       end
     else
-      @parent_tree_categories = @tree.tree_categories.all.sort
+      set_parent_tree_categories
       render :new
     end
   end
@@ -77,7 +77,7 @@ class Admin::TreeCategoriesController < Admin::AdminController
   end
 
   def set_tree_category
-    @tree_category = @tree.tree_categories.where(category: @category).first
+    @tree_category = @tree.tree_categories.for(@category).first
   end
 
   def set_category

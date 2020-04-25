@@ -16,6 +16,7 @@ class TreeCategory < ApplicationRecord
 
   scope :root, -> { where(parent_tree_category: nil) }
   scope :incomplete, -> { joins(:category).merge(Category.not_administrative_measure).includes(:tree_category_questions, :child_tree_categories).where(tree_category_questions: { id: nil }).where(child_tree_categories_tree_categories: { id: nil }) }
+  scope :for, -> (category) { where(category: category) }
 
   after_create :create_school_tree_categories_for_administrative_measure
 
