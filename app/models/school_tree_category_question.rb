@@ -1,12 +1,12 @@
-class SurveyQuestion < ApplicationRecord
+class SchoolTreeCategoryQuestion < ApplicationRecord
 
   belongs_to :survey
-  belongs_to :question
+  belongs_to :tree_category_question
 
   after_destroy :destroy_survey_monkey
   after_commit :create_survey_monkey, on: :create
 
-  scope :for, -> (question) { where(question: question) }
+  # scope :for, -> (question) { where(question: question) }
   scope :on_page, -> (page_id) { where(survey_monkey_page_id: page_id) }
 
   def create_survey_monkey

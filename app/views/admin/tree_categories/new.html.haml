@@ -1,0 +1,17 @@
+%h2
+  New
+  - if @category.administrative_measure?
+    Administrative Measure
+  - elsif @category.parent_category.present?
+    Subcategory
+  - else
+    Category
+
+  - if @category.parent_category.present?
+    - level = @category.path.length
+    Under
+    = "\"#{@category.parent_category.name}\" (Category Level #{level})"
+
+%br
+
+%div= render 'form'

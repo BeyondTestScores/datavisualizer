@@ -1,6 +1,6 @@
-%h2= "#{@school_category.category} Value For #{@school_category.school}"
+%h2= "#{@school_tree_category.category} Value For #{@school_tree_category.school}"
 
 %p
-  = link_to("Edit Adminisrative Measure", edit_admin_school_category_path(@school_category))
+  = link_to("Edit Adminisrative Measure", edit_admin_school_tree_category_path(@school_tree_category))
   &nbsp; | &nbsp;
-  = link_to "Delete Adminisrative Measure", [:admin, @school_category],  method: :delete, data: { confirm: 'Are you sure you want to delete this administrative measure?' }
+  = link_to "Delete Adminisrative Measure", [:admin, @school_tree_category],  method: :delete, data: { confirm: 'Are you sure you want to delete this administrative measure?' }

@@ -34,25 +34,25 @@
     - @category.questions.each do |question|
       %p= link_to question, [:admin,question]
 
-- if @category.administrative_measure? && @category.school_categories.present?
+- if @category.administrative_measure? && @category.school_tree_categories.present?
   %br
   %h4 Administrative Values For Each School:
 
   %ul
-    - @category.school_categories.each do |school_category|
-      - missing = school_category.nonlikert.blank?
-      - value = "#{missing ? 'Missing' : school_category.nonlikert}"
+    - @category.school_tree_categories.each do |school_tree_category|
+      - missing = school_tree_category.nonlikert.blank?
+      - value = "#{missing ? 'Missing' : school_tree_category.nonlikert}"
       %li
-        %b= "#{school_category.name(:school)}:"
+        %b= "#{school_tree_category.name(:school)}:"
         = value
         &nbsp;
         &nbsp;
-        = link_to missing ? 'Fix it >' : 'edit', edit_admin_school_category_path(school_category), class: missing ? "error": ""
+        = link_to missing ? 'Fix it >' : 'edit', edit_admin_school_tree_category_path(school_tree_category), class: missing ? "error": ""
 
 %br
 
 - unless @category.administrative_measure?
-  - level = @category.path(include_self: true).length 
+  - level = @category.path(include_self: true).length
   %p= link_to "+ Add A Category Under This Category (Category Level #{level})", new_admin_category_path(parent_category_id: @category.id)
   %p= link_to "+ Add A Question To This Category", new_admin_question_path(category_id: @category.id)
   %p= link_to "+ Add An Administrative Measure To This Category", new_admin_category_path(parent_category_id: @category.id, administrative_measure: true)
@@ -61,4 +61,4 @@
   %br
 %br
 
-= render 'category_tree', template: "link", show_questions: true
+= render 'tree', template: "link", show_questions: true

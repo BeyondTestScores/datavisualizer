@@ -1,7 +1,8 @@
 class Survey < ApplicationRecord
 
-  has_many :survey_questions, dependent: :destroy
-  has_many :questions, through: :survey_questions, dependent: :destroy
+  belongs_to :tree
+  belongs_to :school
+  has_many :school_tree_category_questions, dependent: :destroy
 
   validates :name, presence: true, length: { minimum: 1 }
 

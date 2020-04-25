@@ -1,4 +1,4 @@
-.category-tree
+.tree
   - Category.root.each do |c|
     .category{data: {category_id: c.id}}
       = render "category_#{template}", category: c

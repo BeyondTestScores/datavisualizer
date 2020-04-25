@@ -2,26 +2,26 @@
 
 %p
   %b Category:
-  = @school_category.category
+  = @school_tree_category.category
 %p
   %b School:
-  = @school_category.school
+  = @school_tree_category.school
 %p
   %b Response count:
-  = @school_category.response_count
+  = @school_tree_category.response_count
 %p
   %b Answer index total:
-  = @school_category.answer_index_total
+  = @school_tree_category.answer_index_total
 %p
   %b Zscore:
-  = @school_category.zscore
+  = @school_tree_category.zscore
 %p
   %b Nonlikert:
-  = @school_category.nonlikert
+  = @school_tree_category.nonlikert
 %p
   %b Year:
-  = @school_category.year
+  = @school_tree_category.year
 
-= link_to 'Edit', edit_school_category_path(@school_category)
+= link_to 'Edit', edit_school_tree_category_path(@school_tree_category)
 \|
-= link_to 'Back', school_categories_path
+= link_to 'Back', school_tree_categories_path

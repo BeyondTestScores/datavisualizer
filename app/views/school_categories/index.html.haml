@@ -1,4 +1,4 @@
-%h1 Listing school_categories
+%h1 Listing school_tree_categories
 
 %table
   %thead
@@ -15,19 +15,19 @@
       %th
 
   %tbody
-    - @school_categories.each do |school_category|
+    - @school_tree_categories.each do |school_tree_category|
       %tr
-        %td= school_category.category
-        %td= school_category.school
-        %td= school_category.response_count
-        %td= school_category.answer_index_total
-        %td= school_category.zscore
-        %td= school_category.nonlikert
-        %td= school_category.year
-        %td= link_to 'Show', school_category
-        %td= link_to 'Edit', edit_school_category_path(school_category)
-        %td= link_to 'Destroy', school_category, method: :delete, data: { confirm: 'Are you sure?' }
+        %td= school_tree_category.category
+        %td= school_tree_category.school
+        %td= school_tree_category.response_count
+        %td= school_tree_category.answer_index_total
+        %td= school_tree_category.zscore
+        %td= school_tree_category.nonlikert
+        %td= school_tree_category.year
+        %td= link_to 'Show', school_tree_category
+        %td= link_to 'Edit', edit_school_tree_category_path(school_tree_category)
+        %td= link_to 'Destroy', school_tree_category, method: :delete, data: { confirm: 'Are you sure?' }
 
 %br
 
-= link_to 'New School category', new_school_category_path
+= link_to 'New School category', new_school_tree_category_path

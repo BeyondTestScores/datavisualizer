@@ -14,11 +14,11 @@
 
 %br
 
-.category-tree
+.tree
   %h4
     Questions In This Survey
 
-  - @survey.category_tree[:child_categories].each do |child_category|
+  - @survey.tree[:child_categories].each do |child_category|
     .category{data: {category_id: child_category[:category].id}}
       = render "category_link", category: child_category[:category]
       = render 'category_questions', category: child_category, template: "link"

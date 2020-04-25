@@ -2,7 +2,7 @@ require "application_system_test_case"
 
 class SchoolCategoriesTest < ApplicationSystemTestCase
   setup do
-    @school_category = school_categories(:one)
+    @school_tree_category = school_tree_categories(:one)
   end
 
   test "school categories are automatically created with no nonlikert when adding an administrative measure" do
@@ -34,9 +34,9 @@ class SchoolCategoriesTest < ApplicationSystemTestCase
     fill_in "Nonlikert", with: 3
     click_on "Update"
 
-    assert_text "#{school_categories(:administrative_measure).name(:school)} was successfully updated"
+    assert_text "#{school_tree_categories(:administrative_measure).name(:school)} was successfully updated"
 
-    assert_text "#{school_categories(:administrative_measure).name(:school)}: 3"
+    assert_text "#{school_tree_categories(:administrative_measure).name(:school)}: 3"
     assert_text administrative_measure.parent_category
   end
 end

@@ -1,5 +1,6 @@
-class Admin::CategoriesController < Admin::AdminController
+class Admin::TreeCategoriesController < Admin::AdminController
 
+  before_action :set_tree
   before_action :set_category, only: [:show, :edit, :update, :destroy]
   before_action :set_parent_categories, only: [:new, :edit]
   before_action :set_path, only: [:show, :edit]
@@ -75,7 +76,10 @@ class Admin::CategoriesController < Admin::AdminController
   end
 
   def set_category
-    @category = Category.friendly.find(params[:id])
+    @category = Category.friendly.find(params[:category_id])
   end
+
+  def set_tree
+    @tree = Tree.friendly.find(params["id"])
 
 end
