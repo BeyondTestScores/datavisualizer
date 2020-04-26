@@ -21,35 +21,6 @@ class Survey < ApplicationRecord
     questions.include?(question)
   end
 
-  def category_tree
-    tree = {child_categories: []}
-
-    questions.each do |question|
-        category = question.category
-        question_path = []
-        while category
-          question_path << category
-          category = category.parent_category
-        end
-
-        node = tree
-        question_path.reverse.each do |category|
-          category_hash = node[:child_categories].find { |cc| cc[:category].name == category.name }
-          if category_hash.blank?
-            category_hash = {category: category, child_categories: []}
-            node[:child_categories].push(category_hash)
-          end
-          node[:child_categories].sort! { |a,b| a[:category].name <=> b[:category].name }
-          node = category_hash
-        end
-
-        node[:questions] ||= []
-        node[:questions] << question
-    end
-
-    return tree
-  end
-
   def surveyMonkeyConnection
     Faraday.new('https://api.surveymonkey.com/v3') do |conn|
       conn.adapter Faraday.default_adapter
@@ -185,10 +156,10 @@ class Survey < ApplicationRecord
       sm_questions = sm_page['questions'] || []
 
       all_questions_removed = true
-      on_page_sq = survey_questions.on_page(sm_page['id']).joins(:question)
+      on_page_stcq = school_tree_category_questions.on_page(sm_page['id'])
 
-      if on_page_sq.present?
-        category = on_page_sq.first.question.category
+      if on_page_stcq.present?
+        category = on_page_stcq.first.category
         if category.name != sm_page["title"]
           surveyMonkeyConnection.patch(
             "surveys/#{details['id']}/pages/#{sm_page['id']}",
@@ -198,17 +169,17 @@ class Survey < ApplicationRecord
       end
 
       sm_questions.each do |sm_question|
-        survey_question = on_page_sq.find do |sq|
-          sq.question.text == sm_question["headings"].first['heading']
+        stcq = on_page_stcq.find do |stcq|
+          stcq.question.text == sm_question["headings"].first['heading']
         end
 
-        if survey_question.nil?
+        if stcq.nil?
           surveyMonkeyConnection.delete(
             "surveys/#{details['id']}/pages/#{sm_page['id']}/questions/#{sm_question['id']}"
           )
         else
           all_questions_removed = false
-          survey_question.update(survey_monkey_id: sm_question['id'], survey_monkey_page_id: sm_page['id'])
+          stcq.update(survey_monkey_id: sm_question['id'], survey_monkey_page_id: sm_page['id'])
         end
       end
 

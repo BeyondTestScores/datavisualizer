@@ -6,9 +6,9 @@ class TreeCategory < ApplicationRecord
   belongs_to :parent_tree_category, class_name: 'TreeCategory', foreign_key: :parent_tree_category_id, optional: true
   has_many :child_tree_categories, class_name: 'TreeCategory', foreign_key: :parent_tree_category_id, dependent: :destroy
 
-  has_many :tree_category_questions
+  has_many :tree_category_questions, dependent: :destroy
 
-  has_many :school_tree_categories
+  has_many :school_tree_categories, dependent: :destroy
 
   accepts_nested_attributes_for :category
 
@@ -33,7 +33,7 @@ class TreeCategory < ApplicationRecord
   end
 
   def all_tree_category_questions
-    tree_category_questions.to_a + child_tree_categories.map(&:all_questions).flatten.uniq
+    tree_category_questions.to_a + child_tree_categories.map(&:all_tree_category_questions).flatten.uniq
   end
 
   def administrative_measure?

@@ -1,7 +1,7 @@
 class Category < ApplicationRecord
   include ActiveModel::Dirty
 
-  has_many :school_tree_categories, dependent: :destroy
+  has_many :tree_categories, dependent: :destroy
 
   validates :name, presence: true, length: { minimum: 1 }
 

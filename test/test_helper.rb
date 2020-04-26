@@ -57,7 +57,7 @@ module SurveyMonkeyHelper
       page_id = survey_question.survey_monkey_page_id
       id = survey_question.survey_monkey_id
       question = survey_question.question
-      page_title = question.category.name
+      page_title = survey_question.category.name
 
       index = pages.index { |p| p["id"] == page_id }
       if index.nil?

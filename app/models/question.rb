@@ -1,6 +1,8 @@
 class Question < ApplicationRecord
   include ActiveModel::Dirty
 
+  has_many :tree_category_questions, dependent: :destroy
+
   validates :text, presence: true, length: { minimum: 1 }
   validates :option1, presence: true, length: { minimum: 1 }
   validates :option2, presence: true, length: { minimum: 1 }

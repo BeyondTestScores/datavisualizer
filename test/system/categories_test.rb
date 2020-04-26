@@ -4,6 +4,8 @@ class CategoriesTest < ApplicationSystemTestCase
   test "creating a category" do
     visit_admin admin_root_path
 
+    click_on trees(:one)
+
     click_on "+ Create New Category"
 
     fill_in "Name", with: "Category Name"
@@ -17,6 +19,8 @@ class CategoriesTest < ApplicationSystemTestCase
 
   test "creating an administrative measure" do
     visit_admin admin_root_path
+
+    click_on trees(:one)
 
     click_text categories(:four).name
 
@@ -42,18 +46,18 @@ class CategoriesTest < ApplicationSystemTestCase
   test "deleting a category" do
     requests = []
 
-    category = categories(:two)
+    tree_category = tree_categories(:two)
 
-    all_questions = category.all_questions
-    all_survey_questions = all_questions.map(&:survey_questions).flatten.uniq
-    deleted_survey_questions = []
-    all_survey_questions.each do |survey_question|
-      deleted_survey_questions << survey_question
-      survey = survey_question.survey
+    all_questions = tree_category.all_tree_category_questions
+    all_stcq = all_questions.map(&:school_tree_category_questions).flatten.uniq
+    deleted_stcq = []
+    all_stcq.each do |stcq|
+      deleted_stcq << stcq
+      survey = stcq.survey
 
       requests << survey_monkey_mock(
         method: :delete,
-        url: "surveys/#{survey.survey_monkey_id}/pages/#{survey_question.survey_monkey_page_id}/questions/#{survey_question.survey_monkey_id}"
+        url: "surveys/#{survey.survey_monkey_id}/pages/#{stcq.survey_monkey_page_id}/questions/#{stcq.survey_monkey_id}"
       )
 
       requests << survey_monkey_mock(
@@ -62,31 +66,33 @@ class CategoriesTest < ApplicationSystemTestCase
         responses: [
           details(
             survey: survey,
-            survey_questions: survey.survey_questions - deleted_survey_questions,
-            pages: [{"id": survey_question.survey_monkey_page_id, "title": category.name}]
+            survey_questions: survey.school_tree_category_questions - deleted_stcq,
+            pages: [{"id": stcq.survey_monkey_page_id, "title": tree_category.name}]
           )
         ]
       )
 
       requests << survey_monkey_mock(
         method: :delete,
-        url: "surveys/#{survey.survey_monkey_id}/pages/#{survey_question.survey_monkey_page_id}"
+        url: "surveys/#{survey.survey_monkey_id}/pages/#{stcq.survey_monkey_page_id}"
       )
 
     end
 
     visit_admin admin_root_path
 
-    click_on category.name
+    click_on trees(:one)
+
+    click_on tree_category
 
     page.accept_confirm do
       click_on "Delete Category", match: :first
     end
 
     assert_text "Category was successfully destroyed"
-    assert_no_text category.name
-    category.questions.each do |question|
-      assert_no_text question.text
+    assert_no_text tree_category.name
+    tree_category.tree_category_questions.each do |tcq|
+      assert_no_text tcq.question.text
     end
 
     assert_requests requests
