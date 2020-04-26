@@ -38,7 +38,7 @@ class Admin::TreeCategoryQuestionsController < Admin::AdminController
   end
 
   def edit
-    add_breadcrumb @tree_category_question.text.truncate(50), [:admin, @question]
+    add_breadcrumb @tree_category_question.to_s.truncate(50), [:admin, @tree, @category, @tree_category_question.question]
     add_breadcrumb "Edit"
   end
 

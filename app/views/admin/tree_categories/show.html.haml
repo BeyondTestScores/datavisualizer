@@ -31,8 +31,8 @@
 - if @tree_category.tree_category_questions.present?
   %br
     %b Questions:
-    - @tree_category_questions.each do |tcq|
-      %p= link_to tcq, [:admin, [@tree, @category, tcq.question]]
+    - @tree_category.tree_category_questions.each do |tcq|
+      %p= link_to tcq, [:admin, @tree, @category, tcq.question]
 
 - if @category.administrative_measure? && @category.school_tree_categories.present?
   %br
