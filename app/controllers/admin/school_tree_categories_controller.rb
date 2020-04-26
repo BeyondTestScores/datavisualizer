@@ -31,7 +31,8 @@ class Admin::SchoolTreeCategoriesController < Admin::AdminController
   def update
     respond_to do |format|
       if @school_tree_category.update(school_tree_category_params)
-        format.html { redirect_to [:admin, @school_tree_category.category], notice: "#{@school_tree_category.name(:school)} was successfully updated." }
+        tc = @school_tree_category.tree_category
+        format.html { redirect_to [:admin, tc.tree, tc.category], notice: "#{@school_tree_category.name(:school)} was successfully updated." }
         # format.json { render :show, status: :ok, location: @school_tree_category }
       else
         format.html { render :edit }
@@ -57,6 +58,9 @@ class Admin::SchoolTreeCategoriesController < Admin::AdminController
 
   def set_school_tree_category
     @school_tree_category = SchoolTreeCategory.find(params[:id])
+    @school_tree_category.path(include_self: true).each do |ptc|
+      add_breadcrumb ptc, [:admin, ptc.tree, ptc.category]
+    end
   end
 
 end

@@ -1,2 +1,6 @@
-.tree-category-link
-  = link_to tree_category.name, [:admin, tree_category.tree, tree_category.category]
+- if tree_category.administrative_measure?
+  %li.tree-category-link.administrative_measure
+    = link_to tree_category.name, [:admin, tree_category.tree, tree_category.category]
+- else
+  .tree-category-link
+    = link_to tree_category.name, [:admin, tree_category.tree, tree_category.category]

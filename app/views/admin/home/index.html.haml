@@ -18,8 +18,10 @@
 .schools.py-3
   %h3 Schools
   %p Please add all of the school communities that will be surveyed.
+
   - School.order(:name).all.each do |school|
     %p= link_to school, [:admin, school]
+
   %p
     %a= link_to "+ Create New School", new_admin_school_path
 
@@ -29,7 +31,7 @@
   %p Each tree represents a years worth of data on the website.
 
   - Tree.all.order(created_at: :desc).each do |tree|
-    = link_to tree, [:admin, tree]
+    %p= link_to tree, [:admin, tree]
 
   %p
     %a= link_to "+ Create New Tree", new_admin_tree_path

@@ -34,7 +34,7 @@
     - @tree_category.tree_category_questions.each do |tcq|
       %p= link_to tcq, [:admin, @tree, @category, tcq.question]
 
-- if @category.administrative_measure? && @category.school_tree_categories.present?
+- if @tree_category.administrative_measure? && @tree_category.school_tree_categories.present?
   %br
   %h4 Administrative Values For Each School:
 

@@ -1,9 +1,15 @@
 .add.py-3
-  %h3 Add To This Tree
+  %h3 Website Tree
+  %br
+  %h5 Add To This Tree
   %p
     To add to this tree create new categories, questions, and administrative measures.
   %p
     %a= link_to "+ Create New Category", new_admin_tree_category_path(@tree)
+
+  .py-3
+    %h5 The Tree
+    = render 'tree', template: "link", show_questions: true
 
 .surveys.py-3
   %h3 Surveys
@@ -13,6 +19,3 @@
       %p= link_to survey, [:admin, survey]
   - else
     %p Surveys will be automatically generated for you based on the questions you add to the tree above.
-
-.tree.py-3
-  = render 'tree', template: "link", show_questions: true
