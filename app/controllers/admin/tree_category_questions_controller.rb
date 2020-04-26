@@ -59,9 +59,9 @@ class Admin::TreeCategoryQuestionsController < Admin::AdminController
   # DELETE /admin/questions/1
   # DELETE /admin/questions/1.json
   def destroy
-    @question.destroy
+    @tree_category_question.destroy
     respond_to do |format|
-      format.html { redirect_to admin_root_url, notice: 'Question was successfully destroyed.' }
+      format.html { redirect_to [:admin, @tree, @category], notice: 'Question was successfully destroyed.' }
       # format.json { head :no_content }
     end
   end
