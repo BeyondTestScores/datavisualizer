@@ -64,11 +64,13 @@ ActiveRecord::Schema.define(version: 2020_04_18_214620) do
 
   create_table "school_tree_category_questions", force: :cascade do |t|
     t.bigint "survey_id", null: false
+    t.bigint "school_id", null: false
     t.bigint "tree_category_question_id", null: false
     t.string "survey_monkey_page_id"
     t.string "survey_monkey_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.index ["school_id"], name: "index_school_tree_category_questions_on_school_id"
     t.index ["survey_id"], name: "index_school_tree_category_questions_on_survey_id"
     t.index ["tree_category_question_id"], name: "index_sctq_on_tcqid"
   end
@@ -82,11 +84,13 @@ ActiveRecord::Schema.define(version: 2020_04_18_214620) do
 
   create_table "surveys", force: :cascade do |t|
     t.string "name"
-    t.bigint "tree_id"
+    t.bigint "tree_id", null: false
+    t.bigint "school_id", null: false
     t.string "survey_monkey_id"
     t.integer "kind"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.index ["school_id"], name: "index_surveys_on_school_id"
     t.index ["tree_id"], name: "index_surveys_on_tree_id"
   end
 
@@ -119,8 +123,11 @@ ActiveRecord::Schema.define(version: 2020_04_18_214620) do
 
   add_foreign_key "school_tree_categories", "schools"
   add_foreign_key "school_tree_categories", "tree_categories"
+  add_foreign_key "school_tree_category_questions", "schools"
   add_foreign_key "school_tree_category_questions", "surveys"
   add_foreign_key "school_tree_category_questions", "tree_category_questions"
+  add_foreign_key "surveys", "schools"
+  add_foreign_key "surveys", "trees"
   add_foreign_key "tree_categories", "categories"
   add_foreign_key "tree_categories", "trees"
   add_foreign_key "tree_category_questions", "questions"

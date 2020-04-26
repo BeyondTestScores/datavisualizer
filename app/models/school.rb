@@ -12,7 +12,7 @@ class School < ApplicationRecord
   end
 
   def create_school_tree_categories_for_administrative_measures
-    Category.administrative_measure.includes(:tree_category).each do |c|
+    Category.administrative_measure.includes(:tree_categories).each do |c|
       c.tree_categories.each do |tc|
         next if school_tree_categories.find { |sc| sc.tree_category == tc.id }
         school_tree_categories.create(tree_category: tc)

@@ -1,6 +1,7 @@
 class SchoolTreeCategoryQuestion < ApplicationRecord
 
   belongs_to :survey
+  belongs_to :school
   belongs_to :tree_category_question
 
   after_destroy :destroy_survey_monkey

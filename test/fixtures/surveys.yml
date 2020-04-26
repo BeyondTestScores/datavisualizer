@@ -2,8 +2,12 @@
 
 one:
   name: Survey One
+  tree: one
+  school: one
   survey_monkey_id: surveymonkeyid1
 
 two:
   name: Survey Two
+  tree: one
+  school: two
   survey_monkey_id: surveymonkeyid2

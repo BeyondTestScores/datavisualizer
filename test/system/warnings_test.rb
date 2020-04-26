@@ -20,11 +20,11 @@ class WarningsTest < ApplicationSystemTestCase
   test "warning is displayed for category that has no children, is not administrative, and has no questions" do
     visit_admin admin_root_path
 
-    base_category_no_questions = categories(:four)
-    warning_text= "#{base_category_no_questions.name} needs a subcategory, questions, or an administrative measure:"
+    base_tree_category_no_questions = tree_categories(:four)
+    warning_text= "#{base_tree_category_no_questions.name} needs a subcategory, questions, or an administrative measure:"
     assert_text warning_text
 
-    click_text "Fix category >", page.find(".missing .category-#{base_category_no_questions.id}")
+    click_text "Fix category >", page.find(".missing .tree-category-#{base_tree_category_no_questions.id}")
 
     click_on "+ Add A Question To This Category"
     fill_in "Text", with: "Question?"
