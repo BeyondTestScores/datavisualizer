@@ -3,9 +3,9 @@
 %br
 
 %p
-  = link_to("Edit Question", edit_admin_tree_category_question_path(@tree_category_question))
+  = link_to("Edit Question", edit_admin_tree_category_question_path(@tree, @category, @question))
   &nbsp; | &nbsp;
-  = link_to "Delete Question", [:admin, @tree_category_question],  method: :delete, data: { confirm: 'Are you sure you want to delete this question?' }
+  = link_to "Delete Question", [:admin, @tree, @category, @question],  method: :delete, data: { confirm: 'Are you sure you want to delete this question?' }
 
 %br
 
