@@ -7,7 +7,6 @@ one:
   option3: Option 3
   option4: Option 4
   option5: Option 5
-  category: one
 
 two:
   text: Question two text?
@@ -16,4 +15,3 @@ two:
   option3: Option 3
   option4: Option 4
   option5: Option 5
-  category: two

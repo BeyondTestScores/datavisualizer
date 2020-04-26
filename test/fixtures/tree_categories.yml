@@ -1,9 +1,31 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
 one:
-  tree_id: 
-  category_id: 
+  tree: one
+  category: one
 
 two:
-  tree_id: 
-  category_id: 
+  tree: one
+  category: two
+  parent_tree_category: one
+
+three:
+  tree: one
+  category: three
+
+four:
+  tree: one
+  category: four
+  parent_tree_category: two
+
+administrative_measure:
+  tree: one
+  category: administrative_measure
+  parent_tree_category: two
+
+administrative_measure2:
+  tree: one
+  category: administrative_measure2
+  parent_tree_category: two

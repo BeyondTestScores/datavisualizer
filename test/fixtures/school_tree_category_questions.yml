@@ -2,12 +2,12 @@
 
 one:
   survey: two
-  question: one
+  tree_category_question: one
   survey_monkey_id: 'QUESTION_ONE_SURVEY_TWO_SURVEY_MONKEY'
   survey_monkey_page_id: 'PAGE_QUESTION_ONE_SURVEY_TWO_SURVEY_MONKEY'
 
 two:
   survey: two
-  question: two
+  tree_category_question: two
   survey_monkey_id: 'QUESTION_TWO_SURVEY_TWO_SURVEY_MONKEY'
   survey_monkey_page_id: 'PAGE_QUESTION_TWO_SURVEY_TWO_SURVEY_MONKEY'
