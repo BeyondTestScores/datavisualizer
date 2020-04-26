@@ -134,9 +134,16 @@ class Survey < ApplicationRecord
     sync_with_survey_monkey
   end
 
-  def remove_survey_monkey_question(survey_question)
+  def remove_survey_monkey_question(school_tree_category_question)
+    puts ""
+    puts ""
+    puts "HI #{school_tree_category_question}"
+    puts ""
+    puts ""
+    page_id = school_tree_category_question.survey_monkey_page_id
+    question_id = school_tree_category_question.survey_monkey_id
     response = surveyMonkeyConnection.delete(
-      "surveys/#{survey_monkey_id}/pages/#{survey_question.survey_monkey_page_id}/questions/#{survey_question.survey_monkey_id}"
+      "surveys/#{survey_monkey_id}/pages/#{page_id}/questions/#{question_id}"
     )
     sync_with_survey_monkey
   end

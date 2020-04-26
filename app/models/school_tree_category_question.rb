@@ -12,6 +12,10 @@ class SchoolTreeCategoryQuestion < ApplicationRecord
   # scope :for, -> (question) { where(question: question) }
   scope :on_page, -> (page_id) { where(survey_monkey_page_id: page_id) }
 
+  def to_s
+    "#{question.text} for #{school.name}"
+  end
+
   def create_survey_monkey
     return true unless id_previously_changed? # this shouldn't be necessary but this callback is sometimes called on update
     survey.create_survey_monkey_question(self)

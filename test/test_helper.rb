@@ -89,7 +89,7 @@ module SurveyMonkeyHelper
     result = {"id": survey.survey_monkey_id, "title": survey.name}
 
     result["pages"] = pages(
-      survey_questions: survey_questions || survey.survey_questions,
+      survey_questions: survey_questions || survey.school_tree_category_questions,
       pages: pages,
       default_page: default_page
     )
