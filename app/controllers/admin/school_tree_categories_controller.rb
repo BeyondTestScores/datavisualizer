@@ -53,7 +53,7 @@ class Admin::SchoolTreeCategoriesController < Admin::AdminController
 
   private
   def school_tree_category_params
-    params.require(:school_tree_category).permit(:nonlikert, :category_id, :school_id)
+    params.require(:school_tree_category).permit(:nonlikert, :tree_category_id, :school_id)
   end
 
   def set_school_tree_category

@@ -20,4 +20,12 @@ class SchoolTreeCategory < ApplicationRecord
     tree_category.path(include_self: include_self)
   end
 
+  def tree
+    tree_category.tree
+  end
+
+  def category
+    tree_category.category
+  end
+
 end
