@@ -21,10 +21,7 @@ Rails.application.routes.draw do
     end
 
     resources :schools
-    resources :surveys
-    resources :categories
-    resources :school_tree_categories
-    resources :questions
+    resources :surveys, only: [:show]
   end
 
 end

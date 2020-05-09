@@ -135,11 +135,6 @@ class Survey < ApplicationRecord
   end
 
   def remove_survey_monkey_question(school_tree_category_question)
-    puts ""
-    puts ""
-    puts "HI #{school_tree_category_question}"
-    puts ""
-    puts ""
     page_id = school_tree_category_question.survey_monkey_page_id
     question_id = school_tree_category_question.survey_monkey_id
     response = surveyMonkeyConnection.delete(
