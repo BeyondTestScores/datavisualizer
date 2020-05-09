@@ -7,7 +7,7 @@ one_student:
   option3: Option 3
   option4: Option 4
   option5: Option 5
-  kind: <%= Question.kinds[:for_student] %>
+  kind: <%= Question.kinds[:for_students] %>
 
 two_teacher:
   text: Question two text?
@@ -16,4 +16,4 @@ two_teacher:
   option3: Option 3
   option4: Option 4
   option5: Option 5
-  kind: <%= Question.kinds[:for_teacher] %>
+  kind: <%= Question.kinds[:for_teachers] %>

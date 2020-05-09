@@ -5,8 +5,8 @@ class SchoolTreeCategoryQuestion < ApplicationRecord
   belongs_to :tree_category_question
 
   before_validation :assign_survey
-  # after_destroy :destroy_survey_monkey
-  # after_commit :create_survey_monkey, on: :create
+  after_destroy :destroy_survey_monkey
+  after_commit :create_survey_monkey, on: :create
 
   default_scope { joins(:survey, :tree_category_question) }
 
@@ -36,6 +36,7 @@ class SchoolTreeCategoryQuestion < ApplicationRecord
   private
   def assign_survey
     survey = tree.surveys.where(school: school, kind: question.kind).first
+
     if survey.nil?
       survey = tree.surveys.create(
         school: school,
@@ -43,6 +44,7 @@ class SchoolTreeCategoryQuestion < ApplicationRecord
         kind: question.kind
       )
     end
+
     self.survey = survey
   end
 

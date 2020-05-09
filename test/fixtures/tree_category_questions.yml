@@ -2,8 +2,8 @@
 
 one:
   tree_category: one
-  question: one
+  question: one_student
 
 two:
-  tree_category: two
-  question: two
+  tree_category: one
+  question: two_teacher

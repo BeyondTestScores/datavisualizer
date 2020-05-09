@@ -9,11 +9,11 @@ class Survey < ApplicationRecord
   validates :name, presence: true, length: { minimum: 1 }
 
   after_create :create_survey_monkey_survey
-
   after_commit :sync_with_survey_monkey, on: :create
   after_update_commit :sync_with_survey_monkey
-
   before_destroy :delete_survey_monkey_survey
+
+  scope :for_school, -> (school) { where(school: school) }
 
   def to_s
     name
@@ -78,8 +78,8 @@ class Survey < ApplicationRecord
     surveyMonkeyConnection.patch("surveys/#{survey_monkey_id}", updates.to_json)
   end
 
-  def create_survey_monkey_question(survey_question)
-    page_title = survey_question.question.category.name
+  def create_survey_monkey_question(school_tree_category_question)
+    page_title = school_tree_category_question.category.name
     smp = survey_monkey_pages
     page = smp.find do |p|
       p['title'] == page_title
@@ -94,12 +94,12 @@ class Survey < ApplicationRecord
 
     response = surveyMonkeyConnection.post(
       "surveys/#{survey_monkey_id}/pages/#{page["id"]}/questions",
-      survey_question.question.survey_monkey_structure(1).to_json
+      school_tree_category_question.question.survey_monkey_structure(1).to_json
     )
 
     smid = response.body['id']
-    if (survey_question.survey_monkey_id != smid || survey_question.survey_monkey_page_id != page["id"])
-      survey_question.update(
+    if (school_tree_category_question.survey_monkey_id != smid || school_tree_category_question.survey_monkey_page_id != page["id"])
+      school_tree_category_question.update(
         survey_monkey_id: response.body['id'],
         survey_monkey_page_id: page["id"]
       )
