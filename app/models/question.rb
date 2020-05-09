@@ -1,6 +1,8 @@
 class Question < ApplicationRecord
   include ActiveModel::Dirty
 
+  enum kind: [:for_students, :for_teachers, :for_community]
+
   has_many :tree_category_questions, dependent: :destroy
 
   validates :text, presence: true, length: { minimum: 1 }

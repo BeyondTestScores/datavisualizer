@@ -1,5 +1,7 @@
 class Survey < ApplicationRecord
 
+  enum kind: Question.kinds
+
   belongs_to :tree
   belongs_to :school
   has_many :school_tree_category_questions, dependent: :destroy

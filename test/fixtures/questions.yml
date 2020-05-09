@@ -1,17 +1,19 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
-one:
+one_student:
   text: Question one text?
   option1: Option 1
   option2: Option 2
   option3: Option 3
   option4: Option 4
   option5: Option 5
+  kind: <%= Question.kinds[:for_student] %>
 
-two:
+two_teacher:
   text: Question two text?
   option1: Option 1
   option2: Option 2
   option3: Option 3
   option4: Option 4
   option5: Option 5
+  kind: <%= Question.kinds[:for_teacher] %>

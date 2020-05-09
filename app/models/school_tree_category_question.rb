@@ -4,8 +4,9 @@ class SchoolTreeCategoryQuestion < ApplicationRecord
   belongs_to :school
   belongs_to :tree_category_question
 
-  after_destroy :destroy_survey_monkey
-  after_commit :create_survey_monkey, on: :create
+  before_validation :assign_survey
+  # after_destroy :destroy_survey_monkey
+  # after_commit :create_survey_monkey, on: :create
 
   default_scope { joins(:survey, :tree_category_question) }
 
@@ -14,15 +15,6 @@ class SchoolTreeCategoryQuestion < ApplicationRecord
 
   def to_s
     "#{question.text} for #{school.name}"
-  end
-
-  def create_survey_monkey
-    return true unless id_previously_changed? # this shouldn't be necessary but this callback is sometimes called on update
-    survey.create_survey_monkey_question(self)
-  end
-
-  def destroy_survey_monkey
-    survey.remove_survey_monkey_question(self)
   end
 
   def tree
@@ -40,5 +32,28 @@ class SchoolTreeCategoryQuestion < ApplicationRecord
   def question
     tree_category_question.question
   end
+
+  private
+  def assign_survey
+    survey = tree.surveys.where(school: school, kind: question.kind).first
+    if survey.nil?
+      survey = tree.surveys.create(
+        school: school,
+        name: "#{tree.name} #{question.kind.gsub(/_/, ' ').titleize}",
+        kind: question.kind
+      )
+    end
+    self.survey = survey
+  end
+
+  def create_survey_monkey
+    return true unless id_previously_changed? # this shouldn't be necessary but this callback is sometimes called on update
+    survey.create_survey_monkey_question(self)
+  end
+
+  def destroy_survey_monkey
+    survey.remove_survey_monkey_question(self)
+  end
+
 
 end
