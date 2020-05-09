@@ -109,24 +109,24 @@ class Admin::CategoriesControllerTest < ActionDispatch::IntegrationTest
 
     assert tree_category.parent_tree_category != new_parent_tree_category
 
-    # tree_category.category.update_column('name', new_category_name)
-    # tree_category.tree_category_questions.each do |tcq|
-    #   tcq.school_tree_category_questions.each do |stcq|
-    #     survey = stcq.survey
-    #     requests << survey_monkey_mock(
-    #       method: :patch,
-    #       url: "surveys/#{survey.survey_monkey_id}/pages/#{stcq.survey_monkey_page_id}",
-    #       body: {title: new_category_name}
-    #     )
-    #
-    #     requests << survey_monkey_mock(
-    #       method: :get,
-    #       url: "surveys/#{survey.survey_monkey_id}/details",
-    #       responses: [details(survey: survey)]
-    #     )
-    #   end
-    # end
-    # tree_category.category.update_column('name', old_category_name)
+    tree_category.category.update_column('name', new_category_name)
+    tree_category.tree_category_questions.each do |tcq|
+      tcq.school_tree_category_questions.each do |stcq|
+        survey = stcq.survey
+        requests << survey_monkey_mock(
+          method: :patch,
+          url: "surveys/#{survey.survey_monkey_id}/pages/#{stcq.survey_monkey_page_id}",
+          body: {title: new_category_name}
+        )
+
+        requests << survey_monkey_mock(
+          method: :get,
+          url: "surveys/#{survey.survey_monkey_id}/details",
+          responses: [details(survey: survey)]
+        )
+      end
+    end
+    tree_category.category.update_column('name', old_category_name)
 
     patch "/admin/trees/#{@tree}/categories/#{tree_category.category.slug}", headers: authorized_headers, params: {
       tree_category: {
