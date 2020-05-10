@@ -16,31 +16,36 @@ class TreeCategoryTest < ActiveSupport::TestCase
     tree_category = tree_categories(:three)
     tree_category_questions = tree_category.tree_category_questions.to_a
 
+
+    SchoolTreeCategoryQuestion.skip_callback(:commit, :after, :create_survey_monkey, raise: false)
+
     sub_tree_category = tree_category.child_tree_categories.create(category_attributes: {name: "subcategory"})
-    tree_category_questions << sub_tree_category.tree_category_questions.create(question_attributes: {text: "sub_tree_category question"})
-    tree_category_questions << sub_tree_category.tree_category_questions.create(question_attributes: {text: "sub_tree_category question2"})
+    tree_category_questions << sub_tree_category.tree_category_questions.create(question_attributes("sub_tree_category question"))
+    tree_category_questions << sub_tree_category.tree_category_questions.create(question_attributes("sub_tree_category question2"))
 
     sub_tree_category2 = tree_category.child_tree_categories.create(category_attributes: {name: "sub_tree_category2"})
-    tree_category_questions << sub_tree_category.tree_category_questions.create(question_attributes: {text: "sub_tree_category2 question"})
-    tree_category_questions << sub_tree_category.tree_category_questions.create(question_attributes: {text: "sub_tree_category2 question2"})
+    tree_category_questions << sub_tree_category.tree_category_questions.create(question_attributes("sub_tree_category2 question"))
+    tree_category_questions << sub_tree_category.tree_category_questions.create(question_attributes("sub_tree_category2 question2"))
 
     sub_sub_tree_category = sub_tree_category.child_tree_categories.create(category_attributes: {name: "sub_sub_tree_category"})
-    tree_category_questions << sub_sub_tree_category.tree_category_questions.create(question_attributes: {text: "sub_sub_tree_category question"})
-    tree_category_questions << sub_sub_tree_category.tree_category_questions.create(question_attributes: {text: "sub_sub_tree_category question2"})
+    tree_category_questions << sub_sub_tree_category.tree_category_questions.create(question_attributes("sub_sub_tree_category question"))
+    tree_category_questions << sub_sub_tree_category.tree_category_questions.create(question_attributes("sub_sub_tree_category question2"))
 
     sub_sub_tree_category_2 = sub_tree_category2.child_tree_categories.create(category_attributes: {name: "sub_sub_tree_category_2"})
-    tree_category_questions << sub_sub_tree_category_2.tree_category_questions.create(question_attributes: {text: "sub_sub_tree_category_2 question"})
-    tree_category_questions << sub_sub_tree_category_2.tree_category_questions.create(question_attributes: {text: "sub_sub_tree_category_2 question2"})
+    tree_category_questions << sub_sub_tree_category_2.tree_category_questions.create(question_attributes("sub_sub_tree_category_2 question"))
+    tree_category_questions << sub_sub_tree_category_2.tree_category_questions.create(question_attributes("sub_sub_tree_category_2 question2"))
 
     tree_category_questions.each do |tcq|
       assert tree_category.all_tree_category_questions.include?(tcq), "#{tcq.question.text} not found"
 
       School.all.each do |school|
         stcq = tcq.school_tree_category_questions.for_school(school).first
-        assert stcq.present?
+        assert stcq.present?, "#{tcq.question.text} for #{school.name} does not exist"
         assert tree_category.all_school_tree_category_questions.include?(stcq), "#{stcq.question.text} for #{school.name} not found"
       end
     end
+
+    SchoolTreeCategoryQuestion.set_callback(:commit, :after, :create_survey_monkey)
   end
 
   def test_delete_also_deletes_questions
@@ -165,6 +170,20 @@ class TreeCategoryTest < ActiveSupport::TestCase
     assert_not incomplete.include?(tree_categories(:four))
 
     assert_requests requests
+  end
+
+  def question_attributes(text)
+    {
+      question_attributes: {
+        text: text,
+        option1: "Option 1",
+        option2: "Option 2",
+        option3: "Option 3",
+        option4: "Option 4",
+        option5: "Option 5",
+        kind: Question.kinds[:for_students]
+      }
+    }
   end
 
 end
