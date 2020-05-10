@@ -33,6 +33,10 @@ class SchoolTreeCategoryQuestion < ApplicationRecord
     tree_category_question.question
   end
 
+  def sync_surveys
+    survey.update_survey_monkey_question(self)
+  end
+
   private
   def assign_survey
     survey = tree.surveys.where(school: school, kind: question.kind).first
@@ -56,6 +60,5 @@ class SchoolTreeCategoryQuestion < ApplicationRecord
   def destroy_survey_monkey
     survey.remove_survey_monkey_question(self)
   end
-
 
 end

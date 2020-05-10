@@ -4,7 +4,7 @@ class SurveyTest < ActiveSupport::TestCase
 
   test "survey monkey sync -- deleted default survey monkey page" do
     requests = []
-    survey = surveys(:two)
+    survey = surveys(:one_teachers)
 
     requests << survey_monkey_mock(
       method: :get,
@@ -25,7 +25,7 @@ class SurveyTest < ActiveSupport::TestCase
   test "survey monkey sync -- name change" do
     requests = []
     new_name = "A totally different name"
-    survey = surveys(:one)
+    survey = surveys(:one_students)
 
     requests << survey_monkey_mock(
       method: :get,
@@ -46,8 +46,8 @@ class SurveyTest < ActiveSupport::TestCase
 
   test "deleting question -- triggers delete of survey monkey_question" do
     requests = []
-    survey = surveys(:two)
-    sq = survey_questions(:one)
+    survey = surveys(:one_students)
+    sq = school_tree_category_questions(:one)
 
     requests << survey_monkey_mock(
       method: :delete,
@@ -57,24 +57,33 @@ class SurveyTest < ActiveSupport::TestCase
     requests << survey_monkey_mock(
       method: :get,
       url: "surveys/#{survey.survey_monkey_id}/details",
-      responses: [details(survey: survey, survey_questions: [survey_questions(:two)])],
-      times: 2
+      responses: [
+        details(survey: survey, survey_questions: [], pages: [{"id": sq.survey_monkey_page_id}])
+      ],
+      times: 1
     )
 
-    survey.update(question_ids: [questions(:two).id])
+    requests << survey_monkey_mock(
+      method: :delete,
+      url: "surveys/#{survey.survey_monkey_id}/pages/#{sq.survey_monkey_page_id}"
+    )
+
+    assert_equal 1, survey.school_tree_category_questions.count
+    sq.destroy
+    assert_equal 0, survey.school_tree_category_questions.count
     assert_requests(requests)
   end
 
   test "survey monkey sync -- delete question" do
     requests = []
-    survey = surveys(:two)
-    deleted = survey_questions(:one)
+    survey = surveys(:one_teachers)
+    deleted = school_tree_category_questions(:one)
     deleted.delete
 
     requests << survey_monkey_mock(
       method: :get,
       url: "surveys/#{survey.survey_monkey_id}/details",
-      responses: [details(survey: survey, survey_questions: [deleted, survey_questions(:two)])]
+      responses: [details(survey: survey, survey_questions: [deleted, school_tree_category_questions(:two)])]
     )
 
     requests << survey_monkey_mock(
@@ -93,71 +102,59 @@ class SurveyTest < ActiveSupport::TestCase
 
   test "survey monkey updated when category deleted (page and questions deleted on multiple surveys)" do
     requests = []
-    category = categories(:two)
-    SurveyQuestion.skip_callback(:commit, :after, :create_survey_monkey, raise: false)
-    surveys(:one).survey_questions.create!(
-      question: questions(:two),
-      survey_monkey_id: "QUESTION_TWO_SURVEY_ONE_SURVEY_MONKEY",
-      survey_monkey_page_id: "PAGE_QUESTION_TWO_SURVEY_ONE_SURVEY_MONKEY"
-    )
+    category = categories(:one)
+    SchoolTreeCategoryQuestion.skip_callback(:commit, :after, :create_survey_monkey, raise: false)
+    stcqs = category.school_tree_category_questions
+    assert_equal 2, stcqs.length
 
-    survey_questions = category.questions.map(&:survey_questions).flatten
-    assert_equal 2, survey_questions.length
-
-    survey_questions.each do |sq|
-      survey = sq.survey
+    stcqs.each do |stcq|
+      survey = stcq.survey
       requests << survey_monkey_mock(
         method: :delete,
-        url: "surveys/#{survey.survey_monkey_id}/pages/#{sq.survey_monkey_page_id}/questions/#{sq.survey_monkey_id}"
+        url: "surveys/#{survey.survey_monkey_id}/pages/#{stcq.survey_monkey_page_id}/questions/#{stcq.survey_monkey_id}"
       )
 
-      remaining_survey_questions = survey.survey_questions.select { |x| x.survey_monkey_id != sq.survey_monkey_id}
+      remaining_stcqs = survey.school_tree_category_questions.select { |x| x.survey_monkey_id != stcq.survey_monkey_id}
       requests << survey_monkey_mock(
         method: :get,
         url: "surveys/#{survey.survey_monkey_id}/details",
         responses: [
           details(
             survey: survey,
-            survey_questions: remaining_survey_questions,
-            pages: [{"id": sq.survey_monkey_page_id}]
+            survey_questions: remaining_stcqs,
+            pages: [{"id": stcq.survey_monkey_page_id}]
           )
         ]
       )
 
       requests << survey_monkey_mock(
         method: :delete,
-        url: "surveys/#{survey.survey_monkey_id}/pages/#{sq.survey_monkey_page_id}"
+        url: "surveys/#{survey.survey_monkey_id}/pages/#{stcq.survey_monkey_page_id}"
       )
     end
 
     category.destroy
     assert_requests(requests)
 
-    SurveyQuestion.set_callback(:commit, :after, :create_survey_monkey)
+    SchoolTreeCategoryQuestion.set_callback(:commit, :after, :create_survey_monkey)
   end
 
   test "survey monkey updated when category renamed" do
     requests = []
 
-    category = categories(:two)
-    SurveyQuestion.skip_callback(:commit, :after, :create_survey_monkey, raise: false)
-    surveys(:one).survey_questions.create!(
-      question: questions(:two),
-      survey_monkey_id: "QUESTION_TWO_SURVEY_ONE_SURVEY_MONKEY",
-      survey_monkey_page_id: "PAGE_QUESTION_TWO_SURVEY_ONE_SURVEY_MONKEY"
-    )
-
-    existing_category_name = category.name
+    tree_category = tree_categories(:two)
+    SchoolTreeCategoryQuestion.skip_callback(:commit, :after, :create_survey_monkey, raise: false)
+    existing_category_name = tree_category.category.name
     new_category_name = "New Category Name"
 
-    category.update_column('name', new_category_name)
-    survey_questions = category.questions.map(&:survey_questions).flatten
-    survey_questions.each do |sq|
-      survey = sq.survey
+    tree_category.category.update_column('name', new_category_name)
+    stcqs = tree_category.school_tree_category_questions
+    stcqs.each do |stcq|
+      survey = stcq.survey
       requests << survey_monkey_mock(
         method: :patch,
-        url: "surveys/#{survey.survey_monkey_id}/pages/#{sq.survey_monkey_page_id}",
-        body: {"title": category.name}
+        url: "surveys/#{survey.survey_monkey_id}/pages/#{stcq.survey_monkey_page_id}",
+        body: {"title": tree_category.category.name}
       )
 
       requests << survey_monkey_mock(
@@ -168,13 +165,13 @@ class SurveyTest < ActiveSupport::TestCase
         ]
       )
     end
-    category.update_column('name', existing_category_name)
+    tree_category.category.update_column('name', existing_category_name)
 
-    category.update(name: new_category_name)
+    tree_category.category.update(name: new_category_name)
 
     assert_requests(requests)
 
-    SurveyQuestion.set_callback(:commit, :after, :create_survey_monkey)
+    SchoolTreeCategoryQuestion.set_callback(:commit, :after, :create_survey_monkey)
   end
 
   test "out of sync category name" do
@@ -183,26 +180,24 @@ class SurveyTest < ActiveSupport::TestCase
     changed_on_survey_monkey = categories(:two)
     existing_name = changed_on_survey_monkey.name
 
-    changed_on_survey_monkey.questions.each do |question|
-      question.survey_questions.each do |survey_question|
-        survey = survey_question.survey
+    changed_on_survey_monkey.all_school_tree_category_questions.each do |stcq|
+      survey = stcq.survey
 
-        changed_on_survey_monkey.update_column('name', "CHANGED CATEGORY NAME")
-        requests << survey_monkey_mock(
-          method: :get,
-          url: "surveys/#{survey.survey_monkey_id}/details",
-          responses: [details(survey: survey)]
-        )
-        changed_on_survey_monkey.update_column('name', existing_name)
+      changed_on_survey_monkey.update_column('name', "CHANGED CATEGORY NAME")
+      requests << survey_monkey_mock(
+        method: :get,
+        url: "surveys/#{survey.survey_monkey_id}/details",
+        responses: [details(survey: survey)]
+      )
+      changed_on_survey_monkey.update_column('name', existing_name)
 
-        requests << survey_monkey_mock(
-          method: :patch,
-          url: "surveys/#{survey.survey_monkey_id}/pages/#{survey_question.survey_monkey_page_id}",
-          body: {"title": existing_name}
-        )
+      requests << survey_monkey_mock(
+        method: :patch,
+        url: "surveys/#{survey.survey_monkey_id}/pages/#{stcq.survey_monkey_page_id}",
+        body: {"title": existing_name}
+      )
 
-        survey.sync_with_survey_monkey
-      end
+      survey.sync_with_survey_monkey
     end
 
     assert_requests(requests)
@@ -211,26 +206,28 @@ class SurveyTest < ActiveSupport::TestCase
   test "survey monkey updated when question updated" do
     requests = []
 
-    question = questions(:two)
+    question = questions(:two_teacher)
 
     existing_text = question.text
     new_text = "New text"
 
     question.update_column('text', new_text)
-    question.survey_questions.each do |survey_question|
-      survey = survey_question.survey
+    question.tree_category_questions.each do |tcq|
+      tcq.school_tree_category_questions.each do |stcq|
+        survey = stcq.survey
 
-      requests << survey_monkey_mock(
-        method: :patch,
-        url: "surveys/#{survey.survey_monkey_id}/pages/#{survey_question.survey_monkey_page_id}/questions/#{survey_question.survey_monkey_id}",
-        body: survey_question.question.survey_monkey_structure(1)
-      )
+        requests << survey_monkey_mock(
+          method: :patch,
+          url: "surveys/#{survey.survey_monkey_id}/pages/#{stcq.survey_monkey_page_id}/questions/#{stcq.survey_monkey_id}",
+          body: stcq.question.survey_monkey_structure(1)
+        )
 
-      requests << survey_monkey_mock(
-        method: :get,
-        url: "surveys/#{survey.survey_monkey_id}/details",
-        responses: [details(survey: survey)]
-      )
+        requests << survey_monkey_mock(
+          method: :get,
+          url: "surveys/#{survey.survey_monkey_id}/details",
+          responses: [details(survey: survey)]
+        )
+      end
     end
     question.update_column('text', existing_text)
 
@@ -242,55 +239,55 @@ class SurveyTest < ActiveSupport::TestCase
   test "survey monkey updated when question assigned to new category" do
     requests = []
 
-    question = questions(:one)
+    tcq = tree_category_questions(:one)
 
-    existing_category = question.category
-    existing_category_id = existing_category.id
-    new_category = categories(:two)
-    new_category_id = new_category.id
+    existing_tree_category = tcq.tree_category
+    existing_tree_category_id = existing_tree_category.id
+    new_tree_category = tree_categories(:two)
+    new_tree_category_id = new_tree_category.id
 
-    assert new_category_id != existing_category_id
+    assert new_tree_category_id != existing_tree_category_id
 
-    question.update_column('category_id', new_category_id)
-    question.survey_questions.each do |survey_question|
-      survey = survey_question.survey
+    tcq.update_column('tree_category_id', new_tree_category_id)
+    tcq.school_tree_category_questions.each do |stcq|
+      survey = stcq.survey
 
-      existing_page_id = survey_question.survey_monkey_page_id
+      existing_page_id = stcq.survey_monkey_page_id
       new_page_id = "NEW_PAGE_ID"
 
-      survey_question.update_column(:survey_monkey_page_id, new_page_id)
+      stcq.update_column(:survey_monkey_page_id, new_page_id)
 
       requests << survey_monkey_mock(
         method: :delete,
-        url: "surveys/#{survey.survey_monkey_id}/pages/#{existing_page_id}/questions/#{survey_question.survey_monkey_id}"
+        url: "surveys/#{survey.survey_monkey_id}/pages/#{existing_page_id}/questions/#{stcq.survey_monkey_id}"
       )
 
       requests << survey_monkey_mock(
         method: :get,
         url: "surveys/#{survey.survey_monkey_id}/pages",
         responses: [
-          {"data": [{"id": existing_page_id, "title": existing_category.name}]}
+          {"data": [{"id": existing_page_id, "title": existing_tree_category.category.name}]}
         ]
       )
 
       requests << survey_monkey_mock(
         method: :post,
         url: "surveys/#{survey.survey_monkey_id}/pages",
-        body: {"title": new_category.name},
+        body: {"title": new_tree_category.category.name},
         responses: [{"id": new_page_id}]
       )
 
       requests << survey_monkey_mock(
         method: :post,
         url: "surveys/#{survey.survey_monkey_id}/pages/#{new_page_id}/questions",
-        body: question.survey_monkey_structure(1)
+        body: stcq.question.survey_monkey_structure(1)
       )
 
       requests << survey_monkey_mock(
         method: :get,
         url: "surveys/#{survey.survey_monkey_id}/details",
         responses: [
-          details(survey: survey, pages: [{"id": existing_page_id, "title": existing_category.name}])
+          details(survey: survey, pages: [{"id": existing_page_id, "title": existing_tree_category.category.name}])
         ]
       )
 
@@ -298,11 +295,11 @@ class SurveyTest < ActiveSupport::TestCase
         method: :delete,
         url: "surveys/#{survey.survey_monkey_id}/pages/#{existing_page_id}"
       )
-      survey_question.update_column(:survey_monkey_page_id, existing_page_id)
+      stcq.update_column(:survey_monkey_page_id, existing_page_id)
     end
-    question.update_column('category_id', existing_category_id)
+    tcq.update_column('tree_category_id', existing_tree_category_id)
 
-    question.update(category_id: new_category_id)
+    tcq.update(tree_category_id: new_tree_category_id)
 
     assert_requests requests
   end
@@ -310,7 +307,7 @@ class SurveyTest < ActiveSupport::TestCase
   test "survey monkey page doesn't exist" do
     requests = []
 
-    survey = surveys(:two)
+    survey = surveys(:one_teachers)
 
     page_on_sm_not_local = "PAGE_ON_SM_NOT_LOCAL"
 
@@ -335,24 +332,24 @@ class SurveyTest < ActiveSupport::TestCase
   test "survey monkey question doesn't exist on page" do
     requests = []
 
-    survey = surveys(:two)
+    survey = surveys(:one_teachers)
+    stcqs = survey.school_tree_category_questions.to_a
 
     question_on_sm_not_local = "QUESTION_ON_SM_NOT_LOCAL"
-    page_id = survey_questions.first.survey_monkey_page_id
-    category = survey_questions.first.question.category
+    page_id = stcqs.first.survey_monkey_page_id
+    tree_category = stcqs.first.tree_category_question.tree_category
 
-    survey_questions = survey.survey_questions.to_a
-    survey_questions << SurveyQuestion.new(
+    stcqs << SchoolTreeCategoryQuestion.new(
       "survey_monkey_id": question_on_sm_not_local,
       "survey_monkey_page_id": page_id,
-      question: Question.new(category: category)
+      tree_category_question: TreeCategoryQuestion.new(tree_category: tree_category, question: Question.new(text: "Question"))
     )
 
     requests << survey_monkey_mock(
       method: :get,
       url: "surveys/#{survey.survey_monkey_id}/details",
       responses: [
-        details(survey: survey, survey_questions: survey_questions)
+        details(survey: survey, survey_questions: stcqs)
       ]
     )
 

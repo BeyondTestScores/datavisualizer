@@ -5,7 +5,7 @@ one_students:
   tree: one
   school: one
   kind: <%= Survey.kinds[:for_students] %>
-  survey_monkey_id: surveymonkeyid1
+  survey_monkey_id: surveymonkeyid1students
 
 
 one_teachers:
@@ -13,11 +13,11 @@ one_teachers:
   tree: one
   school: one
   kind: <%= Survey.kinds[:for_teachers] %>
-  survey_monkey_id: surveymonkeyid1
+  survey_monkey_id: surveymonkeyid1teachers
 
 two_students:
   name: Survey Two
   tree: one
   school: two
   kind: <%= Survey.kinds[:for_students] %>
-  survey_monkey_id: surveymonkeyid2
+  survey_monkey_id: surveymonkeyid2students

@@ -56,8 +56,10 @@ class Question < ApplicationRecord
   end
 
   def sync_surveys
-    survey_questions.each do |survey_question|
-      survey_question.survey.update_survey_monkey_question(survey_question)
+    tree_category_questions.each do |tcq|
+      tcq.school_tree_category_questions.each do |stcq|
+        stcq.survey.update_survey_monkey_question(stcq)
+      end
     end
   end
 

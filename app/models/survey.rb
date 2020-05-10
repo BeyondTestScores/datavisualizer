@@ -108,28 +108,29 @@ class Survey < ApplicationRecord
     sync_with_survey_monkey
   end
 
-  def update_survey_monkey_question(survey_question)
-    page_id = survey_question.survey_monkey_page_id
-    question_id = survey_question.survey_monkey_id
+  def update_survey_monkey_question(school_tree_category_question)
+    page_id = school_tree_category_question.survey_monkey_page_id
+    question_id = school_tree_category_question.survey_monkey_id
 
-    if survey_question.question.category.name_previously_changed?
+    if school_tree_category_question.category.name_previously_changed?
       surveyMonkeyConnection.patch(
         "surveys/#{survey_monkey_id}/pages/#{page_id}",
-        {"title": survey_question.question.category.name}.to_json
+        {"title": school_tree_category_question.category.name}.to_json
       )
     end
 
-    if survey_question.question.category_id_previously_changed?
+    puts school_tree_category_question.tree_category_question.tree_category_id_previously_changed?
+    if school_tree_category_question.tree_category_question.tree_category_id_previously_changed?
       surveyMonkeyConnection.delete(
         "surveys/#{survey_monkey_id}/pages/#{page_id}/questions/#{question_id}"
       )
 
-      create_survey_monkey_question(survey_question)
+      create_survey_monkey_question(school_tree_category_question)
       return
-    elsif survey_question.question.previous_changes.keys.present?
+    elsif school_tree_category_question.question.previous_changes.keys.present?
       surveyMonkeyConnection.patch(
         "surveys/#{survey_monkey_id}/pages/#{page_id}/questions/#{question_id}",
-        survey_question.question.survey_monkey_structure(1).to_json
+        school_tree_category_question.question.survey_monkey_structure(1).to_json
       )
     end
 

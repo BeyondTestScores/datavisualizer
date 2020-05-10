@@ -22,7 +22,19 @@ class Category < ApplicationRecord
   end
 
   def sync_surveys
-    all_questions.map(&:sync_surveys)
+    all_school_tree_category_questions.map(&:sync_surveys)
+  end
+
+  def tree_category_questions
+    tree_categories.map(&:tree_category_questions).flatten
+  end
+
+  def school_tree_category_questions
+    tree_category_questions.map(&:school_tree_category_questions).flatten
+  end
+
+  def all_school_tree_category_questions
+    tree_categories.map(&:all_school_tree_category_questions).flatten
   end
 
 end

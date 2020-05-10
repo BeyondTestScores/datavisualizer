@@ -9,6 +9,8 @@ class TreeCategoryQuestion < ApplicationRecord
 
   scope :for, -> (question) { where(question: question) }
 
+  after_update_commit :sync_surveys
+
   def to_s
     question.text
   end
@@ -23,6 +25,13 @@ class TreeCategoryQuestion < ApplicationRecord
 
   def category_path(include_self: false)
     tree_category.path(include_self: include_self)
+  end
+
+  private
+  def sync_surveys
+    school_tree_category_questions.each do |stcq|
+      stcq.sync_surveys
+    end
   end
 
 end
