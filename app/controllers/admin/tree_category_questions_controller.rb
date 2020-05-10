@@ -33,7 +33,9 @@ class Admin::TreeCategoryQuestionsController < Admin::AdminController
       end
     else
       set_tree_categories
-      render :new
+      respond_to do |format|
+        format.html { render :new }
+      end
     end
   end
 
@@ -80,7 +82,7 @@ class Admin::TreeCategoryQuestionsController < Admin::AdminController
   end
 
   def tree_category_question_params
-    params.require(:tree_category_question).permit(:tree_category_id, question_attributes: [:id, :text, :option1, :option2, :option3, :option4, :option5])
+    params.require(:tree_category_question).permit(:tree_category_id, question_attributes: [:id, :text, :option1, :option2, :option3, :option4, :option5, :kind])
   end
 
   def set_tree_category_question

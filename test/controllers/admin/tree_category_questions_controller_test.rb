@@ -21,56 +21,67 @@ class Admin::TreeCategoryQuestionsControllerTest < ActionDispatch::IntegrationTe
 
   def test_new_has_form
     get "#{root_path}/questions/new", headers: authorized_headers
-    assert_select "select" do
+    assert_select "select[name='tree_category_question[tree_category_id]']" do
       assert_select "option", Category.count + 1
       assert_select "option[value='#{@tree_category.id}'][selected]", {count: 1}
+    end
+    assert_select "label", "Who is this question for?"
+    assert_select "select[name='tree_category_question[kind]']" do
+      assert_select "option", Question.kinds.count + 1
     end
   end
 
   def test_create__requirements
+    SchoolTreeCategoryQuestion.skip_callback(:commit, :after, :create_survey_monkey, raise: false)
+
     question_count = Question.count
-    post "/admin/questions", headers: authorized_headers
+    post "#{root_path}/questions", headers: authorized_headers
     assert_select "p", "Invalid Parameters"
     assert_equal question_count, Question.count
 
-    post "/admin/questions", headers: authorized_headers, params: {
-      question: {
-        text: ""
+    post "#{root_path}/questions", headers: authorized_headers, params: {
+      tree_category_question: {
+        question_attributes: {
+          text: ""
+        }
       }
     }
-    assert_select "li", "Text can't be blank"
-    assert_select "li", "Category must exist"
-    assert_select "li", "Option1 can't be blank"
+    assert_select "li", "Question text can't be blank"
+    assert_select "li", "Question option1 can't be blank"
     assert_equal question_count, Question.count
 
     category = Category.last
-    post "/admin/questions", headers: authorized_headers, params: {
-      question: {
-        text: "New Question Text",
-        option1: "Option 1",
-        option2: "Option 2",
-        option3: "Option 3",
-        option4: "Option 4",
-        option5: "Option 5",
-        category_id: category.id
+    post "#{root_path}/questions", headers: authorized_headers, params: {
+      tree_category_question: {
+        question_attributes: {
+          text: "New Question Text",
+          option1: "Option 1",
+          option2: "Option 2",
+          option3: "Option 3",
+          option4: "Option 4",
+          option5: "Option 5",
+          kind: 'for_students'
+        }
       }
     }
     assert_equal question_count + 1, Question.count
     assert_equal 302, status
     follow_redirect!
 
-    question = Question.last
-    assert_equal "/admin/questions/#{question.id}", path
-    assert_equal category, question.category
+    tree_category_question = TreeCategoryQuestion.last
+    assert_equal "#{root_path}/questions/#{tree_category_question.question.id}", path
+    assert_equal @tree_category, tree_category_question.tree_category
+
+    SchoolTreeCategoryQuestion.set_callback(:commit, :after, :create_survey_monkey)
   end
 
   def test_show
-    question = questions(:two)
-    get "/admin/questions/#{question.id}", headers: authorized_headers
+    tree_category_question = @tree_category.tree_category_questions.first
+    get "#{root_path}/questions/#{tree_category_question.question.id}", headers: authorized_headers
 
-    assert_select "h2", question.text
-    assert_select "p", question.option1
-    assert_select "a", categories(:two).name, :href => /categories\/#{categories(:two).slug}/
+    assert_select "h2", tree_category_question.question.text
+    assert_select "p", tree_category_question.question.option1
+    assert_select "a", @tree_category.name, :href => /categories\/#{@tree_category.category.slug}/
   end
 
   def test_edit
@@ -78,7 +89,7 @@ class Admin::TreeCategoryQuestionsControllerTest < ActionDispatch::IntegrationTe
     get "#{root_path}/questions/#{tree_category_question.question.id}/edit", headers: authorized_headers
 
     assert_select "form"
-    assert_select "select" do
+    assert_select "select[name='tree_category_question[tree_category_id]']" do
       assert_select "option", Category.count + 1
       assert_select "option[value='#{@tree_category.id}'][selected]"
     end

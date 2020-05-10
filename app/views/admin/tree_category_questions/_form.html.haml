@@ -15,6 +15,8 @@
     - 5.times do |i|
       = ff.text_field "option#{i + 1}"
 
+  = f.select :kind, Question.kinds.map { |k| [k[0].gsub(/_/, ' ').titleize, k[1]] }, { label: "Who is this question for?", include_blank: true }
+
   = f.select :tree_category_id, @tree_categories.map { |tc| [tc.name, tc.id] }, { label: "Category", include_blank: true }, { class: 'tree-category-selector-target' }
   = render "tree", template: "selector"
 
