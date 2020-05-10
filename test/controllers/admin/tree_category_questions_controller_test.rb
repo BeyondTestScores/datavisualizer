@@ -23,16 +23,7 @@ class Admin::TreeCategoryQuestionsControllerTest < ActionDispatch::IntegrationTe
     get "#{root_path}/questions/new", headers: authorized_headers
     assert_select "select" do
       assert_select "option", Category.count + 1
-      assert_select "option[selected]", {count: 1}
-    end
-  end
-
-  def test_new_assigns_category_id_when_passed_in
-    category = categories(:two)
-    get "/admin/questions/new?category_id=#{category.id}", headers: authorized_headers
-    assert_select "select" do
-      assert_select "option", Category.count + 1
-      assert_select "option[value='#{category.id}'][selected]", {count: 1}
+      assert_select "option[value='#{@tree_category.id}'][selected]", {count: 1}
     end
   end
 
@@ -83,13 +74,13 @@ class Admin::TreeCategoryQuestionsControllerTest < ActionDispatch::IntegrationTe
   end
 
   def test_edit
-    question = questions(:two)
-    get "/admin/questions/#{question.id}/edit", headers: authorized_headers
+    tree_category_question = @tree_category.tree_category_questions.first
+    get "#{root_path}/questions/#{tree_category_question.question.id}/edit", headers: authorized_headers
 
     assert_select "form"
     assert_select "select" do
       assert_select "option", Category.count + 1
-      assert_select "option[value='#{question.category.id}'][selected]"
+      assert_select "option[value='#{@tree_category.id}'][selected]"
     end
   end
 
@@ -136,64 +127,64 @@ class Admin::TreeCategoryQuestionsControllerTest < ActionDispatch::IntegrationTe
     assert_equal new_question_text, question.reload.text
   end
 
-  def test_update__updates_category
-    requests = []
-
-    question = questions(:two)
-    old_question_text = question.text
-    new_question_text = "New Question Text"
-    old_category = question.category
-    new_category = categories(:three)
-    question_count = new_category.questions.count
-
-    assert question.category != new_category
-
-    question.update_column("text", new_question_text)
-    question.update_column("category_id", new_category.id)
-    question.survey_questions.each do |survey_question|
-      survey = survey_question.survey
-      survey_monkey_id = survey.survey_monkey_id
-      page_id = survey_question.survey_monkey_page_id
-      survey_monkey_question_id = survey_question.survey_monkey_id
-
-      requests << survey_monkey_mock(
-        method: :delete,
-        url: "surveys/#{survey_monkey_id}/pages/#{page_id}/questions/#{survey_monkey_question_id}"
-      )
-
-      requests << survey_monkey_mock(
-        method: :get,
-        url: "surveys/#{survey_monkey_id}/pages",
-        responses: [{"data": details(survey: survey)["pages"]}]
-      )
-
-      requests << survey_monkey_mock(
-        method: :post,
-        url: "surveys/#{survey_monkey_id}/pages/#{page_id}/questions",
-        body: survey_question.question.survey_monkey_structure(1)
-      )
-
-      requests << survey_monkey_mock(
-        method: :get,
-        url: "surveys/#{survey_monkey_id}/details",
-        responses: [details(survey: survey)]
-      )
-
-    end
-    question.update_column("text", old_question_text)
-    question.update_column("category_id", old_category.id)
-
-    patch "/admin/questions/#{question.id}", headers: authorized_headers, params: {
-      question: {
-        text: new_question_text,
-        category_id: new_category.id
-      }
-    }
-
-    assert_equal Question.find_by_text(new_question_text).category, new_category
-    assert_equal question_count + 1, new_category.questions.count
-
-    assert_requests requests
-  end
+  # def test_update__updates_category
+  #   requests = []
+  #
+  #   question = questions(:two)
+  #   old_question_text = question.text
+  #   new_question_text = "New Question Text"
+  #   old_category = question.category
+  #   new_category = categories(:three)
+  #   question_count = new_category.questions.count
+  #
+  #   assert question.category != new_category
+  #
+  #   question.update_column("text", new_question_text)
+  #   question.update_column("category_id", new_category.id)
+  #   question.survey_questions.each do |survey_question|
+  #     survey = survey_question.survey
+  #     survey_monkey_id = survey.survey_monkey_id
+  #     page_id = survey_question.survey_monkey_page_id
+  #     survey_monkey_question_id = survey_question.survey_monkey_id
+  #
+  #     requests << survey_monkey_mock(
+  #       method: :delete,
+  #       url: "surveys/#{survey_monkey_id}/pages/#{page_id}/questions/#{survey_monkey_question_id}"
+  #     )
+  #
+  #     requests << survey_monkey_mock(
+  #       method: :get,
+  #       url: "surveys/#{survey_monkey_id}/pages",
+  #       responses: [{"data": details(survey: survey)["pages"]}]
+  #     )
+  #
+  #     requests << survey_monkey_mock(
+  #       method: :post,
+  #       url: "surveys/#{survey_monkey_id}/pages/#{page_id}/questions",
+  #       body: survey_question.question.survey_monkey_structure(1)
+  #     )
+  #
+  #     requests << survey_monkey_mock(
+  #       method: :get,
+  #       url: "surveys/#{survey_monkey_id}/details",
+  #       responses: [details(survey: survey)]
+  #     )
+  #
+  #   end
+  #   question.update_column("text", old_question_text)
+  #   question.update_column("category_id", old_category.id)
+  #
+  #   patch "/admin/questions/#{question.id}", headers: authorized_headers, params: {
+  #     question: {
+  #       text: new_question_text,
+  #       category_id: new_category.id
+  #     }
+  #   }
+  #
+  #   assert_equal Question.find_by_text(new_question_text).category, new_category
+  #   assert_equal question_count + 1, new_category.questions.count
+  #
+  #   assert_requests requests
+  # end
 
 end
