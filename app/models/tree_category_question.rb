@@ -9,6 +9,7 @@ class TreeCategoryQuestion < ApplicationRecord
 
   scope :for, -> (question) { where(question: question) }
 
+  after_create :create_school_tree_category_questions
   after_update_commit :sync_surveys
 
   def to_s
@@ -31,6 +32,12 @@ class TreeCategoryQuestion < ApplicationRecord
   def sync_surveys
     school_tree_category_questions.each do |stcq|
       stcq.sync_surveys
+    end
+  end
+
+  def create_school_tree_category_questions
+    School.all.each do |school|
+      school_tree_category_questions.find_or_create_by(school: school)
     end
   end
 

@@ -14,6 +14,7 @@ class Survey < ApplicationRecord
   before_destroy :delete_survey_monkey_survey
 
   scope :for_school, -> (school) { where(school: school) }
+  scope :for_kind, -> (kind) { where(kind: kind) }
 
   def to_s
     name

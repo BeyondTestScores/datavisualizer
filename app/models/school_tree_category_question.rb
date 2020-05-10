@@ -10,7 +10,8 @@ class SchoolTreeCategoryQuestion < ApplicationRecord
 
   default_scope { joins(:survey, :tree_category_question) }
 
-  # scope :for, -> (question) { where(question: question) }
+  scope :for_school, -> (school) { where(school: school) }
+  scope :for_survey, -> (suvey) { where(survey: survey) }
   scope :on_page, -> (page_id) { where(survey_monkey_page_id: page_id) }
 
   def to_s
@@ -39,7 +40,7 @@ class SchoolTreeCategoryQuestion < ApplicationRecord
 
   private
   def assign_survey
-    survey = tree.surveys.where(school: school, kind: question.kind).first
+    survey = tree.surveys.for_school(school).for_kind(question.kind).first
 
     if survey.nil?
       survey = tree.surveys.create(
