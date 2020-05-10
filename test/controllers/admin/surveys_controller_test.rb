@@ -11,22 +11,6 @@ class Admin::SurveysControllerTest < ActionDispatch::IntegrationTest
     }
   end
 
-  def test_authentication
-    # get the admin page
-    get "/admin/surveys/new"
-    assert_equal 401, status
-
-    # post the login and follow through to the home page
-    get "/admin/surveys/new", headers: authorized_headers
-    assert_equal "/admin/surveys/new", path
-  end
-
-  def test_new_has_form
-    get "/admin/surveys/new", headers: authorized_headers
-    assert_select "form"
-    assert_select "input.form-check-input", Question.count
-  end
-
   def test_create__requirements
     requests = []
     survey_name = "New Survey For Test"
@@ -149,7 +133,7 @@ class Admin::SurveysControllerTest < ActionDispatch::IntegrationTest
 
   def test_show
     requests = []
-    survey = surveys(:two)
+    survey = surveys(:one_teachers)
 
     requests << survey_monkey_mock(
       method: :get,
@@ -160,7 +144,7 @@ class Admin::SurveysControllerTest < ActionDispatch::IntegrationTest
     get "/admin/surveys/#{survey.id}", headers: authorized_headers
 
     assert_select "h2", survey.name
-    assert_select "a", survey.questions.first.text
+    assert_select "a", survey.school_tree_category_questions.first.question.text
 
     assert_requests requests
   end

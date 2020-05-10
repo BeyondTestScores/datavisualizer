@@ -26,6 +26,10 @@ class SchoolTreeCategoryQuestion < ApplicationRecord
     tree_category_question.category
   end
 
+  def tree_category
+    tree_category_question.tree_category
+  end
+
   def category_path(include_self: false)
     tree_category_question.category_path(include_self)
   end
