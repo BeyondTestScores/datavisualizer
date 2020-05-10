@@ -185,4 +185,5 @@ class Admin::CategoriesControllerTest < ActionDispatch::IntegrationTest
 
     assert_requests requests
   end
+
 end

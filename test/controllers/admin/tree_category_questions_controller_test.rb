@@ -1,6 +1,14 @@
 require 'test_helper'
 
-class Admin::QuestionsControllerTest < ActionDispatch::IntegrationTest
+class Admin::TreeCategoryQuestionsControllerTest < ActionDispatch::IntegrationTest
+
+  setup do
+    @tree_category = tree_categories(:one)
+  end
+
+  def root_path
+    "/admin/trees/#{@tree_category.tree.slug}/categories/#{@tree_category.category.slug}"
+  end
 
   def authorized_headers
     return {
@@ -11,21 +19,11 @@ class Admin::QuestionsControllerTest < ActionDispatch::IntegrationTest
     }
   end
 
-  def test_authentication
-    # get the admin page
-    get "/admin/questions/new"
-    assert_equal 401, status
-
-    # post the login and follow through to the home page
-    get "/admin/questions/new", headers: authorized_headers
-    assert_equal "/admin/questions/new", path
-  end
-
   def test_new_has_form
-    get "/admin/questions/new", headers: authorized_headers
+    get "#{root_path}/questions/new", headers: authorized_headers
     assert_select "select" do
       assert_select "option", Category.count + 1
-      assert_select "option[selected]", {count: 0}
+      assert_select "option[selected]", {count: 1}
     end
   end
 
@@ -97,23 +95,25 @@ class Admin::QuestionsControllerTest < ActionDispatch::IntegrationTest
 
   def test_update
     new_question_text = "New Question Text"
-    question = questions(:two)
+    tree_category_question = tree_category_questions(:two)
+    question = tree_category_question.question
+    original_text = question.text
 
     question.text = new_question_text
-    question.survey_questions.each do |survey_question|
-      survey_monkey_id = survey_question.survey.survey_monkey_id
-      page_id = survey_question.survey_monkey_page_id
-      survey_monkey_question_id = survey_question.survey_monkey_id
+    tree_category_question.school_tree_category_questions.each do |stcq|
+      survey_monkey_id = stcq.survey.survey_monkey_id
+      page_id = stcq.survey_monkey_page_id
+      survey_monkey_question_id = stcq.survey_monkey_id
       survey_monkey_mock(
         method: :patch,
         url: "surveys/#{survey_monkey_id}/pages/#{page_id}/questions/#{survey_monkey_question_id}",
-        body: survey_question.question.survey_monkey_structure(1)
+        body: stcq.question.survey_monkey_structure(1)
       )
 
       survey_monkey_mock(
         method: :get,
         url: "surveys/#{survey_monkey_id}/details",
-        responses: [{"title": survey_question.survey.name}]
+        responses: [{"title": stcq.survey.name}]
       )
 
       survey_monkey_mock(
@@ -122,10 +122,14 @@ class Admin::QuestionsControllerTest < ActionDispatch::IntegrationTest
         responses: [{"data": [{"id": page_id}]}]
       )
     end
+    question.text = original_text
 
-    patch "/admin/questions/#{question.id}", headers: authorized_headers, params: {
-      question: {
-        text: new_question_text
+    patch "#{root_path}/questions/#{question.id}", headers: authorized_headers, params: {
+      tree_category_question: {
+        question_attributes: {
+          id: question.id,
+          text: new_question_text
+        }
       }
     }
 
@@ -192,56 +196,4 @@ class Admin::QuestionsControllerTest < ActionDispatch::IntegrationTest
     assert_requests requests
   end
 
-  def test_destroy__doesnt_destroy_category
-    requests = []
-
-    category_count = Category.count
-    question_count = Question.count
-
-    category = categories(:two)
-    assert_equal 1, category.questions.count
-    question = category.questions.first
-
-    question.survey_questions.each do |sq|
-      survey = sq.survey
-
-      requests << survey_monkey_mock(
-        method: :delete,
-        url: "surveys/#{survey.survey_monkey_id}/pages/#{sq.survey_monkey_page_id}/questions/#{sq.survey_monkey_id}"
-      )
-
-      requests << survey_monkey_mock(
-        method: :get,
-        url: "surveys/#{survey.survey_monkey_id}/details",
-        responses: [details(
-          survey: survey,
-          survey_questions: [],
-          pages: [{"id": sq.survey_monkey_page_id}]
-        )]
-      )
-
-      requests << survey_monkey_mock(
-        method: :delete,
-        url: "surveys/#{survey.survey_monkey_id}/pages/#{sq.survey_monkey_page_id}"
-      )
-    end
-
-    delete admin_question_url(question), headers: authorized_headers
-    assert_redirected_to admin_root_path
-
-    assert_equal category_count, Category.count
-    assert_equal question_count - 1, Question.count
-    assert_equal 0, category.reload.questions.count
-
-    assert_requests requests
-  end
-
-
-  # def test_index
-  #   get "/admin/categories", headers: authorized_headers
-  #   assert_select "h2", "All Categories"
-  #   Category.all.each do |c|
-  #     assert_select "a", c.name, href: admin_category_path(c)
-  #   end
-  # end
 end

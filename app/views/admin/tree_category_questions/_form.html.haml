@@ -15,7 +15,7 @@
     - 5.times do |i|
       = ff.text_field "option#{i + 1}"
 
-  = f.select :tree_category_id, @tree_categories.map { |c| [c.name, c.id] }, { label: "Category", include_blank: true }, { class: 'tree-category-selector-target' }
+  = f.select :tree_category_id, @tree_categories.map { |tc| [tc.name, tc.id] }, { label: "Category", include_blank: true }, { class: 'tree-category-selector-target' }
   = render "tree", template: "selector"
 
   %p.mt-3= f.submit @tree_category_question.new_record? ? "Create" : "Update"

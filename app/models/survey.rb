@@ -120,7 +120,6 @@ class Survey < ApplicationRecord
       )
     end
 
-    puts school_tree_category_question.tree_category_question.tree_category_id_previously_changed?
     if school_tree_category_question.tree_category_question.tree_category_id_previously_changed?
       surveyMonkeyConnection.delete(
         "surveys/#{survey_monkey_id}/pages/#{page_id}/questions/#{question_id}"

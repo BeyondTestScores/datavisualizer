@@ -46,10 +46,12 @@ class Admin::TreeCategoryQuestionsController < Admin::AdminController
   # PATCH/PUT /admin/questions/1.json
   def update
     respond_to do |format|
-      if @question.update(question_params)
-        format.html { redirect_to [:admin, @question], notice: 'Question was successfully updated.' }
+      if @tree_category_question.update(tree_category_question_params)
+        format.html { redirect_to [:admin, @tree, @category, @question], notice: 'Question was successfully updated.' }
         # format.json { render :show, status: :ok, location: @question }
       else
+        raise @tree_category_question.inspect
+        set_tree_categories
         format.html { render :edit }
         # format.json { render json: @question.errors, status: :unprocessable_entity }
       end
@@ -78,7 +80,7 @@ class Admin::TreeCategoryQuestionsController < Admin::AdminController
   end
 
   def tree_category_question_params
-    params.require(:tree_category_question).permit(:tree_category_id, question_attributes: [:text, :option1, :option2, :option3, :option4, :option5])
+    params.require(:tree_category_question).permit(:tree_category_id, question_attributes: [:id, :text, :option1, :option2, :option3, :option4, :option5])
   end
 
   def set_tree_category_question
