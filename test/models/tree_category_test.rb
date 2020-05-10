@@ -51,11 +51,11 @@ class TreeCategoryTest < ActiveSupport::TestCase
   def test_delete_also_deletes_questions
     requests = []
 
-    tree_category = tree_categories(:two)
+    tree_category = tree_categories(:one)
     tree_category_question_count = TreeCategoryQuestion.count
+    school_tree_category_question_count = SchoolTreeCategoryQuestion.count
 
-    all_tree_category_questions = tree_category.all_tree_category_questions
-    all_school_tree_category_questions = all_tree_category_questions.map(&:school_tree_category_questions).flatten.uniq
+    all_school_tree_category_questions = tree_category.all_school_tree_category_questions
     deleted_stcqs = []
     all_school_tree_category_questions.each do |stcq|
       deleted_stcqs << stcq
@@ -72,7 +72,7 @@ class TreeCategoryTest < ActiveSupport::TestCase
         responses: [
           details(
             survey: survey,
-            survey_questions: survey.survey_questions - deleted_stcqs,
+            survey_questions: survey.school_tree_category_questions - deleted_stcqs,
             pages: [{"id": stcq.survey_monkey_page_id, "title": tree_category.category.name}]
           )
         ]
@@ -84,8 +84,11 @@ class TreeCategoryTest < ActiveSupport::TestCase
       )
     end
 
+    assert deleted_stcqs.length > 0
+
     tree_category.destroy
-    assert_equal tree_category_question_count - 1, TreeCategoryQuestion.count
+    assert_equal tree_category_question_count - 2, TreeCategoryQuestion.count
+    assert_equal school_tree_category_question_count - deleted_stcqs.length, SchoolTreeCategoryQuestion.count
 
     assert_requests requests
   end
