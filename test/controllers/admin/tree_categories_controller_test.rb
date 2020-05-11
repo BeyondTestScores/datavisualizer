@@ -147,8 +147,8 @@ class Admin::CategoriesControllerTest < ActionDispatch::IntegrationTest
     requests = []
 
     tree_category_count = TreeCategory.count
-    tree_category = tree_categories(:two)
-    assert_equal 1, tree_category.tree_category_questions.count
+    tree_category = tree_categories(:one)
+    assert_equal 2, tree_category.tree_category_questions.count
     tree_category_question_count = TreeCategoryQuestion.count
 
     tree_category.tree_category_questions.each do |tcq|
@@ -180,8 +180,8 @@ class Admin::CategoriesControllerTest < ActionDispatch::IntegrationTest
     delete admin_tree_category_url(tree_category.tree, tree_category.category), headers: authorized_headers
     assert_redirected_to admin_root_path
 
-    assert_equal tree_category_count - 4, TreeCategory.count # category and it's child categories
-    assert_equal tree_category_question_count - 1, TreeCategoryQuestion.count
+    assert_equal tree_category_count - 5, TreeCategory.count # category and it's child categories
+    assert_equal tree_category_question_count - 2, TreeCategoryQuestion.count
 
     assert_requests requests
   end
