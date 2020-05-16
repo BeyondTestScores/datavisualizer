@@ -18,7 +18,7 @@ class Survey < ApplicationRecord
   scope :for_kind, -> (kind) { where(kind: kind) }
 
   def to_s
-    name
+    "#{name} (#{school.name})"
   end
 
   def has_question(question)
