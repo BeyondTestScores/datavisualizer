@@ -34,44 +34,44 @@ class SchoolsTest < ApplicationSystemTestCase
     school = schools(:two)
     school.surveys.each do |survey|
       deleted_stcqs = []
-      survey.school_tree_category_questions.each do |stcq|
-        deleted_stcqs << stcq
+      # survey.school_tree_category_questions.each do |stcq|
+      #   deleted_stcqs << stcq
 
-        requests << survey_monkey_mock(
-          method: :delete,
-          url: "surveys/#{survey.survey_monkey_id}/pages/#{stcq.survey_monkey_page_id}/questions/#{stcq.survey_monkey_id}"
-        )
+      #   requests << survey_monkey_mock(
+      #     method: :delete,
+      #     url: "surveys/#{survey.survey_monkey_id}/pages/#{stcq.survey_monkey_page_id}/questions/#{stcq.survey_monkey_id}"
+      #   )
 
-        requests << survey_monkey_mock(
-          method: :get,
-          url: "surveys/#{survey.survey_monkey_id}/details",
-          responses: [
-            details(
-              survey: survey,
-              survey_questions: survey.school_tree_category_questions - deleted_stcqs,
-              pages: [
-                {"id": stcq.survey_monkey_page_id, "title": stcq.category.name}
-              ]
-            )
-          ]
-        )
+      #   requests << survey_monkey_mock(
+      #     method: :get,
+      #     url: "surveys/#{survey.survey_monkey_id}/details",
+      #     responses: [
+      #       details(
+      #         survey: survey,
+      #         survey_questions: survey.school_tree_category_questions - deleted_stcqs,
+      #         pages: [
+      #           {"id": stcq.survey_monkey_page_id, "title": stcq.category.name}
+      #         ]
+      #       )
+      #     ]
+      #   )
 
-        requests << survey_monkey_mock(
-          method: :delete,
-          url: "surveys/#{survey.survey_monkey_id}/pages/#{stcq.survey_monkey_page_id}"
-        )
-      end
+      #   requests << survey_monkey_mock(
+      #     method: :delete,
+      #     url: "surveys/#{survey.survey_monkey_id}/pages/#{stcq.survey_monkey_page_id}"
+      #   )
+      # end
 
-      requests << survey_monkey_mock(
-        method: :get,
-        url: "surveys/#{survey.survey_monkey_id}/details",
-        responses: [
-          details(
-            survey: survey,
-            default_page: false
-          )
-        ]
-      )
+      # requests << survey_monkey_mock(
+      #   method: :get,
+      #   url: "surveys/#{survey.survey_monkey_id}/details",
+      #   responses: [
+      #     details(
+      #       survey: survey,
+      #       default_page: false
+      #     )
+      #   ]
+      # )
 
       # requests << survey_monkey_mock(
       #   method: :delete,
