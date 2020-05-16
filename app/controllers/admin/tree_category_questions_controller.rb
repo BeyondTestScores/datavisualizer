@@ -86,7 +86,7 @@ class Admin::TreeCategoryQuestionsController < Admin::AdminController
   end
 
   def set_tree_category_question
-    @tree_category_question = @tree_category.tree_category_questions.for(@question).first
+    @tree_category_question = @tree_category.tree_category_questions.for_question(@question).first
   end
 
   def set_question
