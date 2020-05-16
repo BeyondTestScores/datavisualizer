@@ -8,10 +8,10 @@ class Survey < ApplicationRecord
 
   validates :name, presence: true, length: { minimum: 1 }
 
-  after_create :create_survey_monkey_survey
-  after_commit :sync_with_survey_monkey, on: :create
-  after_update_commit :sync_with_survey_monkey
-  before_destroy :delete_survey_monkey_survey
+  after_create :create_survey_monkey_survey 
+  after_commit :sync_with_survey_monkey, on: :create 
+  after_update_commit :sync_with_survey_monkey 
+  before_destroy :delete_survey_monkey_survey 
 
   scope :for_school, ->(school){ where(school: school) }
   scope :for_tree, -> (tree) { where(tree: tree) }
