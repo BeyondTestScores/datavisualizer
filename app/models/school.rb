@@ -1,17 +1,25 @@
 class School < ApplicationRecord
 
-  has_many :school_categories, dependent: :destroy
+  has_many :school_tree_categories, dependent: :destroy
+  has_many :school_tree_category_questions, dependent: :destroy
 
-  after_create :create_school_categories_for_administrative_measures
+  has_many :surveys, dependent: :destroy
+
+  after_create :create_for_trees
 
   def to_s
     name
   end
 
-  def create_school_categories_for_administrative_measures
-    Category.administrative_measure.each do |c|
-      next if school_categories.find { |sc| sc.category_id == c.id }
-      school_categories.create(category: c)
+  def create_for_trees
+    TreeCategory.includes(:school_tree_categories, tree_category_questions: :school_tree_category_questions).each do |tc|
+      next if school_tree_categories.find { |stc| stc.tree_category == tc }
+      school_tree_categories.create(tree_category: tc)
+
+      tc.tree_category_questions.each do |tcq|
+        next if school_tree_category_questions.find { |stcq| stcq.tree_category_question == tcq }
+        school_tree_category_questions.create(tree_category_question: tcq)
+      end
     end
   end
 

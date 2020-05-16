@@ -17,6 +17,7 @@ class Admin::SurveysController < Admin::AdminController
     if @survey.save
       redirect_to [:admin, @survey]
     else
+      raise @survey.errors.inspect
       render :new
     end
   end
@@ -50,7 +51,7 @@ class Admin::SurveysController < Admin::AdminController
 
   private
   def survey_params
-    params.require(:survey).permit(:name, :survey_monkey_id, question_ids: [])
+    params.require(:survey).permit(:name, :school_id, :kind, :survey_monkey_id, question_ids: [])
   end
 
   def set_survey

@@ -1,0 +1,25 @@
+= bootstrap_form_with model: [:admin, @tree_category], local: true do |f|
+  - if @tree_category.errors.any?
+    #error_explanation
+      %h2
+        = pluralize(@tree_category.errors.count, "error")
+        prohibited
+        this
+        = @tree_category.administrative_measure? ? 'administrative measure' : 'category'
+        from being saved:
+      %ul
+        - @tree_category.errors.full_messages.each do |msg|
+          %li= msg
+
+  = f.fields_for :category do |ff|
+    = ff.text_field :name
+    = ff.text_field :blurb
+    = ff.text_area :description
+    = ff.hidden_field :administrative_measure
+
+  = f.select :parent_tree_category_id, @parent_tree_categories.map { |pc| [pc.name, pc.id] }, { label: "Parent Category (optional)", include_blank: true }, {class: 'tree-category-selector-target'}
+  %p Or click a category in the tree below to select it as the parent.
+  = render "tree", template: "selector"
+
+  %br
+  %p= f.submit @tree_category.new_record? ? "Create" : "Update"

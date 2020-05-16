@@ -1,36 +1,36 @@
 $( document ).on('turbolinks:load', function() {
-  $('.category-selector>a').click(function(event) {
+  $('.tree-category-selector>a').click(function(event) {
     event.preventDefault();
-    const category = $(event.currentTarget).closest('.category');
-    const {categoryId} = category[0].dataset;
-    $('.category-selector-target').val(categoryId);
+    const treeCategory = $(event.currentTarget).closest('.tree-category');
+    const {treeCategoryId} = treeCategory[0].dataset;
+    $('.tree-category-selector-target').val(treeCategoryId);
 
-    var check = !category.find("input[type=checkbox]").prop("checked");
-    category.find('.question-selector').each(function(index, questionElement) {
-      const {questionId} = questionElement.dataset;
-      $("input[name='question-" + questionId + "']").prop("checked", check);
-      $("#survey_question_ids_" + questionId).prop("checked", check)
+    var check = !treeCategory.find("input[type=checkbox]").prop("checked");
+    treeCategory.find('.tree-category-question-selector').each(function(index, questionElement) {
+      const {treeCategoryQuestionId} = questionElement.dataset;
+      $("input[name='question-" + treeCategoryQuestionId + "']").prop("checked", check);
+      $("#survey_question_ids_" + treeCategoryQuestionId).prop("checked", check)
     })
 
     return false;
   });
 
-  $('.question-selector a').click(function(event) {
+  $('.tree-category-question-selector a').click(function(event) {
     event.preventDefault();
-    const {questionId} = $(event.currentTarget).closest('.question-selector')[0].dataset;
-    var check = !$("input[name='question-" + questionId + "']").prop("checked");
+    const {treeCategoryQuestionId} = $(event.currentTarget).closest('.tree-category-question-selector')[0].dataset;
+    var check = !$("input[name='question-" + treeCategoryQuestionId + "']").prop("checked");
 
-    $("input[name='question-" + questionId + "']").prop("checked", check);
-    $('#survey_question_ids_' + questionId).prop( "checked", check );
+    $("input[name='question-" + treeCategoryQuestionId + "']").prop("checked", check);
+    $('#survey_question_ids_' + treeCategoryQuestionId).prop( "checked", check );
     return false;
   });
 
-  $('.question-selector input').click(function(event) {
-    const {questionId} = $(event.currentTarget).closest('.question-selector')[0].dataset;
-    var check = $("input[name='question-" + questionId + "']").prop("checked");
+  $('.tree-category-question-selector input').click(function(event) {
+    const {treeCategoryQuestionId} = $(event.currentTarget).closest('.tree-category-question-selector')[0].dataset;
+    var check = $("input[name='question-" + treeCategoryQuestionId + "']").prop("checked");
 
-    $("input[name='question-" + questionId + "']").prop("checked", check);
-    $('#survey_question_ids_' + questionId).prop( "checked", check );
+    $("input[name='question-" + treeCategoryQuestionId + "']").prop("checked", check);
+    $('#survey_question_ids_' + treeCategoryQuestionId).prop( "checked", check );
     return true;
   });
 

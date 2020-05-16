@@ -1,57 +1,20 @@
-- missing_administrative_measure = SchoolCategory.missing_administrative_measure
-- incomplete_category = Category.incomplete
-- unless missing_administrative_measure.empty? && incomplete_category.empty?
-  .missing
-    %h3.error Missing
-    %p The following items are missing or incomplete.
-    %ul
-      - missing_administrative_measure.each do |school_category|
-        %li{class: "school_category-#{school_category.id}"}
-          = "#{school_category.name} is missing:"
-          = link_to "Fix administrative measure >", edit_admin_school_category_path(school_category), class: 'error'
-      - incomplete_category.each do |category|
-        %li{class: "category-#{category.id}"}
-          = "#{category} needs a subcategory, questions, or an administrative measure:"
-          = link_to "Fix category >", admin_category_path(category), class: 'error'
-
-
 .schools.py-3
   %h3 Schools
   %p Please add all of the school communities that will be surveyed.
+
   - School.order(:name).all.each do |school|
     %p= link_to school, [:admin, school]
+
   %p
     %a= link_to "+ Create New School", new_admin_school_path
 
 
 .tree.py-3
-  %h3 Website Tree
-  %p
-    This tree represents the categories, survey questions, and administrative measures
-    that will display on the website that is visible to the public.
+  %h3 Website Trees
+  %p Each tree represents a years worth of data on the website.
 
-  = render 'category_tree', template: "link", show_questions: true
+  - Tree.all.order(created_at: :desc).each do |tree|
+    %p= link_to tree, [:admin, tree]
 
-.add.py-3
-  %h3 Add To Tree
   %p
-    To add to this tree create new categories, questions, and administrative measures.
-  %p
-    %a= link_to "+ Create New Category", new_admin_category_path
-  %p
-    %a= link_to "+ Create New Question", new_admin_question_path
-  %p
-    %a= link_to "+ Create New Administrative Measure", new_admin_category_path(administrative_measure: true)
-
-
--# %p
--#   %a=link_to "+ Create New Survey", new_admin_survey_path
-
-.surveys.py-3
-  %h3 Surveys
-  - if Survey.count > 0
-    %p The following surveys have been automatically generated on Survey Monkey.
-    - Survey.all.each do |survey|
-      %p= link_to survey, [:admin, survey]
-  - else
-    %p Surveys will be automatically generated for you based on the questions you add to the tree above.
+    %a= link_to "+ Create New Tree", new_admin_tree_path

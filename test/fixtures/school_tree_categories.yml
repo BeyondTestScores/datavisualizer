@@ -1,20 +1,17 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
-  category: one
+  tree_category: one
   school: one
   response_count: 1
   answer_index_total: 1
   zscore: 1.5
-  year: 2020
 
 administrative_measure:
-  category: administrative_measure
+  tree_category: administrative_measure
   school: one
   nonlikert: 1.5
-  year: 2020
 
 administrative_measure2:
-  category: administrative_measure
+  tree_category: administrative_measure
   school: two
-  year: 2020

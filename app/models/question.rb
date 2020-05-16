@@ -1,9 +1,9 @@
 class Question < ApplicationRecord
   include ActiveModel::Dirty
 
-  belongs_to :category
-  has_many :survey_questions, dependent: :destroy
-  has_many :surveys, through: :survey_questions, dependent: :destroy
+  enum kind: [:for_students, :for_teachers, :for_community]
+
+  has_many :tree_category_questions, dependent: :destroy
 
   validates :text, presence: true, length: { minimum: 1 }
   validates :option1, presence: true, length: { minimum: 1 }
@@ -11,6 +11,7 @@ class Question < ApplicationRecord
   validates :option3, presence: true, length: { minimum: 1 }
   validates :option4, presence: true, length: { minimum: 1 }
   validates :option5, presence: true, length: { minimum: 1 }
+  validates :kind, presence: true
 
   after_update_commit :sync_surveys
 
@@ -56,8 +57,10 @@ class Question < ApplicationRecord
   end
 
   def sync_surveys
-    survey_questions.each do |survey_question|
-      survey_question.survey.update_survey_monkey_question(survey_question)
+    tree_category_questions.each do |tcq|
+      tcq.school_tree_category_questions.each do |stcq|
+        stcq.survey.update_survey_monkey_question(stcq)
+      end
     end
   end
 

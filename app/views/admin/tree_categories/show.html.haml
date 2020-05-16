@@ -1,0 +1,64 @@
+%h2= @category.name
+
+%p
+  = link_to "Edit #{@category.classification}", edit_admin_tree_category_path(@tree, @category)
+  &nbsp; | &nbsp;
+  = link_to "Delete #{@category.classification}", [:admin, @tree, @category],  method: :delete, data: { confirm: "Are you sure you want to delete this #{@category.classification}?" }
+
+%p
+  %b Slug:
+  = @category.slug
+
+%p
+  %b Blurb:
+  = @category.blurb
+
+%p
+  %b Description:
+  = @category.description
+
+- if (parent = @tree_category.parent_tree_category).present?
+  %p
+    %b Parent Category:
+    =link_to parent, [:admin, parent.tree, parent.category]
+
+- if @tree_category.child_tree_categories.present?
+  %br
+    %b Child Categories:
+    - @tree_category.child_tree_categories.each do |child_tree_category|
+      %p= link_to child_tree_category, [:admin, @tree, child_tree_category.category]
+
+- if @tree_category.tree_category_questions.present?
+  %br
+    %b Questions:
+    - @tree_category.tree_category_questions.each do |tcq|
+      %p= link_to tcq, [:admin, @tree, @category, tcq.question]
+
+- if @tree_category.administrative_measure? && @tree_category.school_tree_categories.present?
+  %br
+  %h4 Administrative Values For Each School:
+
+  %ul
+    - @tree_category.school_tree_categories.each do |school_tree_category|
+      - missing = school_tree_category.nonlikert.blank?
+      - value = "#{missing ? 'Missing' : school_tree_category.nonlikert}"
+      %li
+        %b= "#{school_tree_category.name(:school)}:"
+        = value
+        &nbsp;
+        &nbsp;
+        = link_to missing ? 'Fix it >' : 'edit', edit_admin_school_tree_category_path(school_tree_category), class: missing ? "error": ""
+
+%br
+
+- unless @category.administrative_measure?
+  - level = @tree_category.path(include_self: true).length
+  %p= link_to "+ Add A Category Under This Category (Category Level #{level})", new_admin_tree_category_path(@tree, parent_tree_category_id: @tree_category.id)
+  %p= link_to "+ Add A Question To This Category", new_admin_tree_category_question_path(@tree, @category)
+  %p= link_to "+ Add An Administrative Measure To This Category", new_admin_tree_category_path(@tree, parent_tree_category_id: @tree_category.id, administrative_measure: true)
+
+  %br
+  %br
+%br
+
+= render 'tree', template: "link", show_questions: true

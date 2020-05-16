@@ -1,0 +1,20 @@
+.add.py-3
+  %h3 Website Tree
+  %br
+  %h5 Add To This Tree
+  %p
+    To add to this tree create new categories, questions, and administrative measures.
+  %p
+    %a= link_to "+ Create New Category", new_admin_tree_category_path(@tree)
+
+  .py-3
+    = render 'tree', template: "link", show_questions: true
+
+.surveys.py-3
+  %h3 Surveys
+  - if Survey.count > 0
+    %p The following surveys have been automatically generated on Survey Monkey.
+    - Survey.all.each do |survey|
+      %p= link_to survey, [:admin, survey]
+  - else
+    %p Surveys will be automatically generated for you based on the questions you add to the tree above.

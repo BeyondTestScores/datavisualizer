@@ -2,14 +2,14 @@
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: https://sass-lang.com/
 
-.child-categories {
+.child-tree-categories {
   padding-left: 30px;
   overflow: hidden;
 }
 
-.category-tree {
+.tree {
 
-  .category-selector, .question-selector {
+  .tree-category-selector, .tree-category-question-selector {
     a:not([href]) {
       color: blue;
       text-decoration: underline;
@@ -17,10 +17,18 @@
     }
   }
 
-  .category-questions {
+  .tree-category-questions {
     padding-left: 30px;
     a {
       color: green;
+    }
+  }
+
+  .child-tree-categories {
+    li.administrative_measure {
+      a {
+        color: orange;
+      }
     }
   }
 }

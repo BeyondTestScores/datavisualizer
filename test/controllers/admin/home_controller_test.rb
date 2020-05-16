@@ -14,7 +14,6 @@ class Admin::HomeControllerTest < ActionDispatch::IntegrationTest
   def test_index_links_to_create_new_category
     get "/admin", headers: authorized_headers
     assert_select "a", "+ Create New School", :href => /admin\/schools\/new/
-    assert_select "a", "+ Create New Category", :href => /admin\/categories\/new/
-    assert_select "a", "+ Create New Question", :href => /admin\/questions\/new/
+    assert_select "a", "+ Create New Tree", :href => /admin\/trees\/new/
   end
 end

@@ -1,0 +1,7 @@
+%h2
+  New Question
+  - if (tree_category = @tree_category_question.tree_category).present?
+    = " for Category \"#{tree_category}\""
+%br
+
+%div= render 'form'

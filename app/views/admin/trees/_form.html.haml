@@ -1,0 +1,17 @@
+= bootstrap_form_with model: [:admin, @tree], local: true do |f|
+
+  - if @tree.errors.any?
+    #error_explanation
+      %h2
+        = pluralize(@tree.errors.count, "error")
+        prohibited
+        this tree from being saved:
+      %ul
+        - @tree.errors.full_messages.each do |msg|
+          %li= msg
+
+
+  = f.text_field :name
+
+  %br
+  %p= f.submit @tree.new_record? ? "Create" : "Update"

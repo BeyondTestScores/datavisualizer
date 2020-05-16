@@ -1,55 +1,35 @@
+$survey_monkey_disabled = false
+
 class Survey < ApplicationRecord
 
-  has_many :survey_questions, dependent: :destroy
-  has_many :questions, through: :survey_questions, dependent: :destroy
+  enum kind: Question.kinds
+
+  belongs_to :tree
+  belongs_to :school
+  has_many :school_tree_category_questions, dependent: :destroy
 
   validates :name, presence: true, length: { minimum: 1 }
 
-  after_create :create_survey_monkey_survey
+  after_create :create_survey_monkey_survey 
+  after_commit :sync_with_survey_monkey, on: :create 
+  after_update_commit :sync_with_survey_monkey 
+  before_destroy :delete_survey_monkey_survey 
 
-  after_commit :sync_with_survey_monkey, on: :create
-  after_update_commit :sync_with_survey_monkey
-
-  before_destroy :delete_survey_monkey_survey
+  scope :for_school, ->(school){ where(school: school) }
+  scope :for_tree, -> (tree) { where(tree: tree) }
+  scope :for_kind, -> (kind) { where(kind: kind) }
 
   def to_s
-    name
+    "#{name} (#{school.name})"
   end
 
   def has_question(question)
     questions.include?(question)
   end
 
-  def category_tree
-    tree = {child_categories: []}
-
-    questions.each do |question|
-        category = question.category
-        question_path = []
-        while category
-          question_path << category
-          category = category.parent_category
-        end
-
-        node = tree
-        question_path.reverse.each do |category|
-          category_hash = node[:child_categories].find { |cc| cc[:category].name == category.name }
-          if category_hash.blank?
-            category_hash = {category: category, child_categories: []}
-            node[:child_categories].push(category_hash)
-          end
-          node[:child_categories].sort! { |a,b| a[:category].name <=> b[:category].name }
-          node = category_hash
-        end
-
-        node[:questions] ||= []
-        node[:questions] << question
-    end
-
-    return tree
-  end
-
   def surveyMonkeyConnection
+    return if $survey_monkey_disabled
+
     Faraday.new('https://api.surveymonkey.com/v3') do |conn|
       conn.adapter Faraday.default_adapter
       conn.response :json, :content_type => /\bjson$/
@@ -59,6 +39,8 @@ class Survey < ApplicationRecord
   end
 
   def survey_monkey_pages_structure
+    return if $survey_monkey_disabled
+
     pages = {}
     questions.each_with_index do |question, index|
       pages[question.category.name] ||= {title: question.category.name, questions: []}
@@ -68,6 +50,8 @@ class Survey < ApplicationRecord
   end
 
   def create_survey_monkey_survey
+    return if $survey_monkey_disabled
+
     return if survey_monkey_id.present?
 
     response = surveyMonkeyConnection.post('surveys', {
@@ -79,33 +63,50 @@ class Survey < ApplicationRecord
   end
 
   def delete_survey_monkey_survey
+    return if $survey_monkey_disabled
+
     return if survey_monkey_id.blank?
+
     surveyMonkeyConnection.delete("surveys/#{survey_monkey_id}")
   end
 
   def survey_monkey_details
+    return if $survey_monkey_disabled
+
     return {} if survey_monkey_id.blank?
+
     surveyMonkeyConnection.get("surveys/#{survey_monkey_id}/details").body
   end
 
   def survey_monkey_pages
+    return if $survey_monkey_disabled
+
     return {} if survey_monkey_id.blank?
+
     surveyMonkeyConnection.get("surveys/#{survey_monkey_id}/pages").body["data"]
   end
 
   def remove_survey_monkey_page(page_id)
+    return if $survey_monkey_disabled
+
     return {} if survey_monkey_id.blank?
+
     surveyMonkeyConnection.delete("surveys/#{survey_monkey_id}/pages/#{page_id}")
     sync_with_survey_monkey
   end
 
   def update_survey_monkey(updates)
+    return if $survey_monkey_disabled
+
     return {} if survey_monkey_id.blank?
+
     surveyMonkeyConnection.patch("surveys/#{survey_monkey_id}", updates.to_json)
   end
 
-  def create_survey_monkey_question(survey_question)
-    page_title = survey_question.question.category.name
+  def create_survey_monkey_question(school_tree_category_question)
+    return if $survey_monkey_disabled
+
+    page_title = school_tree_category_question.category.name
     smp = survey_monkey_pages
     page = smp.find do |p|
       p['title'] == page_title
@@ -120,12 +121,12 @@ class Survey < ApplicationRecord
 
     response = surveyMonkeyConnection.post(
       "surveys/#{survey_monkey_id}/pages/#{page["id"]}/questions",
-      survey_question.question.survey_monkey_structure(1).to_json
+      school_tree_category_question.question.survey_monkey_structure(1).to_json
     )
 
     smid = response.body['id']
-    if (survey_question.survey_monkey_id != smid || survey_question.survey_monkey_page_id != page["id"])
-      survey_question.update(
+    if (school_tree_category_question.survey_monkey_id != smid || school_tree_category_question.survey_monkey_page_id != page["id"])
+      school_tree_category_question.update(
         survey_monkey_id: response.body['id'],
         survey_monkey_page_id: page["id"]
       )
@@ -134,42 +135,50 @@ class Survey < ApplicationRecord
     sync_with_survey_monkey
   end
 
-  def update_survey_monkey_question(survey_question)
-    page_id = survey_question.survey_monkey_page_id
-    question_id = survey_question.survey_monkey_id
+  def update_survey_monkey_question(school_tree_category_question)
+    return if $survey_monkey_disabled
 
-    if survey_question.question.category.name_previously_changed?
+    page_id = school_tree_category_question.survey_monkey_page_id
+    question_id = school_tree_category_question.survey_monkey_id
+
+    if school_tree_category_question.category.name_previously_changed?
       surveyMonkeyConnection.patch(
         "surveys/#{survey_monkey_id}/pages/#{page_id}",
-        {"title": survey_question.question.category.name}.to_json
+        {"title": school_tree_category_question.category.name}.to_json
       )
     end
 
-    if survey_question.question.category_id_previously_changed?
+    if school_tree_category_question.tree_category_question.tree_category_id_previously_changed?
       surveyMonkeyConnection.delete(
         "surveys/#{survey_monkey_id}/pages/#{page_id}/questions/#{question_id}"
       )
 
-      create_survey_monkey_question(survey_question)
+      create_survey_monkey_question(school_tree_category_question)
       return
-    elsif survey_question.question.previous_changes.keys.present?
+    elsif school_tree_category_question.question.previous_changes.keys.present?
       surveyMonkeyConnection.patch(
         "surveys/#{survey_monkey_id}/pages/#{page_id}/questions/#{question_id}",
-        survey_question.question.survey_monkey_structure(1).to_json
+        school_tree_category_question.question.survey_monkey_structure(1).to_json
       )
     end
 
     sync_with_survey_monkey
   end
 
-  def remove_survey_monkey_question(survey_question)
+  def remove_survey_monkey_question(school_tree_category_question)
+    return if $survey_monkey_disabled
+
+    page_id = school_tree_category_question.survey_monkey_page_id
+    question_id = school_tree_category_question.survey_monkey_id
     response = surveyMonkeyConnection.delete(
-      "surveys/#{survey_monkey_id}/pages/#{survey_question.survey_monkey_page_id}/questions/#{survey_question.survey_monkey_id}"
+      "surveys/#{survey_monkey_id}/pages/#{page_id}/questions/#{question_id}"
     )
     sync_with_survey_monkey
   end
 
   def sync_with_survey_monkey
+    return if $survey_monkey_disabled
+
     details = survey_monkey_details
 
     if name != details['title']
@@ -184,10 +193,10 @@ class Survey < ApplicationRecord
       sm_questions = sm_page['questions'] || []
 
       all_questions_removed = true
-      on_page_sq = survey_questions.on_page(sm_page['id']).joins(:question)
+      on_page_stcq = school_tree_category_questions.on_page(sm_page['id'])
 
-      if on_page_sq.present?
-        category = on_page_sq.first.question.category
+      if on_page_stcq.present?
+        category = on_page_stcq.first.category
         if category.name != sm_page["title"]
           surveyMonkeyConnection.patch(
             "surveys/#{details['id']}/pages/#{sm_page['id']}",
@@ -197,17 +206,17 @@ class Survey < ApplicationRecord
       end
 
       sm_questions.each do |sm_question|
-        survey_question = on_page_sq.find do |sq|
-          sq.question.text == sm_question["headings"].first['heading']
+        stcq = on_page_stcq.find do |stcq|
+          stcq.question.text == sm_question["headings"].first['heading']
         end
 
-        if survey_question.nil?
+        if stcq.nil?
           surveyMonkeyConnection.delete(
             "surveys/#{details['id']}/pages/#{sm_page['id']}/questions/#{sm_question['id']}"
           )
         else
           all_questions_removed = false
-          survey_question.update(survey_monkey_id: sm_question['id'], survey_monkey_page_id: sm_page['id'])
+          stcq.update(survey_monkey_id: sm_question['id'], survey_monkey_page_id: sm_page['id'])
         end
       end
 

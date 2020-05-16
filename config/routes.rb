@@ -3,7 +3,7 @@
 Rails.application.routes.draw do
 
   resources :schools, only: [:show] do
-    resources :school_categories, only: [:show]
+    resources :school_tree_categories, only: [:show]
   end
   # resources :surveys, only: [:show]
   # resources :questions, only: [:show]
@@ -14,11 +14,15 @@ Rails.application.routes.draw do
 
   namespace :admin do
     root 'home#index'
+    resources :trees do
+      resources :categories, controller: 'tree_categories' do
+        resources :questions, controller: 'tree_category_questions'
+      end
+    end
+
     resources :schools
-    resources :surveys
-    resources :categories
-    resources :school_categories
-    resources :questions
+    resources :surveys, only: [:show, :edit, :update]
+    resources :school_tree_categories
   end
 
 end

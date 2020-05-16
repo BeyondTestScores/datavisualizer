@@ -1,0 +1,27 @@
+%h2= @tree_category_question
+
+%br
+
+%p
+  = link_to("Edit Question", edit_admin_tree_category_question_path(@tree, @category, @question))
+  &nbsp; | &nbsp;
+  = link_to "Delete Question", [:admin, @tree, @category, @question],  method: :delete, data: { confirm: 'Are you sure you want to delete this question?' }
+
+%br
+
+%h3 Options
+- 5.times do |i|
+  %p= @question.send("option#{i + 1}")
+
+%br
+
+%p
+  %b Category:
+  = link_to(@category, [:admin, @tree, @category])
+
+
+%br
+%br
+%br
+
+= render 'tree', template: "link", show_questions: true
