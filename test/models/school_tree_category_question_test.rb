@@ -18,65 +18,68 @@ class SchoolTreeCategoryQuestionTest < ActiveSupport::TestCase
       kind: Question.kinds[:for_community]
     )
 
-    stc = tree_category.tree_category_questions.create(
+    tcq = tree_category.tree_category_questions.new(
       question: question_for_community
     )
 
-    stcq = stc.school_tree_category_questions.new(
-      school: schools(:one)
-    )
-
-    survey_monkey_id = "SURVEY_MONKEY_ID"
-    survey_monkey_page_id = "SURVEY_MONKEY_PAGE_ID"
-    survey_monkey_question_id = "SURVEY_MONKEY_QUESTION_ID"
     requests << survey_monkey_mock(
       method: :post,
       url: "surveys",
       body: {title: "2020-2021 For Community"},
-      responses: [{"id": survey_monkey_id}]
+      responses: School.all.map { |school| {"id": "SURVEY_MONKEY_ID_#{school.id}"} },
+      times: 2
     )
 
-    requests << survey_monkey_mock(
-      method: :post,
-      url: "surveys/#{survey_monkey_id}/pages",
-      body: {title: tree_category.category.name},
-      responses: [{"id": survey_monkey_page_id}]
-    )
+    School.all.each do |school|
+      survey_monkey_id = "SURVEY_MONKEY_ID_#{school.id}"
+      survey_monkey_page_id = "SURVEY_MONKEY_PAGE_ID_#{school.id}"
+      survey_monkey_question_id = "SURVEY_MONKEY_QUESTION_ID_#{school.id}"
 
-    requests << survey_monkey_mock(
-      method: :get,
-      url: "surveys/#{survey_monkey_id}/pages",
-      responses: [{"data": [
-        {"id": DEFAULT_PAGE_ID}
-      ]}]
-    )
+      requests << survey_monkey_mock(
+        method: :post,
+        url: "surveys/#{survey_monkey_id}/pages",
+        body: {title: tree_category.category.name},
+        responses: [{"id": survey_monkey_page_id}]
+      )
 
-    requests << survey_monkey_mock(
-      method: :post,
-      url: "surveys/#{survey_monkey_id}/pages/#{survey_monkey_page_id}/questions",
-      body: question_for_community.survey_monkey_structure,
-      responses: [{"id": survey_monkey_question_id}]
-    )
+      requests << survey_monkey_mock(
+        method: :get,
+        url: "surveys/#{survey_monkey_id}/pages",
+        responses: [{"data": [
+          {"id": DEFAULT_PAGE_ID}
+        ]}]
+      )
 
-    stcq.survey_monkey_page_id = survey_monkey_page_id
-    stcq.survey_monkey_id = survey_monkey_question_id
-    requests << survey_monkey_mock(
-      method: :get,
-      url: "surveys/#{survey_monkey_id}/details",
-      responses: [
-        details(
-          survey: Survey.new(name: "#{tree_category.tree.name} For Community", survey_monkey_id: survey_monkey_id),
-          survey_questions: [stcq]
-        )
-      ]
-    )
-    stcq.survey_monkey_page_id = nil
-    stcq.survey_monkey_id = nil
+      requests << survey_monkey_mock(
+        method: :post,
+        url: "surveys/#{survey_monkey_id}/pages/#{survey_monkey_page_id}/questions",
+        body: question_for_community.survey_monkey_structure,
+        responses: [{"id": survey_monkey_question_id}]
+      )
 
-    stcq.save
+      requests << survey_monkey_mock(
+        method: :get,
+        url: "surveys/#{survey_monkey_id}/details",
+        responses: [
+          details(
+            survey: Survey.new(name: "#{tree_category.tree.name} For Community", survey_monkey_id: survey_monkey_id),
+            survey_questions: [school.school_tree_category_questions.new(
+              tree_category_question: tcq,
+              survey_monkey_page_id: survey_monkey_page_id,
+              survey_monkey_id: survey_monkey_question_id
+            )]
+          )
+        ]
+      )
+    end
 
-    assert_equal tree_survey_for_community_count + 1, tree_category.tree.surveys.for_community.count
-    assert tree_category.tree.surveys.for_community.last.school_tree_category_questions.include?(stcq)
+    tcq.save
+
+    assert_equal tree_survey_for_community_count + School.count, tree_category.tree.surveys.for_community.count
+    School.all.each do |school|
+      survey = school.surveys.for_community.first
+      assert survey.school_tree_category_questions.for_question(question_for_community).present?
+    end
 
     assert_requests requests
   end
