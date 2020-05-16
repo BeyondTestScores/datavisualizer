@@ -1,0 +1,15 @@
+- missing_administrative_measure = SchoolTreeCategory.missing_administrative_measure
+- incomplete_tree_categories = TreeCategory.incomplete
+- unless missing_administrative_measure.empty? && incomplete_tree_categories.empty?
+  .missing
+    %h3.error Missing
+    %p The following items are missing or incomplete.
+    %ul
+      - missing_administrative_measure.each do |school_tree_category|
+        %li{class: "school-tree-category-#{school_tree_category.id}"}
+          = "#{school_tree_category.name} is missing:"
+          = link_to "Fix administrative measure >", edit_admin_school_tree_category_path(school_tree_category), class: 'error'
+      - incomplete_tree_categories.each do |tree_category|
+        %li{class: "tree-category-#{tree_category.id}"}
+          = "#{tree_category} needs a subcategory, questions, or an administrative measure:"
+          = link_to "Fix category >", [:admin, tree_category.tree, tree_category.category], class: 'error'

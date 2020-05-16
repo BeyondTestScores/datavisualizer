@@ -26,7 +26,7 @@ class Admin::TreeCategoryQuestionsControllerTest < ActionDispatch::IntegrationTe
       assert_select "option[value='#{@tree_category.id}'][selected]", {count: 1}
     end
     assert_select "label", "Who is this question for?"
-    assert_select "select[name='tree_category_question[kind]']" do
+    assert_select "select[name='tree_category_question[question_attributes][kind]']" do
       assert_select "option", Question.kinds.count + 1
     end
   end

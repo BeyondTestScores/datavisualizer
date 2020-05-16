@@ -11,6 +11,7 @@ class Question < ApplicationRecord
   validates :option3, presence: true, length: { minimum: 1 }
   validates :option4, presence: true, length: { minimum: 1 }
   validates :option5, presence: true, length: { minimum: 1 }
+  validates :kind, presence: true
 
   after_update_commit :sync_surveys
 
