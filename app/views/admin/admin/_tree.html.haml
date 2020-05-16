@@ -1,8 +1,9 @@
 - if @tree.present?
   .tree
-    %h4
-      Tree:
-      = link_to @tree, [:admin, @tree]
+    - if template == "link"
+      %h4
+        Tree:
+        = link_to @tree, [:admin, @tree]
       
     - @tree.tree_categories.root.each do |tc|
       .tree-category{data: {tree_category_id: tc.id}}
