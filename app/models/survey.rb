@@ -1,3 +1,5 @@
+$survey_monkey_disabled = false
+
 class Survey < ApplicationRecord
 
   enum kind: Question.kinds
@@ -26,6 +28,8 @@ class Survey < ApplicationRecord
   end
 
   def surveyMonkeyConnection
+    return if $survey_monkey_disabled
+
     Faraday.new('https://api.surveymonkey.com/v3') do |conn|
       conn.adapter Faraday.default_adapter
       conn.response :json, :content_type => /\bjson$/
@@ -35,6 +39,8 @@ class Survey < ApplicationRecord
   end
 
   def survey_monkey_pages_structure
+    return if $survey_monkey_disabled
+
     pages = {}
     questions.each_with_index do |question, index|
       pages[question.category.name] ||= {title: question.category.name, questions: []}
@@ -44,6 +50,8 @@ class Survey < ApplicationRecord
   end
 
   def create_survey_monkey_survey
+    return if $survey_monkey_disabled
+
     return if survey_monkey_id.present?
 
     response = surveyMonkeyConnection.post('surveys', {
@@ -55,32 +63,49 @@ class Survey < ApplicationRecord
   end
 
   def delete_survey_monkey_survey
+    return if $survey_monkey_disabled
+
     return if survey_monkey_id.blank?
+
     surveyMonkeyConnection.delete("surveys/#{survey_monkey_id}")
   end
 
   def survey_monkey_details
+    return if $survey_monkey_disabled
+
     return {} if survey_monkey_id.blank?
+
     surveyMonkeyConnection.get("surveys/#{survey_monkey_id}/details").body
   end
 
   def survey_monkey_pages
+    return if $survey_monkey_disabled
+
     return {} if survey_monkey_id.blank?
+
     surveyMonkeyConnection.get("surveys/#{survey_monkey_id}/pages").body["data"]
   end
 
   def remove_survey_monkey_page(page_id)
+    return if $survey_monkey_disabled
+
     return {} if survey_monkey_id.blank?
+
     surveyMonkeyConnection.delete("surveys/#{survey_monkey_id}/pages/#{page_id}")
     sync_with_survey_monkey
   end
 
   def update_survey_monkey(updates)
+    return if $survey_monkey_disabled
+
     return {} if survey_monkey_id.blank?
+
     surveyMonkeyConnection.patch("surveys/#{survey_monkey_id}", updates.to_json)
   end
 
   def create_survey_monkey_question(school_tree_category_question)
+    return if $survey_monkey_disabled
+
     page_title = school_tree_category_question.category.name
     smp = survey_monkey_pages
     page = smp.find do |p|
@@ -111,6 +136,8 @@ class Survey < ApplicationRecord
   end
 
   def update_survey_monkey_question(school_tree_category_question)
+    return if $survey_monkey_disabled
+
     page_id = school_tree_category_question.survey_monkey_page_id
     question_id = school_tree_category_question.survey_monkey_id
 
@@ -139,6 +166,8 @@ class Survey < ApplicationRecord
   end
 
   def remove_survey_monkey_question(school_tree_category_question)
+    return if $survey_monkey_disabled
+
     page_id = school_tree_category_question.survey_monkey_page_id
     question_id = school_tree_category_question.survey_monkey_id
     response = surveyMonkeyConnection.delete(
@@ -148,6 +177,8 @@ class Survey < ApplicationRecord
   end
 
   def sync_with_survey_monkey
+    return if $survey_monkey_disabled
+
     details = survey_monkey_details
 
     if name != details['title']

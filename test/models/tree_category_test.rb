@@ -13,11 +13,10 @@ class TreeCategoryTest < ActiveSupport::TestCase
   end
 
   def test_all_tree_category_questions_and_all_school_tree_category_questions
+    $survey_monkey_disabled = true
+    
     tree_category = tree_categories(:three)
     tree_category_questions = tree_category.tree_category_questions.to_a
-
-
-    SchoolTreeCategoryQuestion.skip_callback(:commit, :after, :create_survey_monkey, raise: false)
 
     sub_tree_category = tree_category.child_tree_categories.create(category_attributes: {name: "subcategory"})
     tree_category_questions << sub_tree_category.tree_category_questions.create(question_attributes("sub_tree_category question"))
@@ -45,7 +44,7 @@ class TreeCategoryTest < ActiveSupport::TestCase
       end
     end
 
-    SchoolTreeCategoryQuestion.set_callback(:commit, :after, :create_survey_monkey)
+    $survey_monkey_disabled = false
   end
 
   def test_delete_also_deletes_questions

@@ -32,7 +32,7 @@ class Admin::TreeCategoryQuestionsControllerTest < ActionDispatch::IntegrationTe
   end
 
   def test_create__requirements
-    SchoolTreeCategoryQuestion.skip_callback(:commit, :after, :create_survey_monkey, raise: false)
+    $survey_monkey_disabled = true
 
     question_count = Question.count
     post "#{root_path}/questions", headers: authorized_headers
@@ -72,7 +72,7 @@ class Admin::TreeCategoryQuestionsControllerTest < ActionDispatch::IntegrationTe
     assert_equal "#{root_path}/questions/#{tree_category_question.question.id}", path
     assert_equal @tree_category, tree_category_question.tree_category
 
-    SchoolTreeCategoryQuestion.set_callback(:commit, :after, :create_survey_monkey)
+    $survey_monkey_disabled = false
   end
 
   def test_show

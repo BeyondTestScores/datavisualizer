@@ -11,26 +11,23 @@ class Admin::SchoolsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should create school" do
-    Survey.skip_callback(:commit, :after, :sync_with_survey_monkey, raise: false) do
-      Survey.skip_callback(:create, :after, :create_survey_monkey_survey, raise: false) do
-        SchoolTreeCategoryQuestion.skip_callback(:commit, :after, :create_survey_monkey, raise: false) do
+    $survey_monkey_disabled = true
 
-          survey_count = Survey.count
-          school_tree_category_count = SchoolTreeCategory.count
-          school_tree_category_question_count = SchoolTreeCategoryQuestion.count
+    survey_count = Survey.count
+    school_tree_category_count = SchoolTreeCategory.count
+    school_tree_category_question_count = SchoolTreeCategoryQuestion.count
 
-          assert_difference('School.count') do
-            post admin_schools_url, params: { school: { description: @school.description, name: @school.name } }, headers: authorized_headers
-          end
-
-          assert_equal survey_count + schools(:one).surveys.count, Survey.count
-          assert_equal school_tree_category_count + TreeCategory.count, SchoolTreeCategory.count
-          assert_equal school_tree_category_question_count + TreeCategoryQuestion.count, SchoolTreeCategoryQuestion.count
-
-          assert_redirected_to admin_school_url(School.last)
-        end
-      end
+    assert_difference('School.count') do
+      post admin_schools_url, params: { school: { description: @school.description, name: @school.name } }, headers: authorized_headers
     end
+
+    assert_equal survey_count + schools(:one).surveys.count, Survey.count
+    assert_equal school_tree_category_count + TreeCategory.count, SchoolTreeCategory.count
+    assert_equal school_tree_category_question_count + TreeCategoryQuestion.count, SchoolTreeCategoryQuestion.count
+
+    assert_redirected_to admin_school_url(School.last)
+
+    $survey_monkey_disabled = false
   end
 
   test "should show school" do

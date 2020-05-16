@@ -103,7 +103,7 @@ class SurveyTest < ActiveSupport::TestCase
   test "survey monkey updated when category deleted (page and questions deleted on multiple surveys)" do
     requests = []
     category = categories(:one)
-    SchoolTreeCategoryQuestion.skip_callback(:commit, :after, :create_survey_monkey, raise: false)
+
     stcqs = category.school_tree_category_questions
     assert_equal 2, stcqs.length
 
@@ -135,15 +135,15 @@ class SurveyTest < ActiveSupport::TestCase
 
     category.destroy
     assert_requests(requests)
-
-    SchoolTreeCategoryQuestion.set_callback(:commit, :after, :create_survey_monkey)
   end
 
   test "survey monkey updated when category renamed" do
+    $survey_monkey_disabled = true
+    
     requests = []
 
     tree_category = tree_categories(:two)
-    SchoolTreeCategoryQuestion.skip_callback(:commit, :after, :create_survey_monkey, raise: false)
+    
     existing_category_name = tree_category.category.name
     new_category_name = "New Category Name"
 
@@ -171,7 +171,7 @@ class SurveyTest < ActiveSupport::TestCase
 
     assert_requests(requests)
 
-    SchoolTreeCategoryQuestion.set_callback(:commit, :after, :create_survey_monkey)
+    $survey_monkey_disabled = false
   end
 
   test "out of sync category name" do

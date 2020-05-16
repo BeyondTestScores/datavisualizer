@@ -6,24 +6,18 @@ class SchoolsTest < ApplicationSystemTestCase
   end
 
   test "creating a School" do
-    Survey.skip_callback(:commit, :after, :sync_with_survey_monkey, raise: false) do
-      Survey.skip_callback(:create, :after, :create_survey_monkey_survey, raise: false) do
-        Survey.skip_callback(:destroy, :before, :delete_survey_monkey_survey, raise: false) do
-          SchoolTreeCategoryQuestion.skip_callback(:commit, :after, :create_survey_monkey, raise: false) do
-            SchoolTreeCategoryQuestion.skip_callback(:destroy, :after, :destroy_survey_monkey, raise: false) do
-              visit_admin admin_root_path
-              click_on "+ Create New School"
+    $survey_monkey_disabled = true
+  
+    visit_admin admin_root_path
+    click_on "+ Create New School"
 
-              # fill_in "Description", with: @school.description
-              fill_in "Name", with: @school.name
-              click_on "Create"
+    # fill_in "Description", with: @school.description
+    fill_in "Name", with: @school.name
+    click_on "Create"
 
-              assert_text "School was successfully created"
-            end
-          end
-        end
-      end
-    end
+    assert_text "School was successfully created"
+
+    $survey_monkey_disabled = false
   end
 
   test "updating a School" do
