@@ -11,7 +11,8 @@ class SchoolTreeCategoryQuestion < ApplicationRecord
   default_scope { joins(:survey, :tree_category_question) }
 
   scope :for_school, -> (school) { where(school: school) }
-  scope :for_survey, -> (suvey) { where(survey: survey) }
+  scope :for_survey, -> (survey) { where(survey: survey) }
+  scope :for_question, -> (question) { joins(:tree_category_question).merge(TreeCategoryQuestion.for_question(question)) }
   scope :on_page, -> (page_id) { where(survey_monkey_page_id: page_id) }
 
   def to_s

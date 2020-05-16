@@ -77,7 +77,7 @@ class Admin::TreeCategoriesController < Admin::AdminController
   end
 
   def set_tree_category
-    @tree_category = @tree.tree_categories.for(@category).first
+    @tree_category = @tree.tree_categories.for_category(@category).first
   end
 
   def set_category

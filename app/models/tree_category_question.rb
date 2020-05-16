@@ -7,7 +7,7 @@ class TreeCategoryQuestion < ApplicationRecord
 
   default_scope { joins(:question, :tree_category) }
 
-  scope :for, -> (question) { where(question: question) }
+  scope :for_question, -> (question) { where(question: question) }
 
   after_create :create_school_tree_category_questions
   after_update_commit :sync_surveys

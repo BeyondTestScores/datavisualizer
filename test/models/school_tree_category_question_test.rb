@@ -84,8 +84,6 @@ class SchoolTreeCategoryQuestionTest < ActiveSupport::TestCase
   test "adding a question of a kind where a survey already exists adds it to that survey" do
     requests = []
 
-    survey = surveys(:one_students)
-    school = schools(:one)
     tree_category = tree_categories(:one)
     tree_survey_for_students_count = tree_category.tree.surveys.for_students.count
     existing_stcq = school_tree_category_questions(:one)
@@ -100,47 +98,60 @@ class SchoolTreeCategoryQuestionTest < ActiveSupport::TestCase
       kind: Question.kinds[:for_students]
     )
 
-    stc = tree_category.tree_category_questions.create(
+    tcq = tree_category.tree_category_questions.new(
       question: question_for_students
     )
 
-    stcq = stc.school_tree_category_questions.new(
-      school: school
-    )
+    School.all.each do |school|
+      survey = school.surveys.for_tree(tree_category.tree).for_kind(question_for_students.kind).first
 
-    survey_monkey_question_id = "SURVEY_MONKEY_QUESTION_ID"
+      stcq = tcq.school_tree_category_questions.new(
+        school: school
+      )
+
+      survey_monkey_question_id = "SURVEY_MONKEY_QUESTION_ID"
+      requests << survey_monkey_mock(
+        method: :get,
+        url: "surveys/#{survey.survey_monkey_id}/pages",
+        responses: [
+          {"data": [
+            {"id": existing_stcq.survey_monkey_page_id, "title": existing_stcq.category.name}
+          ]}
+        ]
+      )
+
+      requests << survey_monkey_mock(
+        method: :post,
+        url: "surveys/#{survey.survey_monkey_id}/pages/#{existing_stcq.survey_monkey_page_id}/questions",
+        body: question_for_students.survey_monkey_structure,
+        responses: [{"id": survey_monkey_question_id}]
+      )
+
+      requests << survey_monkey_mock(
+        method: :get,
+        url: "surveys/#{survey.survey_monkey_id}/details",
+        responses: [
+          details(
+            survey: survey,
+            survey_questions: survey.school_tree_category_questions
+          )
+        ]
+      )
+    end
+
     requests << survey_monkey_mock(
-      method: :get,
-      url: "surveys/#{survey.survey_monkey_id}/pages",
-      responses: [
-        {"data": [
-          {"id": existing_stcq.survey_monkey_page_id, "title": existing_stcq.category.name}
-        ]}
-      ]
+      method: :delete,
+      url: "surveys/surveymonkeyid2students/pages/#{DEFAULT_PAGE_ID}",
     )
 
-    requests << survey_monkey_mock(
-      method: :post,
-      url: "surveys/#{survey.survey_monkey_id}/pages/#{existing_stcq.survey_monkey_page_id}/questions",
-      body: question_for_students.survey_monkey_structure,
-      responses: [{"id": survey_monkey_question_id}]
-    )
-
-    requests << survey_monkey_mock(
-      method: :get,
-      url: "surveys/#{survey.survey_monkey_id}/details",
-      responses: [
-        details(
-          survey: survey,
-          survey_questions: survey.school_tree_category_questions.to_a + [stcq]
-        )
-      ]
-    )
-
-    stcq.save
+    tcq.save
 
     assert_equal tree_survey_for_students_count, tree_category.tree.surveys.for_students.count
-    assert tree_category.tree.surveys.for_school(school).for_students.first.school_tree_category_questions.include?(stcq)
+
+    School.all.each do |school|
+      survey = tree_category.tree.surveys.for_school(school).for_students.first
+      assert survey.school_tree_category_questions.for_question(question_for_students).present?
+    end
 
     assert_requests requests
   end

@@ -251,7 +251,7 @@ class Admin::SurveysControllerTest < ActionDispatch::IntegrationTest
   #   survey = surveys(:one_teachers)
   #   question = questions(:one)
   #   deleting_question = questions(:two)
-  #   survey_question = survey.survey_questions.for(deleting_question).first
+  #   survey_question = survey.survey_questions.for_question(deleting_question).first
   #   question_count = survey.questions.count
   #   survey_question_count = SurveyQuestion.count
   #

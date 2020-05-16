@@ -13,7 +13,8 @@ class Survey < ApplicationRecord
   after_update_commit :sync_with_survey_monkey
   before_destroy :delete_survey_monkey_survey
 
-  scope :for_school, -> (school) { where(school: school) }
+  scope :for_school, ->(school){ where(school: school) }
+  scope :for_tree, -> (tree) { where(tree: tree) }
   scope :for_kind, -> (kind) { where(kind: kind) }
 
   def to_s
