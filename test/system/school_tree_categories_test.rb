@@ -8,9 +8,9 @@ class SchoolTreeCategoriesTest < ApplicationSystemTestCase
   test "school categories are automatically created with no nonlikert when adding an administrative measure" do
     visit_admin admin_root_path
 
-    click_on trees(:one)
+    click_on trees(:one).name
 
-    click_on categories(:one)
+    click_on categories(:one).name
 
     click_on "+ Add An Administrative Measure To This Category"
 
@@ -29,7 +29,7 @@ class SchoolTreeCategoriesTest < ApplicationSystemTestCase
   test "updating a school category" do
     visit_admin admin_root_path
 
-    click_on trees(:one)
+    click_on trees(:one).name
 
     administrative_measure = tree_categories(:administrative_measure)
     click_text administrative_measure

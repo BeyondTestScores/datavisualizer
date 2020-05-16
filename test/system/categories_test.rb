@@ -4,7 +4,7 @@ class CategoriesTest < ApplicationSystemTestCase
   test "creating a category" do
     visit_admin admin_root_path
 
-    click_on trees(:one)
+    click_on trees(:one).name
 
     click_on "+ Create New Category"
 
@@ -20,7 +20,7 @@ class CategoriesTest < ApplicationSystemTestCase
   test "creating an administrative measure" do
     visit_admin admin_root_path
 
-    click_on trees(:one)
+    click_on trees(:one).name
 
     click_text categories(:four).name
 
@@ -81,9 +81,9 @@ class CategoriesTest < ApplicationSystemTestCase
 
     visit_admin admin_root_path
 
-    click_on trees(:one)
+    click_on trees(:one).name
 
-    click_on tree_category
+    click_on tree_category.to_s
 
     page.accept_confirm do
       click_on "Delete Category", match: :first
