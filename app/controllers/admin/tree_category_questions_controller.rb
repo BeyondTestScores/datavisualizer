@@ -19,9 +19,10 @@ class Admin::TreeCategoryQuestionsController < Admin::AdminController
 
     add_breadcrumb "New Question"
 
+    @question =  Question.new
     @tree_category_question = @tree_category.tree_category_questions.new(
       tree_category: @tree_category,
-      question: Question.new
+      question: @question
     )
   end
 

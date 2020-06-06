@@ -1,4 +1,4 @@
-= bootstrap_form_with model: [:admin, @school_tree_category], local: true do |f|
+= bootstrap_form_with url: [:admin, @school_tree_category], model: @school_tree_category, local: true do |f|
 
   - if @school_tree_category.errors.any?
     #error_explanation

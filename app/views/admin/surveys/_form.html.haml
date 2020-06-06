@@ -1,4 +1,4 @@
-= bootstrap_form_with model: [:admin, @survey], local: true do |f|
+= bootstrap_form_with url: [:admin, @survey], model: @survey, local: true do |f|
 
   - if @survey.errors.any?
     #error_explanation

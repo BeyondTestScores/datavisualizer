@@ -20,9 +20,10 @@ class Admin::TreeCategoriesController < Admin::AdminController
       parent_tree_category.path(include_self: true).each { |ptc| add_breadcrumb ptc.name, [:admin, ptc.tree, ptc.category] }
     end
     add_breadcrumb "New #{parent_tree_category.present? ? 'Subcategory' : 'Category'}"
+    @category = Category.new(administrative_measure: params[:administrative_measure] || false)
     @tree_category = @tree.tree_categories.new(
       parent_tree_category: parent_tree_category,
-      category: Category.new(administrative_measure: params[:administrative_measure] || false)
+      category: @category
     )
   end
 

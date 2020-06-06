@@ -1,4 +1,4 @@
-= bootstrap_form_with model: [:admin, @category], local: true do |f|
+= bootstrap_form_with url: [:admin, @category], model: @category, local: true do |f|
 
   - if @category.errors.any?
     #error_explanation

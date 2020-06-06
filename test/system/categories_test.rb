@@ -15,6 +15,15 @@ class CategoriesTest < ApplicationSystemTestCase
 
     assert_text "Category Name"
     assert_text "Parent Category: Category Four"
+
+    click_on "Edit"
+
+    fill_in "Name", with: "Category Name Changed"
+
+    click_on "Update"
+
+    assert_text "Category Name Changed"
+    assert_text "Parent Category: Category Four"
   end
 
   test "creating an administrative measure" do
