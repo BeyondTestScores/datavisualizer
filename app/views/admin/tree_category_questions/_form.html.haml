@@ -10,7 +10,7 @@
         - @tree_category_question.errors.full_messages.each do |msg|
           %li= msg
 
-  %p= @tree.inspect
+  %p= @tree_category_question.inspect
   = f.fields_for :question do |ff|
     = ff.text_field :text
     - 5.times do |i|
