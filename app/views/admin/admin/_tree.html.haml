@@ -11,3 +11,8 @@
         - if local_assigns[:show_questions]
           = render 'category_questions', tree_category: tc, template: template
         = render "child_categories", tree_category: tc, template: template, show_questions: local_assigns[:show_questions]
+    
+    - if @tree.tree_categories.empty?
+      %p
+        No categories currently exist for this tree
+      %p= link_to("Create the first cateogry >", new_admin_tree_category_path(@tree))

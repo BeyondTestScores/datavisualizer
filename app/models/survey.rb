@@ -27,7 +27,7 @@ class Survey < ApplicationRecord
     questions.include?(question)
   end
 
-  def surveyMonkeyConnection
+  def survey_monkey_connection
     return if $survey_monkey_disabled
 
     Faraday.new('https://api.surveymonkey.com/v3') do |conn|
@@ -36,6 +36,12 @@ class Survey < ApplicationRecord
       conn.headers['Authorization'] = "bearer #{Rails.application.credentials.dig(Rails.env.to_sym)[:surveymonkey][:access_token]}"
       conn.headers['Content-Type'] = 'application/json'
     end
+  end
+
+  def survey_monkey_responses
+    return if $survey_monkey_disabled
+    return if survey_monkey_id.blank?
+    survey_monkey_connection.get("surveys/#{survey_monkey_id}/responses").body
   end
 
   def survey_monkey_pages_structure
@@ -54,7 +60,7 @@ class Survey < ApplicationRecord
 
     return if survey_monkey_id.present?
 
-    response = surveyMonkeyConnection.post('surveys', {
+    response = survey_monkey_connection.post('surveys', {
       "title":"#{name}"#,
       #"pages": survey_monkey_pages_structure.values
     }.to_json)
@@ -67,7 +73,7 @@ class Survey < ApplicationRecord
 
     return if survey_monkey_id.blank?
 
-    surveyMonkeyConnection.delete("surveys/#{survey_monkey_id}")
+    survey_monkey_connection.delete("surveys/#{survey_monkey_id}")
   end
 
   def survey_monkey_details
@@ -75,7 +81,7 @@ class Survey < ApplicationRecord
 
     return {} if survey_monkey_id.blank?
 
-    surveyMonkeyConnection.get("surveys/#{survey_monkey_id}/details").body
+    survey_monkey_connection.get("surveys/#{survey_monkey_id}/details").body
   end
 
   def survey_monkey_pages
@@ -83,7 +89,7 @@ class Survey < ApplicationRecord
 
     return {} if survey_monkey_id.blank?
 
-    surveyMonkeyConnection.get("surveys/#{survey_monkey_id}/pages").body["data"]
+    survey_monkey_connection.get("surveys/#{survey_monkey_id}/pages").body["data"]
   end
 
   def remove_survey_monkey_page(page_id)
@@ -91,7 +97,7 @@ class Survey < ApplicationRecord
 
     return {} if survey_monkey_id.blank?
 
-    surveyMonkeyConnection.delete("surveys/#{survey_monkey_id}/pages/#{page_id}")
+    survey_monkey_connection.delete("surveys/#{survey_monkey_id}/pages/#{page_id}")
     sync_with_survey_monkey
   end
 
@@ -100,7 +106,7 @@ class Survey < ApplicationRecord
 
     return {} if survey_monkey_id.blank?
 
-    surveyMonkeyConnection.patch("surveys/#{survey_monkey_id}", updates.to_json)
+    survey_monkey_connection.patch("surveys/#{survey_monkey_id}", updates.to_json)
   end
 
   def create_survey_monkey_question(school_tree_category_question)
@@ -113,13 +119,13 @@ class Survey < ApplicationRecord
     end
 
     if page.nil?
-      page = surveyMonkeyConnection.post(
+      page = survey_monkey_connection.post(
         "surveys/#{survey_monkey_id}/pages",
         {title: page_title}.to_json
       ).body
     end
 
-    response = surveyMonkeyConnection.post(
+    response = survey_monkey_connection.post(
       "surveys/#{survey_monkey_id}/pages/#{page["id"]}/questions",
       school_tree_category_question.question.survey_monkey_structure(1).to_json
     )
@@ -142,21 +148,21 @@ class Survey < ApplicationRecord
     question_id = school_tree_category_question.survey_monkey_id
 
     if school_tree_category_question.category.name_previously_changed?
-      surveyMonkeyConnection.patch(
+      survey_monkey_connection.patch(
         "surveys/#{survey_monkey_id}/pages/#{page_id}",
         {"title": school_tree_category_question.category.name}.to_json
       )
     end
 
     if school_tree_category_question.tree_category_question.tree_category_id_previously_changed?
-      surveyMonkeyConnection.delete(
+      survey_monkey_connection.delete(
         "surveys/#{survey_monkey_id}/pages/#{page_id}/questions/#{question_id}"
       )
 
       create_survey_monkey_question(school_tree_category_question)
       return
     elsif school_tree_category_question.question.previous_changes.keys.present?
-      surveyMonkeyConnection.patch(
+      survey_monkey_connection.patch(
         "surveys/#{survey_monkey_id}/pages/#{page_id}/questions/#{question_id}",
         school_tree_category_question.question.survey_monkey_structure(1).to_json
       )
@@ -170,14 +176,30 @@ class Survey < ApplicationRecord
 
     page_id = school_tree_category_question.survey_monkey_page_id
     question_id = school_tree_category_question.survey_monkey_id
-    response = surveyMonkeyConnection.delete(
+    response = survey_monkey_connection.delete(
       "surveys/#{survey_monkey_id}/pages/#{page_id}/questions/#{question_id}"
     )
     sync_with_survey_monkey
   end
 
+  def create_webhook
+    callback_url = Rails.application.credentials.dig(Rails.env.to_sym)[:url]
+    return if callback_url.blank?
+    webhooks = survey_monkey_connection.get("webhooks").body["data"]
+    return if webhooks.present?
+    survey_monkey_connection.post("webhooks", {
+      "name": "Survey #{id} Webhook", 
+      "event_type": "response_completed", 
+      "object_type": "survey",
+      "object_ids": [survey_monkey_id],
+      "subscription_url": callback_url + "survey_responses"
+    }.to_json)
+  end
+
   def sync_with_survey_monkey
     return if $survey_monkey_disabled
+
+    create_webhook
 
     details = survey_monkey_details
 
@@ -198,7 +220,7 @@ class Survey < ApplicationRecord
       if on_page_stcq.present?
         category = on_page_stcq.first.category
         if category.name != sm_page["title"]
-          surveyMonkeyConnection.patch(
+          survey_monkey_connection.patch(
             "surveys/#{details['id']}/pages/#{sm_page['id']}",
             {title: category.name}.to_json
           )
@@ -211,7 +233,7 @@ class Survey < ApplicationRecord
         end
 
         if stcq.nil?
-          surveyMonkeyConnection.delete(
+          survey_monkey_connection.delete(
             "surveys/#{details['id']}/pages/#{sm_page['id']}/questions/#{sm_question['id']}"
           )
         else
@@ -221,7 +243,7 @@ class Survey < ApplicationRecord
       end
 
       if sm_questions.blank? || all_questions_removed
-        surveyMonkeyConnection.delete(
+        survey_monkey_connection.delete(
           "surveys/#{details['id']}/pages/#{sm_page['id']}"
         )
       end
