@@ -1,5 +1,8 @@
 .add.py-3
-  %h3 Website Tree
+  %h3 
+    Website Tree: 
+    = @tree.name
+  %p= link_to "Edit Tree Name", edit_admin_tree_path(@tree)
   %br
   %h5 Add To This Tree
   %p

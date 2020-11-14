@@ -9,9 +9,11 @@
 
 %br
 
-%h3 Options
+%h3 Response Options
 - 5.times do |i|
-  %p= @question.send("option#{i + 1}")
+  %p
+    %b= "Option #{i + 1}: "
+    = @question.send("option#{i + 1}")
 
 %br
 

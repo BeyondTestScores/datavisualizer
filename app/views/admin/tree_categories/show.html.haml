@@ -6,10 +6,6 @@
   = link_to "Delete #{@category.classification}", [:admin, @tree, @category],  method: :delete, data: { confirm: "Are you sure you want to delete this #{@category.classification}?" }
 
 %p
-  %b Slug:
-  = @category.slug
-
-%p
   %b Blurb:
   = @category.blurb
 

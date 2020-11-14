@@ -12,8 +12,12 @@
 
   = f.fields_for :question do |ff|
     = ff.text_field :text
+
+    %p 
+      %b Response Options
+      (all five are required):
     - 5.times do |i|
-      = ff.text_field "option#{i + 1}"
+      = ff.text_field "option#{i + 1}", label: "Option #{i + 1}"
 
     = ff.select :kind, Question.kinds.map { |k| [k[0].gsub(/_/, ' ').titleize, k[0]] }, { label: "Who is this question for?", include_blank: true }
 
