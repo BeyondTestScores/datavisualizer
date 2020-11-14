@@ -4,3 +4,9 @@
   = link_to("Edit School", edit_admin_school_path(@school))
   &nbsp; | &nbsp;
   = link_to "Delete School", [:admin, @school],  method: :delete, data: { confirm: 'Are you sure you want to delete this school?' }
+
+%p{style: "margin-top: 90px;"} Surveys in Survey Monkey will be created automatically for each school created.
+
+%p 
+  To create or edit the survey structure. Return to the
+  = link_to("Admin Home Page", admin_root_path)
