@@ -87,11 +87,11 @@ class QuestionsTest < ApplicationSystemTestCase
     click_on "+ Add A Question To This Category"
 
     fill_in "Text", with: new_question.text
-    fill_in "Option1", with: new_question.option1
-    fill_in "Option2", with: new_question.option2
-    fill_in "Option3", with: new_question.option3
-    fill_in "Option4", with: new_question.option4
-    fill_in "Option5", with: new_question.option5
+    fill_in "Option 1", with: new_question.option1
+    fill_in "Option 2", with: new_question.option2
+    fill_in "Option 3", with: new_question.option3
+    fill_in "Option 4", with: new_question.option4
+    fill_in "Option 5", with: new_question.option5
     select "For Community", :from => "tree_category_question[question_attributes][kind]" 
 
     click_on "Create"
