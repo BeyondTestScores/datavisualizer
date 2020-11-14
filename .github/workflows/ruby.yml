@@ -60,7 +60,7 @@ jobs:
 
     - name: Install RubyGems
       run: |
-        apt-get install -y ruby-full
+        apt-get install -y ruby-full 2.7.1
 
     - name: Install Yarn
       run: |
