@@ -1,7 +1,7 @@
 = bootstrap_form_with url: [:admin, @tree, @category], model: @tree_category, local: true do |f|
   - if @tree_category.errors.any?
     #error_explanation
-      %h2
+      %h4
         = pluralize(@tree_category.errors.count, "error")
         prohibited
         this

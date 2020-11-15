@@ -1,4 +1,4 @@
-%h2
+%h3
   New
   - if @tree_category.administrative_measure?
     Administrative Measure
@@ -10,7 +10,15 @@
   - if @tree_category.parent_tree_category.present?
     - level = @tree_category.path.length
     Under
-    = "\"#{@tree_category.parent_tree_category.name}\" (Category Level #{level})"
+    = "\"#{@tree_category.parent_tree_category.name}\""
+
+- if @tree_category.parent_tree_category.present?
+  %p= "(Category Level #{level})"
+
+- if @tree_category.administrative_measure?
+  %p 
+    Administrative measures are factual data about schools, 
+    such as the student-teacher ratio. They are not survey questions.
 
 %br
 

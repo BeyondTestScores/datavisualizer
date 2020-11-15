@@ -2,7 +2,7 @@
 
   - if @tree_category_question.errors.any?
     #error_explanation
-      %h2
+      %h4
         = pluralize(@tree_category_question.errors.count, "error")
         prohibited
         this question from being saved:

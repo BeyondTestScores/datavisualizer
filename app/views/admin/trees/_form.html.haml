@@ -2,7 +2,7 @@
 
   - if @tree.errors.any?
     #error_explanation
-      %h2
+      %h4
         = pluralize(@tree.errors.count, "error")
         prohibited
         this tree from being saved:

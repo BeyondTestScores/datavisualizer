@@ -1,7 +1,7 @@
 = form_for @school_tree_category do |f|
   - if @school_tree_category.errors.any?
     #error_explanation
-      %h2= "#{pluralize(@school_tree_category.errors.count, "error")} prohibited this school_tree_category from being saved:"
+      %h4= "#{pluralize(@school_tree_category.errors.count, "error")} prohibited this school_tree_category from being saved:"
       %ul
         - @school_tree_category.errors.full_messages.each do |message|
           %li= message

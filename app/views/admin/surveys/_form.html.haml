@@ -2,7 +2,7 @@
 
   - if @survey.errors.any?
     #error_explanation
-      %h2
+      %h4
         = pluralize(@survey.errors.count, "error")
         prohibited
         this survey from being saved:

@@ -2,7 +2,7 @@
 
   - if @question.errors.any?
     #error_explanation
-      %h2
+      %h4
         = pluralize(@question.errors.count, "error")
         prohibited
         this category from being saved:

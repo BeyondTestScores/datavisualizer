@@ -2,7 +2,7 @@
 
   - if @school.errors.any?
     #error_explanation
-      %h2
+      %h4
         = pluralize(@school.errors.count, "error")
         prohibited
         this school from being saved:

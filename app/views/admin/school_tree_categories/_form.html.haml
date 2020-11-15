@@ -2,7 +2,7 @@
 
   - if @school_tree_category.errors.any?
     #error_explanation
-      %h2
+      %h4
         = pluralize(@school_tree_category.errors.count, "error")
         prohibited
         this administrative measure from being saved:
