@@ -114,6 +114,9 @@ class Survey < ApplicationRecord
 
     page_title = school_tree_category_question.category.name
     smp = survey_monkey_pages
+
+    return if smp.nil?
+    
     page = smp.find do |p|
       p['title'] == page_title
     end
