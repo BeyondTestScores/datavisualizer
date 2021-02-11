@@ -10,7 +10,6 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     container:
@@ -38,60 +37,60 @@ jobs:
           POSTGRES_PASSWORD: postgres
           POSTGRES_DB: postgres
         ports:
-        - 5432:5432
+          - 5432:5432
         # needed because the postgres container does not provide a healthcheck
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
     steps:
-    - uses: actions/checkout@v2
+      - uses: actions/checkout@v2
 
-#     - name: Set up Ruby 2.7.2
-#       uses: actions/setup-ruby@v1
-#       with:
-#         ruby-version: 2.7.2
+      - name: Set up Ruby 2.7.2
+        uses: actions/setup-ruby@v1
+        with:
+          ruby-version: 2.7.2
 
-    - name: Update apt-get
-      run: |
-        apt-get update -qq
+      - name: Update apt-get
+        run: |
+          apt-get update -qq
 
-    - name: Install PostgreSQL 12 client
-      run: |
-        apt-get install -y nodejs postgresql-client
+      - name: Install PostgreSQL 12 client
+        run: |
+          apt-get install -y nodejs postgresql-client
 
-    - name: Install RubyGems
-      run: |
-        apt-get install -y ruby-full
+      - name: Install RubyGems
+        run: |
+          apt-get install -y ruby-full
 
-    - name: Install Yarn
-      run: |
-        curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
-        echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
-        apt update
-        apt install -y yarn
-        yarn --version
+      - name: Install Yarn
+        run: |
+          curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
+          echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
+          apt update
+          apt install -y yarn
+          yarn --version
 
-    - name: Install Zip
-      run: |
-        apt-get install zip
+      - name: Install Zip
+        run: |
+          apt-get install zip
 
-    - name: Build App
-      env:
-        PGHOST: postgres
-        PGUSER: postgres
-        PGPASSWORD: postgres
-      run: |
-        gem install bundler:2.1.4
-        gem install nokogiri -v '1.10.8' --source 'https://rubygems.org/'
-        bundle install --jobs 4 --retry 3
-        rails db:setup
-        RAILS_ENV=test bundle exec rails assets:precompile
+      - name: Build App
+        env:
+          PGHOST: postgres
+          PGUSER: postgres
+          PGPASSWORD: postgres
+        run: |
+          gem install bundler:2.1.4
+          gem install nokogiri -v '1.10.8' --source 'https://rubygems.org/'
+          bundle install --jobs 4 --retry 3
+          rails db:setup
+          RAILS_ENV=test bundle exec rails assets:precompile
 
-    - name: Test App
-      env:
-        PGHOST: postgres
-        PGUSER: postgres
-        PGPASSWORD: postgres
-        SELENIUM_URL: "http://hub:4444/wd/hub"
-      run: |
-        rails test
-        rails test:system
+      - name: Test App
+        env:
+          PGHOST: postgres
+          PGUSER: postgres
+          PGPASSWORD: postgres
+          SELENIUM_URL: "http://hub:4444/wd/hub"
+        run: |
+          rails test
+          rails test:system
