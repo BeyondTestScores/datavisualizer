@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
 
     container:
-      image: ruby
+      image: ruby:2.7.2
       options: --network-alias testHost
 
     env:
@@ -44,10 +44,10 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Set up Ruby 2.7.2
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: 2.7.2
+      # - name: Set up Ruby 2.7.2
+      #   uses: ruby/setup-ruby@v1
+      #   with:
+      #     ruby-version: 2.7.2
 
       - name: Update apt-get
         run: |
