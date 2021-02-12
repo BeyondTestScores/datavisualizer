@@ -112,6 +112,8 @@ class Survey < ApplicationRecord
   def create_survey_monkey_question(school_tree_category_question)
     return if $survey_monkey_disabled
 
+    # return if school_tree_category_question.survey_monkey_page_id.present?
+
     page_title = school_tree_category_question.category.name
     smp = survey_monkey_pages
 
@@ -162,6 +164,7 @@ class Survey < ApplicationRecord
         "surveys/#{survey_monkey_id}/pages/#{page_id}/questions/#{question_id}"
       )
 
+      # school_tree_category_question.survey_monkey_page_id = nil
       create_survey_monkey_question(school_tree_category_question)
       return
     elsif school_tree_category_question.question.previous_changes.keys.present?
@@ -179,7 +182,7 @@ class Survey < ApplicationRecord
 
     page_id = school_tree_category_question.survey_monkey_page_id
     question_id = school_tree_category_question.survey_monkey_id
-    response = survey_monkey_connection.delete(
+    survey_monkey_connection.delete(
       "surveys/#{survey_monkey_id}/pages/#{page_id}/questions/#{question_id}"
     )
     sync_with_survey_monkey
@@ -213,7 +216,6 @@ class Survey < ApplicationRecord
     end
 
     sm_pages = details['pages'] || []
-    sm_page_count = sm_pages.length
     sm_pages.each do |sm_page|
       sm_questions = sm_page['questions'] || []
 

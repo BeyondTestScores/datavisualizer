@@ -112,14 +112,18 @@ class TreeCategoryTest < ActiveSupport::TestCase
       }
     )
 
+
     [surveys(:one_students), surveys(:two_students)].each do |survey|
+      survey.school_tree_category_questions.each { |stcq| stcq.update(survey_monkey_page_id: nil) }
+      survey_monkey_page_id = "SURVEY_MONKEY_PAGE_ID"
+      survey_monkey_question_id = "SURVEY_MONKEY_QUESTION_ID"
+      
       requests << survey_monkey_mock(
         method: :get,
         url: "surveys/#{survey.survey_monkey_id}/pages",
         responses: [{"data": []}]
       )
-
-      survey_monkey_page_id = "SURVEY_MONKEY_PAGE_ID"
+      
       requests << survey_monkey_mock(
         method: :post,
         url: "surveys/#{survey.survey_monkey_id}/pages",
@@ -129,7 +133,6 @@ class TreeCategoryTest < ActiveSupport::TestCase
         ]
       )
 
-      survey_monkey_question_id = "SURVEY_MONKEY_QUESTION_ID"
       requests << survey_monkey_mock(
         method: :post,
         url: "surveys/#{survey.survey_monkey_id}/pages/#{survey_monkey_page_id}/questions",

@@ -31,3 +31,14 @@ bundle
 yarn
 rails test (requires survey monkey account)
 rails test:system
+
+Creating SurveyMonkey Surveys from Existing Surveys
+
+Survey.all.each do |s|
+s.update(survey_monkey_id: nil)
+s.create_survey_monkey_survey
+s.school_tree_category_questions.each do |stcq|
+stcq.update(survey_monkey_page_id: nil)
+s.create_survey_monkey_question(stcq)
+end
+end
