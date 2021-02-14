@@ -25,7 +25,11 @@ Things you may want to cover:
 
 Getting Started
 
-EDITOR="code --wait" bin/rails credentials:edit (master key in 1Password)
+Edit Credentials (master key in 1Password):
+
+EDITOR="code --wait" bin/rails credentials:edit
+
+Run Tests
 
 bundle
 yarn
