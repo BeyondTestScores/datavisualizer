@@ -12,10 +12,10 @@ class SurveyResponsesController < ApplicationController
     puts ""
     puts ""
     if request.get?
-      render status: 200 and return 
+      render plain: "OK" and return 
     end
 
-    render status: 200
+    render plain: "OK"
   end
 
 end
