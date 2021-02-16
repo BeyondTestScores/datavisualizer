@@ -11,6 +11,7 @@ class Admin::SurveyResponsesController < Admin::AdminController
     puts ""
     puts ""
     puts ""
+    render status: 200
   end
 
 end
