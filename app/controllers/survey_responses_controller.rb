@@ -1,4 +1,4 @@
-class SurveyResponsesController < Admin::AdminController
+class SurveyResponsesController < ApplicationController
   skip_forgery_protection
 
   def create    
