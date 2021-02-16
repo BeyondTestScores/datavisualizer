@@ -26,4 +26,5 @@ Rails.application.routes.draw do
   end
 
   post '/survey_responses', to: 'admin/survey_responses#create'
+  get '/survey_responses', to: 'admin/survey_responses#create'
 end
