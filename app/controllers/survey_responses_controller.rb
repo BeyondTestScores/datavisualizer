@@ -6,6 +6,7 @@ class SurveyResponsesController < ApplicationController
     puts ""
     puts ""
     puts ""
+    puts survey_response_params.inspect
     puts params.inspect
     puts ""
     puts ""
@@ -16,6 +17,10 @@ class SurveyResponsesController < ApplicationController
     end
 
     render plain: "OK"
+  end
+
+  def survey_response_params
+    params.permit!
   end
 
 end

@@ -191,8 +191,8 @@ class Survey < ApplicationRecord
   def create_webhook
     callback_url = Rails.application.credentials.dig(Rails.env.to_sym)[:url]
     return if callback_url.blank?
-    webhooks = survey_monkey_connection.get("webhooks").body["data"]
-    return if webhooks.present?
+    # webhooks = survey_monkey_connection.get("webhooks").body["data"]
+    # return if webhooks.present?
     survey_monkey_connection.post("webhooks", {
       "name": "Survey #{id} Webhook", 
       "event_type": "response_completed", 
