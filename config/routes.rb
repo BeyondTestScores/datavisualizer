@@ -25,6 +25,6 @@ Rails.application.routes.draw do
     resources :school_tree_categories
   end
 
-  post '/survey_responses', to: 'admin/survey_responses#create'
-  get '/survey_responses', to: 'admin/survey_responses#create'
+  post '/survey_responses', to: 'survey_responses#create'
+  get '/survey_responses', to: 'survey_responses#create'
 end
