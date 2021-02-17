@@ -220,6 +220,18 @@ class Survey < ApplicationRecord
     end
   end
 
+  def get_survey_responses()
+    responses = survey_monkey_connection.get("surves/#{survey_monkey_id}").body
+    print("")
+    print("")
+    print("")
+    print("RESPONSES")
+    print(responses)
+    print("")
+    print("")
+    print("")
+  end
+
   def sync_with_survey_monkey
     return if $survey_monkey_disabled
 
