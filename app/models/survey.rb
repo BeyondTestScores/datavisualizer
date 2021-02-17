@@ -214,9 +214,9 @@ class Survey < ApplicationRecord
     }.to_json
     
     if webhooks.present?
-      survey_monkey_connection.post(endpoint, data)
-    else
       survey_monkey_connection.put(endpoint, data)
+    else
+      survey_monkey_connection.post(endpoint, data)
     end
   end
 
