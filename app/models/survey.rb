@@ -221,7 +221,7 @@ class Survey < ApplicationRecord
   end
 
   def get_survey_responses()
-    responses = survey_monkey_connection.get("surves/#{survey_monkey_id}").body
+    responses = survey_monkey_connection.get("surveys/#{survey_monkey_id}").body
     print("")
     print("")
     print("")
