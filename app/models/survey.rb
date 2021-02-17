@@ -204,14 +204,20 @@ class Survey < ApplicationRecord
     end
 
     object_ids << survey_monkey_id
-    
-    survey_monkey_connection.post(endpoint, {
+
+    data = {
       "name": "Survey Responses Webhook", 
       "event_type": "response_completed", 
       "object_type": "survey",
       "object_ids": object_ids,
       "subscription_url": callback_url + "survey_responses"
-    }.to_json)
+    }.to_json
+    
+    if webhooks.present?
+      survey_monkey_connection.post(endpoint, data)
+    else
+      survey_monkey_connection.put(endpoint, data)
+    end
   end
 
   def sync_with_survey_monkey
