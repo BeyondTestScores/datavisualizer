@@ -8,6 +8,7 @@ class SurveyResponsesController < ApplicationController
     puts ""
     puts survey_response_params.inspect
     puts params.inspect
+    puts request.body.read.inspect
     puts ""
     puts ""
     puts ""
