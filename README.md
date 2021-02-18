@@ -44,5 +44,7 @@ s.create_survey_monkey_survey
 s.school_tree_category_questions.each do |stcq|
 stcq.update(survey_monkey_page_id: nil)
 s.create_survey_monkey_question(stcq)
+sleep(1)
 end
+sleep(1)
 end

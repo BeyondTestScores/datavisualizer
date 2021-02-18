@@ -141,7 +141,13 @@ class Survey < ApplicationRecord
     puts ""
     puts ""
     puts "RESPONSE"
-    puts response.inspect
+    puts response.body.inspect
+    puts ""
+    puts "RESPONSE ANSWERS"
+    puts response.body["answers"].inspect
+    puts ""
+    puts "RESPONSE CHOICES"
+    puts response.body["answers"]["choices"].inspect
     puts ""
     puts ""
     puts ""
