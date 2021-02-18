@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_04_18_214620) do
+ActiveRecord::Schema.define(version: 2021_02_18_211436) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -70,6 +70,11 @@ ActiveRecord::Schema.define(version: 2020_04_18_214620) do
     t.string "survey_monkey_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.string "survey_monkey_option1_id"
+    t.string "survey_monkey_option2_id"
+    t.string "survey_monkey_option3_id"
+    t.string "survey_monkey_option4_id"
+    t.string "survey_monkey_option5_id"
     t.index ["school_id"], name: "index_school_tree_category_questions_on_school_id"
     t.index ["survey_id"], name: "index_school_tree_category_questions_on_survey_id"
     t.index ["tree_category_question_id"], name: "index_sctq_on_tcqid"

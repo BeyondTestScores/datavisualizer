@@ -136,10 +136,23 @@ class Survey < ApplicationRecord
     )
 
     smid = response.body['id']
-    if (school_tree_category_question.survey_monkey_id != smid || school_tree_category_question.survey_monkey_page_id != page["id"])
+    choices = response.body["answers"]["choices"]
+    if (school_tree_category_question.survey_monkey_id != smid || 
+        school_tree_category_question.survey_monkey_page_id != page["id"] ||
+        school_tree_category_question.survey_monkey_option1_id != choices[0]["id"] ||
+        school_tree_category_question.survey_monkey_option2_id != choices[1]["id"] ||
+        school_tree_category_question.survey_monkey_option3_id != choices[2]["id"] ||
+        school_tree_category_question.survey_monkey_option4_id != choices[3]["id"] ||
+        school_tree_category_question.survey_monkey_option5_id != choices[4]["id"]
+    )
       school_tree_category_question.update(
-        survey_monkey_id: response.body['id'],
-        survey_monkey_page_id: page["id"]
+        survey_monkey_id: smid,
+        survey_monkey_page_id: page["id"],
+        survey_monkey_option1_id: choices[0]["id"],
+        survey_monkey_option2_id: choices[1]["id"],
+        survey_monkey_option3_id: choices[2]["id"],
+        survey_monkey_option4_id: choices[3]["id"],
+        survey_monkey_option5_id: choices[4]["id"],
       )
     end
 
@@ -221,7 +234,8 @@ class Survey < ApplicationRecord
   end
 
   def get_survey_responses()
-    responses = survey_monkey_connection.get("surveys/#{survey_monkey_id}").body
+    object_id = 12414918305
+    responses = survey_monkey_connection.get("surveys/#{survey_monkey_id}/responses/#{object_id}").body
     print("")
     print("")
     print("")

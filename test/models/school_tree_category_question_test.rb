@@ -54,7 +54,12 @@ class SchoolTreeCategoryQuestionTest < ActiveSupport::TestCase
         method: :post,
         url: "surveys/#{survey_monkey_id}/pages/#{survey_monkey_page_id}/questions",
         body: question_for_community.survey_monkey_structure,
-        responses: [{"id": survey_monkey_question_id}]
+        responses: [{
+          "id": survey_monkey_question_id, 
+          "answers": {
+            "choices": [{"id": 1}, {"id": 2}, {"id": 3}, {"id": 4}, {"id": 5}]
+          }
+        }]
       )
 
       requests << survey_monkey_mock(
@@ -127,7 +132,12 @@ class SchoolTreeCategoryQuestionTest < ActiveSupport::TestCase
         method: :post,
         url: "surveys/#{survey.survey_monkey_id}/pages/#{existing_stcq.survey_monkey_page_id}/questions",
         body: question_for_students.survey_monkey_structure,
-        responses: [{"id": survey_monkey_question_id}]
+        responses: [{
+          "id": survey_monkey_question_id, 
+          "answers": {
+            "choices": [{"id": 1}, {"id": 2}, {"id": 3}, {"id": 4}, {"id": 5}]
+          }
+        }]
       )
 
       requests << survey_monkey_mock(
@@ -153,7 +163,13 @@ class SchoolTreeCategoryQuestionTest < ActiveSupport::TestCase
 
     School.all.each do |school|
       survey = tree_category.tree.surveys.for_school(school).for_students.first
-      assert survey.school_tree_category_questions.for_question(question_for_students).present?
+      stcq = survey.school_tree_category_questions.for_question(question_for_students).first
+      assert stcq.present?
+      assert_equal stcq.survey_monkey_option1_id, "1"
+      assert_equal stcq.survey_monkey_option2_id, "2"
+      assert_equal stcq.survey_monkey_option3_id, "3"
+      assert_equal stcq.survey_monkey_option4_id, "4"
+      assert_equal stcq.survey_monkey_option5_id, "5"
     end
 
     assert_requests requests

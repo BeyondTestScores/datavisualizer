@@ -280,7 +280,13 @@ class SurveyTest < ActiveSupport::TestCase
       requests << survey_monkey_mock(
         method: :post,
         url: "surveys/#{survey.survey_monkey_id}/pages/#{new_page_id}/questions",
-        body: stcq.question.survey_monkey_structure(1)
+        body: stcq.question.survey_monkey_structure(1),
+        responses: [{
+          "id": "QUESTION_ID", 
+          "answers": {
+            "choices": [{"id": 1}, {"id": 2}, {"id": 3}, {"id": 4}, {"id": 5}]
+          }
+        }]
       )
 
       requests << survey_monkey_mock(
