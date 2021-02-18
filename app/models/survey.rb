@@ -136,6 +136,15 @@ class Survey < ApplicationRecord
     )
 
     smid = response.body['id']
+
+    puts ""
+    puts ""
+    puts ""
+    puts "RESPONSE"
+    puts response.inspect
+    puts ""
+    puts ""
+    puts ""
     choices = response.body["answers"]["choices"]
     if (school_tree_category_question.survey_monkey_id != smid || 
         school_tree_category_question.survey_monkey_page_id != page["id"] ||
