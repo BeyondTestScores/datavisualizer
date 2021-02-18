@@ -137,20 +137,6 @@ class Survey < ApplicationRecord
 
     smid = response.body['id']
 
-    puts ""
-    puts ""
-    puts ""
-    puts "RESPONSE"
-    puts response.body.inspect
-    puts ""
-    puts "RESPONSE ANSWERS"
-    puts response.body["answers"].inspect
-    puts ""
-    puts "RESPONSE CHOICES"
-    puts response.body["answers"]["choices"].inspect
-    puts ""
-    puts ""
-    puts ""
     choices = response.body["answers"]["choices"]
     if (school_tree_category_question.survey_monkey_id != smid || 
         school_tree_category_question.survey_monkey_page_id != page["id"] ||
@@ -248,8 +234,7 @@ class Survey < ApplicationRecord
     end
   end
 
-  def get_survey_responses()
-    object_id = 12414918305
+  def get_survey_responses(object_id)
     responses = survey_monkey_connection.get("surveys/#{survey_monkey_id}/responses/#{object_id}").body
     print("")
     print("")
