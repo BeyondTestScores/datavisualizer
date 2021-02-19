@@ -60,7 +60,12 @@ class WarningsTest < ApplicationSystemTestCase
         method: :post,
         url: "surveys/#{survey.survey_monkey_id}/pages/#{survey_monkey_page_id}/questions",
         body: new_question.survey_monkey_structure,
-        responses: [{"id": survey_monkey_question_id}]
+        responses: [{
+          "id": survey_monkey_question_id,
+          "answers": {
+            "choices": [{"id": 1}, {"id": 2}, {"id": 3}, {"id": 4}, {"id": 5}]
+          }
+        }]
       )
 
       survey.school_tree_category_questions.new(

@@ -235,7 +235,7 @@ class Survey < ApplicationRecord
     end
   end
 
-  def get_survey_responses(respondent_id, response_id)
+  def create_survey_responses(respondent_id, response_id)
     stcqs = school_tree_category_questions
 
     endpoint = "surveys/#{survey_monkey_id}/responses/#{response_id}/details"
