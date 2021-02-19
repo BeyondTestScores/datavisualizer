@@ -13,13 +13,13 @@ class SurveyResponsesController < ApplicationController
     puts request.body.inspect
     puts ""
     puts ""
-    puts info.inspect
+    pp info
     puts ""
     puts ""
-    puts info["resources"].inspect
+    pp info["resources"]
     puts ""
     puts ""
-    puts info["resources"]["survey_id"]
+    pp info["resources"]["survey_id"]
     puts ""
     puts ""
 
