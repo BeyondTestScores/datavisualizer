@@ -7,6 +7,7 @@ class Survey < ApplicationRecord
   belongs_to :tree
   belongs_to :school
   has_many :school_tree_category_questions, dependent: :destroy
+  has_many :responses, dependent: :destroy
 
   validates :name, presence: true, length: { minimum: 1 }
 
@@ -234,8 +235,34 @@ class Survey < ApplicationRecord
     end
   end
 
-  def get_survey_responses(object_id)
-    survey_monkey_connection.get("surveys/#{survey_monkey_id}/responses/#{object_id}/details").body
+  def get_survey_responses(respondent_id, response_id)
+    stcqs = school_tree_category_questions
+
+    endpoint = "surveys/#{survey_monkey_id}/responses/#{response_id}/details"
+    survey_monkey_body = survey_monkey_connection.get(endpoint).body
+    survey_monkey_pages = survey_monkey_body["pages"]
+
+    survey_monkey_pages.each do |page|
+      question = page["questions"].first
+      option = question["answers"].first
+
+      stcq = stcqs.select do |stcq| 
+        stcq.survey_monkey_page_id == page["id"] &&
+        stcq.survey_monkey_id == question["id"]
+      end.first
+
+      option_index = (1..5).select do |i| 
+        stcq["survey_monkey_option#{i}_id"] == option["choice_id"] 
+      end.first
+
+      responses.create(
+        school_tree_category_question_id: stcq.id,
+        survey_monkey_respondent_id: respondent_id,
+        survey_monkey_response_id: response_id,
+        survey_monkey_choice_id: option["choice_id"],
+        option: option_index
+      )
+    end
   end
 
   def sync_with_survey_monkey

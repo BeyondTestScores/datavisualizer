@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_02_18_211436) do
+ActiveRecord::Schema.define(version: 2021_02_19_114004) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -47,6 +47,17 @@ ActiveRecord::Schema.define(version: 2021_02_18_211436) do
     t.integer "kind"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "responses", force: :cascade do |t|
+    t.bigint "survey_id"
+    t.bigint "school_tree_category_question_id"
+    t.string "survey_monkey_response_id"
+    t.string "survey_monkey_respondent_id"
+    t.string "survey_monkey_choice_id"
+    t.integer "option"
+    t.index ["school_tree_category_question_id"], name: "index_responses_on_school_tree_category_question_id"
+    t.index ["survey_id"], name: "index_responses_on_survey_id"
   end
 
   create_table "school_tree_categories", force: :cascade do |t|
