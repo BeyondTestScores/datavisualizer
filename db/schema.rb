@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_02_19_114004) do
+ActiveRecord::Schema.define(version: 2021_02_19_202139) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -69,6 +69,8 @@ ActiveRecord::Schema.define(version: 2021_02_19_114004) do
     t.float "nonlikert"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.integer "responses_sum", default: 0
+    t.integer "responses_count", default: 0
     t.index ["school_id"], name: "index_school_tree_categories_on_school_id"
     t.index ["tree_category_id"], name: "index_school_tree_categories_on_tree_category_id"
   end
@@ -86,6 +88,8 @@ ActiveRecord::Schema.define(version: 2021_02_19_114004) do
     t.string "survey_monkey_option3_id"
     t.string "survey_monkey_option4_id"
     t.string "survey_monkey_option5_id"
+    t.integer "responses_sum", default: 0
+    t.integer "responses_count", default: 0
     t.index ["school_id"], name: "index_school_tree_category_questions_on_school_id"
     t.index ["survey_id"], name: "index_school_tree_category_questions_on_survey_id"
     t.index ["tree_category_question_id"], name: "index_sctq_on_tcqid"

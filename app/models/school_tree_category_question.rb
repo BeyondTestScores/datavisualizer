@@ -3,10 +3,12 @@ class SchoolTreeCategoryQuestion < ApplicationRecord
   belongs_to :survey
   belongs_to :school
   belongs_to :tree_category_question
+  has_many :responses
 
   before_validation :assign_survey
   after_destroy :destroy_survey_monkey
   after_commit :create_survey_monkey, on: :create
+  after_update :update_category_totals
 
   default_scope { joins(:survey, :tree_category_question) }
 
@@ -31,6 +33,10 @@ class SchoolTreeCategoryQuestion < ApplicationRecord
     tree_category_question.tree_category
   end
 
+  def school_tree_category
+    tree_category_question.tree_category.school_tree_categories.for_school(school).first
+  end
+
   def category_path(include_self: false)
     tree_category_question.category_path(include_self)
   end
@@ -41,6 +47,20 @@ class SchoolTreeCategoryQuestion < ApplicationRecord
 
   def sync_surveys
     survey.update_survey_monkey_question(self)
+  end
+
+  def update_totals
+    return if responses.empty?
+
+    update(
+      responses_sum: responses.sum(&:option),
+      responses_count: responses.length
+    )
+  end
+
+  def update_category_totals
+    return unless school_tree_category.present? 
+    school_tree_category.update_totals
   end
 
   private

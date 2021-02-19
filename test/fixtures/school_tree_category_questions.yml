@@ -6,11 +6,11 @@ one:
   tree_category_question: one
   survey_monkey_id: "QUESTION_ONE_SURVEY_ONE_STUDENTS_SURVEY_MONKEY"
   survey_monkey_page_id: "PAGE_QUESTION_ONE_SURVEY_ONE_STUDENTS_SURVEY_MONKEY"
-  survey_monkey_option1_id: 1
-  survey_monkey_option1_id: 2
-  survey_monkey_option1_id: 3
-  survey_monkey_option1_id: 4
-  survey_monkey_option1_id: 5
+  survey_monkey_option1_id: "1"
+  survey_monkey_option2_id: "2"
+  survey_monkey_option3_id: "3"
+  survey_monkey_option4_id: "4"
+  survey_monkey_option5_id: "5"
 
 two:
   survey: one_teachers
@@ -18,8 +18,8 @@ two:
   tree_category_question: two
   survey_monkey_id: "QUESTION_TWO_SURVEY_ONE_TEACHERS_SURVEY_MONKEY"
   survey_monkey_page_id: "PAGE_QUESTION_TWO_SURVEY_ONE_TEACHERS_SURVEY_MONKEY"
-  survey_monkey_option1_id: 1
-  survey_monkey_option1_id: 2
-  survey_monkey_option1_id: 3
-  survey_monkey_option1_id: 4
-  survey_monkey_option1_id: 5
+  survey_monkey_option1_id: "1"
+  survey_monkey_option2_id: "2"
+  survey_monkey_option3_id: "3"
+  survey_monkey_option4_id: "4"
+  survey_monkey_option5_id: "5"

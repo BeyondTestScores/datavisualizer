@@ -6,6 +6,7 @@ class SchoolTreeCategory < ApplicationRecord
   default_scope { joins(:tree_category, :school) }
 
   scope :missing_administrative_measure, -> { where(nonlikert: [nil, '']).joins(tree_category: :category).merge(Category.administrative_measure) }
+  scope :for_school, -> (school) { where(school: school) }
 
   def to_s
     name
@@ -26,6 +27,25 @@ class SchoolTreeCategory < ApplicationRecord
 
   def category
     tree_category.category
+  end
+
+  def update_totals
+    sum = 0
+    count = 0
+    tree_category.all_tree_category_questions.each do |tcq|
+      stcqs = tcq.school_tree_category_questions.for_school(school)
+      sum += stcqs.sum(&:responses_sum)
+      count += stcqs.sum(&:responses_count)
+    end
+    update(responses_sum: sum, responses_count: count)
+
+    parent_tree_category = path.last
+    return unless parent_tree_category.present?
+
+    parent_school_tree_category = parent_tree_category.for_school(school)
+    return unless parent_school_tree_category.present?
+
+    parent_school_tree_category.update_totals 
   end
 
 end

@@ -374,6 +374,88 @@ class SurveyTest < ActiveSupport::TestCase
     assert_requests requests
   end
 
+  test "create responses" do
+    requests = []
+
+    survey = surveys(:one_teachers)
+    stcq = survey.school_tree_category_questions.first
+
+    respondent1_id = "RESPONDENT1_ID"
+    response1_id = "RESPONSE1_ID"
+
+    respondent2_id = "RESPONDENT2_ID"
+    response2_id = "RESPONSE2_ID"
+
+    requests << survey_monkey_mock(
+      method: :get,
+      url: "surveys/#{survey.survey_monkey_id}/responses/#{response1_id}/details",
+      responses: [
+        {
+          "pages": [
+            {
+              "id": stcq.survey_monkey_page_id, 
+              "questions": [{
+                "id": stcq.survey_monkey_id,
+                "answers": [
+                  "choice_id": "3"
+                ]
+              }]              
+            }
+          ]
+        }
+      ]
+    )
+
+    requests << survey_monkey_mock(
+      method: :get,
+      url: "surveys/#{survey.survey_monkey_id}/responses/#{response2_id}/details",
+      responses: [
+        {
+          "pages": [
+            {
+              "id": stcq.survey_monkey_page_id, 
+              "questions": [{
+                "id": stcq.survey_monkey_id,
+                "answers": [
+                  "choice_id": "2"
+                ]
+              }]              
+            }
+          ]
+        }
+      ]
+    )
+
+    survey.create_survey_responses(respondent1_id, response1_id)
+    survey.create_survey_responses(respondent2_id, response2_id)
+
+    response1 = survey.responses.where(
+      school_tree_category_question_id: stcq.id,
+      survey_monkey_response_id: response1_id
+    ).first
+
+    assert_equal 3, response1.option
+    assert_equal respondent1_id, response1.survey_monkey_respondent_id
+    assert_equal response1_id, response1.survey_monkey_response_id
+
+    response2 = survey.responses.where(
+      school_tree_category_question_id: stcq.id,
+      survey_monkey_response_id: response2_id
+    ).first
+
+    assert_equal 2, response2.option
+    assert_equal respondent2_id, response2.survey_monkey_respondent_id
+    assert_equal response2_id, response2.survey_monkey_response_id
+
+    assert_equal 5, stcq.reload.responses_sum
+    assert_equal 2, stcq.reload.responses_count
+
+    assert_equal 5, stcq.school_tree_category.responses_sum
+    assert_equal 2, stcq.school_tree_category.responses_count
+
+    assert_requests requests
+  end
+
   # test 'survey monkey times out' do
   #   requests = []
   #
