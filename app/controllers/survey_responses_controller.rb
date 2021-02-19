@@ -7,6 +7,22 @@ class SurveyResponsesController < ApplicationController
     end
 
     info = request.body.read
+
+    puts ""
+    puts ""
+    puts request.body.inspect
+    puts ""
+    puts ""
+    puts info.inspect
+    puts ""
+    puts ""
+    puts info["resources"].inspect
+    puts ""
+    puts ""
+    puts info["resources"]["survey_id"]
+    puts ""
+    puts ""
+
     survey = Survey.find_by_survey_monkey_id[info["resources"]["survey_id"]]
     survey.create_survey_responses(info["resources"]["respondent_id"], info["object_id"])
 
