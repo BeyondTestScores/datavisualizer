@@ -235,15 +235,7 @@ class Survey < ApplicationRecord
   end
 
   def get_survey_responses(object_id)
-    responses = survey_monkey_connection.get("surveys/#{survey_monkey_id}/responses/#{object_id}").body
-    print("")
-    print("")
-    print("")
-    print("RESPONSES")
-    print(responses)
-    print("")
-    print("")
-    print("")
+    survey_monkey_connection.get("surveys/#{survey_monkey_id}/responses/#{object_id}/details").body
   end
 
   def sync_with_survey_monkey
