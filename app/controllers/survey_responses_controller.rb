@@ -2,7 +2,7 @@ class SurveyResponsesController < ApplicationController
   skip_forgery_protection
 
   def create    
-    if request.get?
+    if request.head?
       render plain: "OK" 
       return 
     end
