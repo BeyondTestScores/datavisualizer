@@ -3,7 +3,8 @@ class SurveyResponsesController < ApplicationController
 
   def create    
     if request.get?
-      render plain: "OK" and return 
+      render plain: "OK" 
+      return 
     end
 
     puts ""
