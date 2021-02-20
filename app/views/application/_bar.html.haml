@@ -1,0 +1,9 @@
+- return if local_assigns[:value].nil?
+.bar
+  .segment.low &nbsp;
+  .segment.medlow &nbsp;
+  .segment.med &nbsp;
+  .segment.medhigh &nbsp;
+  .segment.high &nbsp;
+  .value{style: "left: #{(local_assigns[:value].to_f / 0.05) - 5}%"}
+    %div= local_assigns[:value]
