@@ -255,7 +255,6 @@ class Survey < ApplicationRecord
         stcq["survey_monkey_option#{i}_id"] == option["choice_id"] 
       end.first
 
-
       responses.create(
         school_tree_category_question_id: stcq.id,
         survey_monkey_respondent_id: respondent_id,

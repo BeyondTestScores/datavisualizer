@@ -4,7 +4,9 @@ class SchoolTreesController < ApplicationController
   before_action :set_school, only: [:show]
 
   def show
-    
+    @root_school_tree_categories = @tree.tree_categories.root.map do |tc|
+      tc.school_tree_categories.for_school(@school).first
+    end.flatten
   end
 
   private

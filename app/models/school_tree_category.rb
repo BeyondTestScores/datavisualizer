@@ -29,6 +29,11 @@ class SchoolTreeCategory < ApplicationRecord
     tree_category.category
   end
 
+  def responses_average
+    return "" if responses_count == 0
+    responses_sum.to_f / responses_count.to_f
+  end
+
   def update_totals
     sum = 0
     count = 0
