@@ -26,7 +26,7 @@ Rails.application.routes.draw do
   end
 
   resources :schools do
-    resources :trees, controller: 'school_trees', only: [:show] do
+    resources :trees, :path => "data", controller: 'school_trees', only: [:show] do
       resources :categories, controller: 'school_tree_categories', only: [:show] do
         resources :questions, controller: 'school_tree_category_questions', only: [:show]
       end
