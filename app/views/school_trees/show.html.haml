@@ -9,4 +9,4 @@
     - stats = "(#{count} Responses, Avg: #{average})"
 
   %p
-    = link_to "#{category} #{stats}", tree_school_category_path(@tree, @school, category)
+    = link_to "#{category} #{stats}", school_tree_category_path(@school, @tree, category)

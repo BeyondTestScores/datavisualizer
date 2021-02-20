@@ -1,7 +1,7 @@
 class SchoolTreeCategoriesController < ApplicationController
 
-  before_action :set_tree, only: [:show]
   before_action :set_school, only: [:show]
+  before_action :set_tree, only: [:show]
   before_action :set_category, only: [:show]
   before_action :set_school_tree_category, only: [:show]
 
@@ -14,7 +14,7 @@ class SchoolTreeCategoriesController < ApplicationController
     @tree_category = @tree.tree_categories.for_category(@category).first
     @school_tree_category = @tree_category.school_tree_categories.for_school(@school).first
     @school_tree_category.path(include_self: false).each do |ptc|
-      add_breadcrumb ptc.category, tree_school_category_path(@tree, @school, ptc.category)
+      add_breadcrumb ptc.category, school_tree_category_path(@school, @tree, ptc.category)
     end
   end
 
@@ -29,7 +29,7 @@ class SchoolTreeCategoriesController < ApplicationController
 
   def set_tree
     @tree = Tree.friendly.find(params[:tree_id])
-    add_breadcrumb @tree, @tree
+    add_breadcrumb @tree, school_tree_path(@school, @tree)
   end
 
 

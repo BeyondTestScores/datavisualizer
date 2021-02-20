@@ -9,7 +9,7 @@
     - stats = "(#{count} Responses, Avg: #{average})"
 
   %p
-    = link_to "#{ctc.category} #{stats}", tree_school_category_path(@tree, @school, ctc.category)
+    = link_to "#{ctc.category} #{stats}", school_tree_category_path(@school, @tree, ctc.category)
 
 - @tree_category.tree_category_questions.each do |tcq|
   - stcq = tcq.school_tree_category_question(@school)

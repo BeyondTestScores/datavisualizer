@@ -1,7 +1,7 @@
 class SchoolTreesController < ApplicationController
   
-  before_action :set_tree, only: [:show]
   before_action :set_school, only: [:show]
+  before_action :set_tree, only: [:show]
 
   def show
     @root_school_tree_categories = @tree.tree_categories.root.map do |tc|
@@ -11,13 +11,13 @@ class SchoolTreesController < ApplicationController
 
   private
   def set_school
-    @school = School.friendly.find(params[:id])
-    add_breadcrumb @school
+    @school = School.friendly.find(params[:school_id])
+    add_breadcrumb @school, @school
   end
 
   def set_tree
-    @tree = Tree.friendly.find(params["tree_id"])
-    add_breadcrumb @tree, @tree
+    @tree = Tree.friendly.find(params[:id])
+    add_breadcrumb @tree
   end
 
 end

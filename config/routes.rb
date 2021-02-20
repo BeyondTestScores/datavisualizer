@@ -25,8 +25,8 @@ Rails.application.routes.draw do
     resources :school_tree_categories
   end
 
-  resources :trees do
-    resources :schools, controller: 'school_trees', only: [:show] do
+  resources :schools do
+    resources :trees, controller: 'school_trees', only: [:show] do
       resources :categories, controller: 'school_tree_categories', only: [:show] do
         resources :questions, controller: 'school_tree_category_questions', only: [:show]
       end
