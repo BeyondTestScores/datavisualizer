@@ -10,10 +10,22 @@ class SurveyResponsesController < ApplicationController
     info = request.body.read
 
     puts ""
-    puts ""
+    puts "1"
     pp info
     puts ""
-    puts ""  
+    puts "2"
+    puts info
+    puts ""
+    puts "3"
+    puts "NAME #{info["name"]}"
+    puts ""
+    puts "4"
+    puts JSON.parse(info.to_s)
+    puts ""
+    puts "5"  
+    puts JSON.parse(info.to_s)["name"]
+    puts ""
+    puts ""
 
     survey = Survey.find_by_survey_monkey_id[info["resources"]["survey_id"]]
     survey.create_survey_responses(info["resources"]["respondent_id"], info["object_id"])
