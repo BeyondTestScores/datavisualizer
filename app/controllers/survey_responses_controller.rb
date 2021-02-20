@@ -7,23 +7,11 @@ class SurveyResponsesController < ApplicationController
       return 
     end
 
-    info = request.body.read
+    info = JSON.parse(request.body.read.to_s)
 
     puts ""
-    puts "1"
+    puts ""
     pp info
-    puts ""
-    puts "2"
-    puts info
-    puts ""
-    puts "3"
-    puts "NAME #{info["name"]}"
-    puts ""
-    puts "4"
-    puts JSON.parse(info.to_s)
-    puts ""
-    puts "5"  
-    puts JSON.parse(info.to_s)["name"]
     puts ""
     puts ""
 
