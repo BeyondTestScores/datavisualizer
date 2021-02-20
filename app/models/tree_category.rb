@@ -20,7 +20,7 @@ class TreeCategory < ApplicationRecord
   scope :administrative_measure, -> { joins(:category).merge(Category.administrative_measure) }
 
   before_validation :assign_tree_from_parent
-  after_create :create_school_tree_categories_for_administrative_measure
+  after_create :create_school_tree_categories
 
   def name
     category.name
@@ -63,10 +63,9 @@ class TreeCategory < ApplicationRecord
 
   private
 
-  def create_school_tree_categories_for_administrative_measure
-    return unless category.administrative_measure?
+  def create_school_tree_categories    
     School.all.each do |school|
-      school_tree_categories.create(school: school)
+      school_tree_categories.find_or_create_by(school: school)
     end
   end
 

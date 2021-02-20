@@ -13,8 +13,9 @@ class School < ApplicationRecord
 
   def create_for_trees
     TreeCategory.includes(:school_tree_categories, tree_category_questions: :school_tree_category_questions).each do |tc|
-      next if school_tree_categories.find { |stc| stc.tree_category == tc }
-      school_tree_categories.create(tree_category: tc)
+      unless school_tree_categories.find { |stc| stc.tree_category == tc }
+        school_tree_categories.create(tree_category: tc)
+      end
 
       tc.tree_category_questions.each do |tcq|
         next if school_tree_category_questions.find { |stcq| stcq.tree_category_question == tcq }
