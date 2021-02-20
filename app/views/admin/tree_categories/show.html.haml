@@ -13,6 +13,11 @@
   %b Description:
   = @category.description
 
+- if @tree_category.administrative_measure?
+  %p
+    %b Best Possible Value:
+    = @tree_category.nonlikert
+
 - if (parent = @tree_category.parent_tree_category).present?
   %p
     %b Parent Category:

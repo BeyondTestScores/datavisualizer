@@ -74,7 +74,7 @@ class Admin::TreeCategoriesController < Admin::AdminController
   end
 
   def tree_category_params
-    params.require(:tree_category).permit(:parent_tree_category_id, category_attributes: [:id, :name, :blurb, :description, :administrative_measure])
+    params.require(:tree_category).permit(:parent_tree_category_id, :nonlikert, category_attributes: [:id, :name, :blurb, :description, :administrative_measure])
   end
 
   def set_tree_category

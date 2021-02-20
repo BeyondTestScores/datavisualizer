@@ -17,6 +17,9 @@
     = ff.text_area :description
     = ff.hidden_field :administrative_measure
 
+  - if @tree_category.administrative_measure?
+    %p= f.text_field :nonlikert, label: "What is the best possible value?"
+
   = f.select :parent_tree_category_id, @parent_tree_categories.map { |pc| [pc.name, pc.id] }, { label: "Parent Category (optional)", include_blank: true }, {class: 'tree-category-selector-target'}
   %p Or click a category in the tree below to select it as the parent.
   = render "tree", template: "selector"
