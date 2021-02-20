@@ -7,13 +7,9 @@ class SurveyResponsesController < ApplicationController
       return 
     end
 
-    puts ""
-    puts ""
-    puts request.body.read
-    puts ""
+    info = request.body.read
 
-    info = JSON.parse(request.body.read)
-
+    puts ""
     puts ""
     pp info
     puts ""
