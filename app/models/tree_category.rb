@@ -18,6 +18,7 @@ class TreeCategory < ApplicationRecord
   scope :for_category, -> (category) { where(category: category) }
   scope :incomplete, -> { joins(:category).merge(Category.not_administrative_measure).includes(:tree_category_questions, :child_tree_categories).where(tree_category_questions: { id: nil }).where(child_tree_categories_tree_categories: { id: nil }) }
   scope :administrative_measure, -> { joins(:category).merge(Category.administrative_measure) }
+  scope :missing_administrative_measure, -> { where(nonlikert: [nil, '']).merge(TreeCategory.administrative_measure) }
 
   before_validation :assign_tree_from_parent
   after_create :create_school_tree_categories
@@ -80,6 +81,11 @@ class TreeCategory < ApplicationRecord
   def assign_tree_from_parent
     return unless tree.blank? && parent_tree_category.present?
     self.tree = parent_tree_category.tree
+  end
+
+  def update_school_tree_categories
+    return unless administrative_measure?
+    school_tree_categories.each { |stc| stc.save! }
   end
 
 end

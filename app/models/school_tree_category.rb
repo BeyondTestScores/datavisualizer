@@ -3,7 +3,7 @@ class SchoolTreeCategory < ApplicationRecord
   belongs_to :tree_category
   belongs_to :school
 
-  after_save :update_totals
+  after_save :update_totals, if: :administrative_measure?
 
   default_scope { joins(:tree_category, :school) }
 
@@ -33,6 +33,10 @@ class SchoolTreeCategory < ApplicationRecord
     tree_category.category
   end
 
+  def administrative_measure?
+    tree_category.administrative_measure?
+  end
+
   def responses_average
     return nil if responses_count == 0
     (responses_sum.to_f / responses_count.to_f).round(1)
@@ -43,6 +47,7 @@ class SchoolTreeCategory < ApplicationRecord
     count = 0
 
     if (nonlikert.present?) 
+      return if tree_category.nonlikert.blank?
       sum = 5 * nonlikert / tree_category.nonlikert
       count = 1
     else
