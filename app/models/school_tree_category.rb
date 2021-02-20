@@ -39,10 +39,10 @@ class SchoolTreeCategory < ApplicationRecord
     end
     update(responses_sum: sum, responses_count: count)
 
-    parent_tree_category = path.last
+    parent_tree_category = tree_category.parent_tree_category
     return unless parent_tree_category.present?
 
-    parent_school_tree_category = parent_tree_category.for_school(school)
+    parent_school_tree_category = parent_tree_category.school_tree_categories.for_school(school)
     return unless parent_school_tree_category.present?
 
     parent_school_tree_category.update_totals 
