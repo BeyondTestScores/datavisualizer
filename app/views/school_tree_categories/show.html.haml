@@ -24,3 +24,8 @@
     %p
       Source:
       = stcq.question.kind.split('_').last.titleize
+
+- if @tree_category.administrative_measure?
+  .administrative_measure.py-3
+    %p= "Best Possible Value: #{@tree_category.nonlikert}" 
+    %p= "This School: #{@school_tree_category.nonlikert}"

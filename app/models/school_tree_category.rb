@@ -48,8 +48,9 @@ class SchoolTreeCategory < ApplicationRecord
 
     if (nonlikert.present?) 
       return if tree_category.nonlikert.blank?
-      sum = 5 * nonlikert / tree_category.nonlikert
-      count = 1
+      factor = 10
+      sum = 5 * factor * nonlikert / tree_category.nonlikert
+      count = factor
     else
       stcqs = tree_category.school_tree_category_questions(school)
       sum += stcqs.sum(&:responses_sum)

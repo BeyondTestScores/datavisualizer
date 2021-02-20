@@ -85,12 +85,6 @@ class TreeCategory < ApplicationRecord
   end
 
   def update_school_tree_categories
-    puts ""
-    puts ""
-    puts "HI"
-    puts ""
-    puts ""
-    puts ""
     school_tree_categories.each { |stc| stc.save! }
   end
 
