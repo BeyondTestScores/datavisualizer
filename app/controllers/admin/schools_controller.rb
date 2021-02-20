@@ -56,7 +56,7 @@ class Admin::SchoolsController < Admin::AdminController
   end
 
   def set_school
-    @school = School.find(params[:id])
+    @school = School.friendly.find(params[:id])
   end
 
 end

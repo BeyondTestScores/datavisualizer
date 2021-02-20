@@ -3,7 +3,9 @@
 one:
   name: School One
   description: School one description
+  slug: school-one
 
 two:
   name: School Two
   description: School two description
+  slug: school-two

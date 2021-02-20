@@ -5,7 +5,9 @@ class SchoolTreeCategory < ApplicationRecord
 
   default_scope { joins(:tree_category, :school) }
 
-  scope :missing_administrative_measure, -> { where(nonlikert: [nil, '']).joins(tree_category: :category).merge(Category.administrative_measure) }
+  scope :missing_administrative_measure, -> { 
+    where(nonlikert: [nil, '']).joins(tree_category: :category).merge(Category.administrative_measure) 
+  }
   scope :for_school, -> (school) { where(school: school) }
 
   def to_s
