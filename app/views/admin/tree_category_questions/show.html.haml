@@ -21,6 +21,10 @@
   %b Category:
   = link_to(@category, [:admin, @tree, @category])
 
+%p
+  %b Audience:
+  = @question.kind.gsub(/\s/, ' ').titleize
+
 
 %br
 %br
