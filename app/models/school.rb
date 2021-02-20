@@ -1,5 +1,8 @@
 class School < ApplicationRecord
 
+  extend FriendlyId
+  friendly_id :name, use: :slugged
+  
   has_many :school_tree_categories, dependent: :destroy
   has_many :school_tree_category_questions, dependent: :destroy
 

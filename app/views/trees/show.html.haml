@@ -1,0 +1,8 @@
+.py-3
+  %h2= @tree
+  
+.py-3
+  %h4 Schools
+  - School.all.each do |school|
+    %p= link_to school, tree_school_path(@tree, school)
+    

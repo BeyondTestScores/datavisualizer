@@ -1,2 +1,7 @@
-%h1 Welcome
-%p Find me in app/views/welcome/index.html.haml
+%h2 Surveys
+
+- Tree.all.each do |tree|
+  %p= link_to tree, tree
+
+
+
