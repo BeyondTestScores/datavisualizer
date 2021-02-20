@@ -38,7 +38,7 @@ class TreeCategoryTest < ActiveSupport::TestCase
       assert tree_category.all_tree_category_questions.include?(tcq), "#{tcq.question.text} not found"
 
       School.all.each do |school|
-        stcq = tcq.school_tree_category_questions.for_school(school).first
+        stcq = tcq.school_tree_category_question(school)
         assert stcq.present?, "#{tcq.question.text} for #{school.name} does not exist"
         assert tree_category.all_school_tree_category_questions.include?(stcq), "#{stcq.question.text} for #{school.name} not found"
       end

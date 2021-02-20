@@ -46,6 +46,10 @@ class TreeCategory < ApplicationRecord
     school_tree_category_questions.to_a + child_tree_categories.map(&:all_school_tree_category_questions).flatten.uniq
   end
 
+  def school_tree_category(school)
+    school_tree_categories.for_school(school).first
+  end
+
   def administrative_measure?
     category.administrative_measure?
   end

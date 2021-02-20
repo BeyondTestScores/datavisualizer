@@ -1,1 +1,24 @@
 %h2= @category
+
+- @tree_category.child_tree_categories.each do |ctc|
+  - stats = ""
+  - school_tree_category = ctc.school_tree_categories.for_school(@school).first
+  - count = school_tree_category.responses_count
+  - average = school_tree_category.responses_average
+  - if count > 0
+    - stats = "(#{count} Responses, Avg: #{average})"
+
+  %p
+    = link_to "#{ctc.category} #{stats}", tree_school_category_path(@tree, @school, ctc.category)
+
+- @tree_category.tree_category_questions.each do |tcq|
+  - stcq = tcq.school_tree_category_question(@school)
+  .question.py-3
+    %p
+      %b= stcq.question.text
+    %p
+      Responses:
+      = stcq.responses_count
+    %p
+      Average:
+      = stcq.responses_average 

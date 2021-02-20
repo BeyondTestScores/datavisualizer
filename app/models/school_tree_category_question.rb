@@ -34,7 +34,7 @@ class SchoolTreeCategoryQuestion < ApplicationRecord
   end
 
   def school_tree_category
-    tree_category_question.tree_category.school_tree_categories.for_school(school).first
+    tree_category_question.tree_category.school_tree_category(school)
   end
 
   def category_path(include_self: false)
@@ -47,6 +47,11 @@ class SchoolTreeCategoryQuestion < ApplicationRecord
 
   def sync_surveys
     survey.update_survey_monkey_question(self)
+  end
+
+  def responses_average
+    return "" if responses_count == 0
+    responses_sum.to_f / responses_count.to_f
   end
 
   def update_totals

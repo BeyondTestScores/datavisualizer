@@ -11,10 +11,10 @@ class SchoolTreeCategoriesController < ApplicationController
 
   private
   def set_school_tree_category
-    tree_category = @tree.tree_categories.for_category(@category).first
-    @school_tree_category = tree_category.school_tree_categories.for_school(@school).first
+    @tree_category = @tree.tree_categories.for_category(@category).first
+    @school_tree_category = @tree_category.school_tree_categories.for_school(@school).first
     @school_tree_category.path(include_self: false).each do |ptc|
-      add_breadcrumb ptc.category, tree_school_category_path[@tree, @school, ptc.category]
+      add_breadcrumb ptc.category, tree_school_category_path(@tree, @school, ptc.category)
     end
   end
 

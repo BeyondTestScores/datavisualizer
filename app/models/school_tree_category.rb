@@ -49,7 +49,7 @@ class SchoolTreeCategory < ApplicationRecord
     parent_tree_category = tree_category.parent_tree_category
     return unless parent_tree_category.present?
 
-    parent_school_tree_category = parent_tree_category.school_tree_categories.for_school(school).first
+    parent_school_tree_category = parent_tree_category.school_tree_category(school)
     return unless parent_school_tree_category.present?
 
     parent_school_tree_category.update_totals 

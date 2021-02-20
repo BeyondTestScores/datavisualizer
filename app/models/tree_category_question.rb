@@ -28,6 +28,10 @@ class TreeCategoryQuestion < ApplicationRecord
     tree_category.path(include_self: include_self)
   end
 
+  def school_tree_category_question(school)
+    school_tree_category_questions.for_school(school).first
+  end
+
   private
   def sync_surveys
     school_tree_category_questions.each do |stcq|
