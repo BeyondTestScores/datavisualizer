@@ -34,8 +34,12 @@ class TreeCategory < ApplicationRecord
     name
   end
 
-  def school_tree_category_questions
-    tree_category_questions.map(&:school_tree_category_questions).flatten
+  def school_tree_category_questions(school=nil)
+    tree_category_questions.map do |tcq|
+      stcqs = tcq.school_tree_category_questions
+      stcqs = stcqs.for_school(school) if school.present?
+      stcqs
+    end.flatten
   end
 
   def all_tree_category_questions

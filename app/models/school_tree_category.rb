@@ -3,6 +3,8 @@ class SchoolTreeCategory < ApplicationRecord
   belongs_to :tree_category
   belongs_to :school
 
+  after_save :update_totals
+
   default_scope { joins(:tree_category, :school) }
 
   scope :missing_administrative_measure, -> { 
@@ -39,12 +41,23 @@ class SchoolTreeCategory < ApplicationRecord
   def update_totals
     sum = 0
     count = 0
-    tree_category.all_tree_category_questions.each do |tcq|
-      stcqs = tcq.school_tree_category_questions.for_school(school)
+
+    if (nonlikert.present?) 
+      sum = 5 * nonlikert / tree_category.nonlikert
+      count = 1
+    else
+      stcqs = tree_category.school_tree_category_questions(school)
       sum += stcqs.sum(&:responses_sum)
       count += stcqs.sum(&:responses_count)
+  
+      cstcs = tree_category.child_tree_categories.map do |ctc|
+        ctc.school_tree_category(school)
+      end.compact
+      sum += cstcs.sum(&:responses_sum)
+      count += cstcs.sum(&:responses_count)
     end
-    update(responses_sum: sum, responses_count: count)
+    
+    update_columns(responses_sum: sum, responses_count: count)
 
     parent_tree_category = tree_category.parent_tree_category
     return unless parent_tree_category.present?
