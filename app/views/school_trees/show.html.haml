@@ -1,12 +1,10 @@
 %h2= @school
 
 - @root_school_tree_categories.each do |school_tree_category|
-  - stats = ""
   - category = school_tree_category.tree_category.category
   - average = school_tree_category.responses_average
   
-
   .category
     %h4= link_to category, school_tree_category_path(@school, @tree, category)
-
-    = render "bar", value: school_tree_category.responses_average
+    = render "bar", value: average
+    %p= category.description

@@ -1,15 +1,14 @@
 %h2= @category
 
 - @tree_category.child_tree_categories.each do |ctc|
-  - stats = ""
   - school_tree_category = ctc.school_tree_categories.for_school(@school).first
   - count = school_tree_category.responses_count
   - average = school_tree_category.responses_average
-  - if count > 0
-    - stats = "(#{count} Responses, Avg: #{average})"
-
-  %p
-    = link_to "#{ctc.category} #{stats}", school_tree_category_path(@school, @tree, ctc.category)
+   
+  .category
+    %h4= link_to ctc.category, school_tree_category_path(@school, @tree, ctc.category)
+    = render "bar", value: average
+    %p= ctc.category.description
 
 - @tree_category.tree_category_questions.each do |tcq|
   - stcq = tcq.school_tree_category_question(@school)
