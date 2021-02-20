@@ -17,6 +17,12 @@ class SurveyResponsesController < ApplicationController
     pp info["resources"]
     puts ""
     puts ""
+    pp info["resources"]["survey_id"]
+    puts ""
+    puts ""
+    pp info["resources"]["respondent_id"]
+    puts ""
+    puts ""
     pp info["object_id"]
     puts ""
     puts ""
