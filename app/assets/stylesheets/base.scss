@@ -2,3 +2,54 @@
   color: red;
   font-weight: bold;
 }
+
+.bar {
+  height: 30px;
+  width: 100%;
+  margin: 12px 0;
+  position: relative;
+}
+
+.bar > .segment {
+  width: 20%;
+  float: left;
+  height: 100%;
+  margin: 0;
+}
+
+.bar > .segment.low {
+  background-color: red;
+}
+
+.bar > .segment.medlow {
+  background-color: orange;
+}
+
+.bar > .segment.med {
+  background-color: yellow;
+}
+
+.bar > .segment.medhigh {
+  background-color: lightgreen;
+}
+
+.bar > .segment.high {
+  background-color: darkgreen;
+}
+
+.bar > .value {
+  position: absolute;
+  width: 10%;
+  height: 120%;
+  top: -3px;
+  border: 2px dashed black;
+  font-weight: bold;
+  font-size: 14px;
+  text-align: center;
+}
+
+.bar > .value > div {
+  font-size: 10px;
+  height: 80%;
+  margin-top: 20%;
+}

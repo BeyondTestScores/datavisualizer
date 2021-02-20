@@ -32,8 +32,8 @@ class SchoolTreeCategory < ApplicationRecord
   end
 
   def responses_average
-    return "" if responses_count == 0
-    responses_sum.to_f / responses_count.to_f
+    return nil if responses_count == 0
+    (responses_sum.to_f / responses_count.to_f).round(1)
   end
 
   def update_totals
