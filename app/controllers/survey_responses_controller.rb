@@ -6,9 +6,13 @@ class SurveyResponsesController < ApplicationController
       render plain: "OK" and return 
     end
 
+    puts ""
+    puts ""
+    puts request.body.read
+    puts ""
+
     info = JSON.parse(request.body.read)
 
-    puts ""
     puts ""
     pp info
     puts ""
