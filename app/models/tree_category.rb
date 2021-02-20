@@ -22,6 +22,7 @@ class TreeCategory < ApplicationRecord
 
   before_validation :assign_tree_from_parent
   after_create :create_school_tree_categories
+  after_save :update_school_tree_categories, if: :administrative_measure?
 
   def name
     category.name
@@ -84,7 +85,12 @@ class TreeCategory < ApplicationRecord
   end
 
   def update_school_tree_categories
-    return unless administrative_measure?
+    puts ""
+    puts ""
+    puts "HI"
+    puts ""
+    puts ""
+    puts ""
     school_tree_categories.each { |stc| stc.save! }
   end
 
