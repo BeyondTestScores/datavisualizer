@@ -9,6 +9,8 @@
 
 %p= link_to "Edit Survey", edit_admin_survey_path(@survey)
 
+%p= link_to "Results", school_tree_path(@survey.school, @survey.tree)
+
 %br
 
 
