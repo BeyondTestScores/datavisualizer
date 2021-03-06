@@ -243,60 +243,60 @@ class Survey < ApplicationRecord
     survey_monkey_pages = survey_monkey_body["pages"]
 
     survey_monkey_pages.each do |page|
-      question = page["questions"].first
-      option = question["answers"].first
+      page["questions"].each do |question|
+        option = question["answers"].first
 
-      stcq = stcqs.select do |stcq| 
-        stcq.survey_monkey_page_id == page["id"] &&
-        stcq.survey_monkey_id == question["id"]
-      end.first
+        stcq = stcqs.select do |stcq| 
+          stcq.survey_monkey_page_id == page["id"] &&
+          stcq.survey_monkey_id == question["id"]
+        end.first
 
-      option_index = (1..5).select do |i| 
-        stcq["survey_monkey_option#{i}_id"] == option["choice_id"] 
-      end.first
+        option_index = (1..5).select do |i| 
+          stcq["survey_monkey_option#{i}_id"] == option["choice_id"] 
+        end.first
 
-      if option_index.blank?
-        survey_monkey_question = survey_monkey_connection.get(
-          "surveys/#{survey_monkey_id}/pages/#{stcq.survey_monkey_page_id}/questions/#{stcq.survey_monkey_id}"
-        ).body
-        updates = {}
-        choices = survey_monkey_question["answers"]["choices"]
-        (1..5).each do |i| 
-          choice_id = choices[i-1]["id"] 
-          option_index = i if option["choice_id"] == choice_id
-          updates["survey_monkey_option#{i}_id"] = choice_id 
+        if option_index.blank?
+          survey_monkey_question = survey_monkey_connection.get(
+            "surveys/#{survey_monkey_id}/pages/#{stcq.survey_monkey_page_id}/questions/#{stcq.survey_monkey_id}"
+          ).body
+          updates = {}
+          choices = survey_monkey_question["answers"]["choices"]
+          (1..5).each do |i| 
+            choice_id = choices[i-1]["id"] 
+            option_index = i if option["choice_id"] == choice_id
+            updates["survey_monkey_option#{i}_id"] = choice_id 
+          end
+          stcq.update(updates)
         end
-        stcq.update(updates)
-      end
 
-      response = responses.where(
-        school_tree_category_question_id: stcq.id,
-        survey_monkey_response_id: response_id
-      ).first
-      
-      if (response.blank?) 
-        response = responses.create(
+        response = responses.where(
           school_tree_category_question_id: stcq.id,
-          survey_monkey_response_id: response_id,            
-          survey_monkey_choice_id: option["choice_id"],
-          option: option_index
-        ) 
-      else
-        response.update(
-          survey_monkey_choice_id: option["choice_id"],
-          option: option_index
-        )
+          survey_monkey_response_id: response_id
+        ).first
+        
+        if (response.blank?) 
+          responses.create(
+            school_tree_category_question_id: stcq.id,
+            survey_monkey_response_id: response_id,            
+            survey_monkey_choice_id: option["choice_id"],
+            option: option_index
+          ) 
+        else
+          response.update(
+            survey_monkey_choice_id: option["choice_id"],
+            option: option_index
+          )
+        end
       end
-
     end
   end
 
   def update_responses
-    endpoint = "surveys/#{s.survey_monkey_id}/responses"
-    Survey.all.each do |s| 
-      s.survey_monkey_connection.get(endpoint).body["data"].each do |d| 
-        s.create_survey_responses(d["id"])
-      end
+    endpoint = "surveys/#{survey_monkey_id}/responses"
+    responses = survey_monkey_connection.get(endpoint).body["data"]
+    return if responses.blank?
+    responses.each do |response| 
+      create_survey_responses(response["id"])
     end
   end
 
