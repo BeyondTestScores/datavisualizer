@@ -235,7 +235,7 @@ class Survey < ApplicationRecord
     end
   end
 
-  def create_survey_responses(respondent_id, response_id)
+  def create_survey_responses(response_id)
     stcqs = school_tree_category_questions
 
     endpoint = "surveys/#{survey_monkey_id}/responses/#{response_id}/details"
@@ -255,13 +255,48 @@ class Survey < ApplicationRecord
         stcq["survey_monkey_option#{i}_id"] == option["choice_id"] 
       end.first
 
-      responses.create(
+      if option_index.blank?
+        survey_monkey_question = survey_monkey_connection.get(
+          "surveys/#{survey_monkey_id}/pages/#{stcq.survey_monkey_page_id}/questions/#{stcq.survey_monkey_id}"
+        ).body
+        updates = {}
+        choices = survey_monkey_question["answers"]["choices"]
+        (1..5).each do |i| 
+          choice_id = choices[i-1]["id"] 
+          option_index = i if option["choice_id"] == choice_id
+          updates["survey_monkey_option#{i}_id"] = choice_id 
+        end
+        stcq.update(updates)
+      end
+
+      response = responses.where(
         school_tree_category_question_id: stcq.id,
-        survey_monkey_respondent_id: respondent_id,
-        survey_monkey_response_id: response_id,
-        survey_monkey_choice_id: option["choice_id"],
-        option: option_index
-      )
+        survey_monkey_response_id: response_id
+      ).first
+      
+      if (response.blank?) 
+        response = responses.create(
+          school_tree_category_question_id: stcq.id,
+          survey_monkey_response_id: response_id,            
+          survey_monkey_choice_id: option["choice_id"],
+          option: option_index
+        ) 
+      else
+        response.update(
+          survey_monkey_choice_id: option["choice_id"],
+          option: option_index
+        )
+      end
+
+    end
+  end
+
+  def update_responses
+    endpoint = "surveys/#{s.survey_monkey_id}/responses"
+    Survey.all.each do |s| 
+      s.survey_monkey_connection.get(endpoint).body["data"].each do |d| 
+        s.create_survey_responses(d["id"])
+      end
     end
   end
 

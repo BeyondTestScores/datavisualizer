@@ -380,10 +380,8 @@ class SurveyTest < ActiveSupport::TestCase
     survey = surveys(:one_teachers)
     stcq = survey.school_tree_category_questions.first
 
-    respondent1_id = "RESPONDENT1_ID"
     response1_id = "RESPONSE1_ID"
 
-    respondent2_id = "RESPONDENT2_ID"
     response2_id = "RESPONSE2_ID"
 
     requests << survey_monkey_mock(
@@ -426,8 +424,8 @@ class SurveyTest < ActiveSupport::TestCase
       ]
     )
 
-    survey.create_survey_responses(respondent1_id, response1_id)
-    survey.create_survey_responses(respondent2_id, response2_id)
+    survey.create_survey_responses(response1_id)
+    survey.create_survey_responses(response2_id)
 
     response1 = survey.responses.where(
       school_tree_category_question_id: stcq.id,
@@ -435,7 +433,6 @@ class SurveyTest < ActiveSupport::TestCase
     ).first
 
     assert_equal 3, response1.option
-    assert_equal respondent1_id, response1.survey_monkey_respondent_id
     assert_equal response1_id, response1.survey_monkey_response_id
 
     response2 = survey.responses.where(
@@ -444,7 +441,6 @@ class SurveyTest < ActiveSupport::TestCase
     ).first
 
     assert_equal 2, response2.option
-    assert_equal respondent2_id, response2.survey_monkey_respondent_id
     assert_equal response2_id, response2.survey_monkey_response_id
 
     assert_equal 5, stcq.reload.responses_sum

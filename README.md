@@ -15,6 +15,13 @@ rails test:system
 
 git push && git push heroku MTA:master
 
+# Get latest database dump
+
+rm latest.dump
+sudo heroku pg:backups:capture
+sudo heroku pg:backups:download
+pg_restore --verbose --clean --no-acl --no-owner -h localhost -U postgres -d edcontext_development latest.dump
+
 # Console
 
 sudo heroku run console
