@@ -2,20 +2,26 @@ require "application_system_test_case"
 
 class WarningsTest < ApplicationSystemTestCase
 
-  test "warning is displayed for administrative measure that has a school_tree_category with missing nonlikert" do
-    visit_admin admin_root_path
+  # commented out in case we want to put warnings about administrative measures back in.
+  # - missing_administrative_measure.each do |school_tree_category|
+  #   %li{class: "school-tree-category-#{school_tree_category.id}"}
+  #     = "#{school_tree_category.name} is missing:"
+  #     = link_to "Fix administrative measure >", edit_admin_school_tree_category_path(school_tree_category), class: 'error'
 
-    incomplete_admin_measure = school_tree_categories(:administrative_measure2)
-    assert_text "#{incomplete_admin_measure.name} is missing"
+  # test "warning is displayed for administrative measure that has a school_tree_category with missing nonlikert" do
+  #   visit_admin admin_root_path
 
-    click_on "Fix administrative measure >", match: :first
+  #   incomplete_admin_measure = school_tree_categories(:administrative_measure2)
+  #   assert_text "#{incomplete_admin_measure.name} is missing"
 
-    fill_in "Nonlikert", with: "84"
-    click_on "Update"
+  #   click_on "Fix administrative measure >", match: :first
 
-    click_on "Home", match: :first
-    assert_no_text "#{incomplete_admin_measure.name} is missing"
-  end
+  #   fill_in "Nonlikert", with: "84"
+  #   click_on "Update"
+
+  #   click_on "Home", match: :first
+  #   assert_no_text "#{incomplete_admin_measure.name} is missing"
+  # end
 
   test "warning is displayed for category that has no children, is not administrative, and has no questions" do
     requests = []
