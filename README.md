@@ -1,5 +1,12 @@
 # Getting Started
 
+- Clone this repository
+- Run it locally using the instructions below
+- Register an account on [Heroku](https://www.heroku.com/)
+- Click "Create New App"
+- Give it a name
+- Click "Create App"
+
 Edit Credentials (master key in 1Password - contains Survey Monkey credentials):
 
 EDITOR="code --wait" bin/rails credentials:edit
