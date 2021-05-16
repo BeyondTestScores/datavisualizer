@@ -1,17 +1,25 @@
 class ApplicationController < ActionController::Base
 
   def authenticate(section)
-    env_credentials = Rails.application.credentials[Rails.env.to_sym]
-    return true if env_credentials.nil?
+    username = ENV["AUTH_USERNAME"]
+    password = ENV["AUTH_PASSWORD"]
 
-    authentication = env_credentials[:authentication]
-    return true if authentication.nil?
+    if username.blank? || password.blank?
+      env_credentials = Rails.application.credentials[Rails.env.to_sym]
+      return true if env_credentials.nil?
 
-    section = authentication[section]
-    return true if section.nil?
+      authentication = env_credentials[:authentication]
+      return true if authentication.nil?
+
+      section = authentication[section]
+      return true if section.nil?
+
+      username = section[:username]
+      password = section[:password]
+    end
 
     authenticate_or_request_with_http_basic do |u, p|
-      u == section[:username] && p == section[:password]
+      u == username && p == password
     end
   end
 

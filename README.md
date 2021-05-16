@@ -1,11 +1,17 @@
 # Getting Started
 
-- Clone this repository
+- Fork this repository
 - Run it locally using the instructions below
 - Register an account on [Heroku](https://www.heroku.com/)
 - Click "Create New App"
 - Give it a name
 - Click "Create App"
+- Click "GitHub: Connect to GitHub" in the "Deployment method" section.
+- Select the app you've forked
+- Click "Connect"
+- Click "Enable Automatic Deploys"
+- Click "Deploy Branch"
+- Add Secrets
 
 Edit Credentials (master key in 1Password - contains Survey Monkey credentials):
 
