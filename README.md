@@ -11,7 +11,9 @@
 - Click "Connect"
 - Click "Enable Automatic Deploys"
 - Click "Deploy Branch"
-- Add Secrets
+- Click on "Settings"
+- Click on "Reveal Config Vars"
+- Add "AUTH_USERNAME" and "AUTH_PASSWORD" and set them to create an admin username and password
 
 Edit Credentials (master key in 1Password - contains Survey Monkey credentials):
 
