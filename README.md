@@ -14,10 +14,15 @@
 - Click on "Settings"
 - Click on "Reveal Config Vars"
 - Add "AUTH_USERNAME" and "AUTH_PASSWORD" and set them to create an admin username and password
-
-Edit Credentials (master key in 1Password - contains Survey Monkey credentials):
-
-EDITOR="code --wait" bin/rails credentials:edit
+- Register an account on [SurveyMonkey](https://www.surveymonkey.com/user/sign-up/?ut_source=homepage&ut_source3=megamenu)
+- Click [Upgrade](https://www.surveymonkey.com/pricing/upgrade/) in the top right corner
+- Select a plan (any of them should be fine)
+- Visit the [Developer Dashboard](https://developer.surveymonkey.com/)
+- Give the app a name and select "Private App"
+- Then hit "Create App"
+- Click "Settings"
+- In the "Credentials" section find the Access Token.
+- Copy it and add it to the config vars in Heroku like you did "AUTH_USERNAME" above. Call is "SURVEYMONKEY_ACCESS_TOKEN"
 
 # Run Tests
 
