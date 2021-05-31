@@ -23,6 +23,7 @@
 - Click "Settings"
 - In the "Credentials" section find the Access Token.
 - Copy it and add it to the config vars in Heroku like you did "AUTH_USERNAME" above. Call is "SURVEYMONKEY_ACCESS_TOKEN"
+- Click "Open App" at the top of the page to open the app.
 
 # Run Tests
 

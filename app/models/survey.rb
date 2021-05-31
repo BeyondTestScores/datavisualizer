@@ -31,10 +31,10 @@ class Survey < ApplicationRecord
   def survey_monkey_connection
     return if $survey_monkey_disabled
 
-    access_token  = ENV["SURVEYMONKEY_ACCESS_TOKEN"]
+    access_token = ENV["SURVEYMONKEY_ACCESS_TOKEN"]
 
     if access_token.blank?
-      Rails.application.credentials.dig(Rails.env.to_sym)[:surveymonkey][:access_token]
+      access_token = Rails.application.credentials.dig(Rails.env.to_sym)[:surveymonkey][:access_token]
     end
 
     Faraday.new('https://api.surveymonkey.com/v3') do |conn|
