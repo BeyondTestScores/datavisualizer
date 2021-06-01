@@ -21,8 +21,19 @@
 - Give the app a name and select "Private App"
 - Then hit "Create App"
 - Click "Settings"
+- In the "Scopes" section select the following scopes:
+- Create/Modify Surveys
+- Create/Modify Collections
+- Create/Modify Responses
+- View Response Details
+- View Webhooks
+- View Surveys
+- View Collectors
+- View Responses
+- Create/Modify Webhooks
 - In the "Credentials" section find the Access Token.
-- Copy it and add it to the config vars in Heroku like you did "AUTH_USERNAME" above. Call is "SURVEYMONKEY_ACCESS_TOKEN"
+- Back In Heroku copy it and add it to the config vars in Heroku like you did "AUTH_USERNAME" above. Call is "SURVEYMONKEY_ACCESS_TOKEN"
+- Add another config var that looks like "SURVEYMONKEY_CALLBACK_URL" and give it the domain for your website (unless you are using a custom domain this would be https://[NAME OF YOUR APP].herokuapp.com/)
 - Click "Open App" at the top of the page to open the app.
 
 # Run Tests
