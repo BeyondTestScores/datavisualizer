@@ -37,6 +37,13 @@ class Survey < ApplicationRecord
       access_token = Rails.application.credentials.dig(Rails.env.to_sym)[:surveymonkey][:access_token]
     end
 
+    puts ""
+    puts ""
+    puts "ACCESS TOKEN: #{access_token}"
+    puts ""
+    puts ""
+
+
     Faraday.new('https://api.surveymonkey.com/v3') do |conn|
       conn.adapter Faraday.default_adapter
       conn.response :json, :content_type => /\bjson$/
@@ -141,6 +148,12 @@ class Survey < ApplicationRecord
       "surveys/#{survey_monkey_id}/pages/#{page["id"]}/questions",
       school_tree_category_question.question.survey_monkey_structure(1).to_json
     )
+
+    puts ""
+    puts ""
+    puts "RESPONSE: #{response.body}"
+    puts ""
+    puts ""
 
     smid = response.body['id']
 
