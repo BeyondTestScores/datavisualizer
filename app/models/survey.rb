@@ -228,7 +228,7 @@ class Survey < ApplicationRecord
     webhooks = survey_monkey_connection.get(endpoint).body["data"]
 
     object_ids = []
-    if (webhooks)
+    if (webhooks.present?)
       endpoint = "webhooks/#{webhooks.first["id"]}"
       webhook = survey_monkey_connection.get(endpoint).body
       object_ids = webhook["object_ids"] || []
