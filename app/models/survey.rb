@@ -223,7 +223,12 @@ class Survey < ApplicationRecord
   end
 
   def create_webhook
-    callback_url = Rails.application.credentials.dig(Rails.env.to_sym)[:url]
+    callback_url = ENV["SURVEYMONKEY_CALLBACK_URL"]
+
+    if callback_url.blank?
+      callback_url = Rails.application.credentials.dig(Rails.env.to_sym)[:url]
+    end
+
     return if callback_url.blank?
     
     endpoint = "webhooks"
