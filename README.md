@@ -1,5 +1,6 @@
 # Getting Started
 
+- If you don't have a GitHub account then register one (here)[https://github.com/join].
 - Fork this repository
 - Run it locally using the instructions below
 - Register an account on [Heroku](https://www.heroku.com/)
@@ -45,7 +46,7 @@ rails test:system
 
 # Deploying (CI tests are running)
 
-git push && git push heroku MTA:master
+If Heroku has been set up correctly then tests and deployment should happen automatically on git push
 
 # Get latest database dump
 
@@ -57,10 +58,6 @@ pg_restore --verbose --clean --no-acl --no-owner -h localhost -U postgres -d edc
 # Console
 
 sudo heroku run console
-
-# Migration
-
-sudo heroku run rails db:migrate
 
 # Creating SurveyMonkey Surveys from Existing Surveys
 
@@ -77,10 +74,6 @@ end
 
 # Links
 
-https://www.surveymonkey.com/dashboard
+(Heroku)[]
 
-https://beyond-test-scores-test.herokuapp.com/
-
-https://beyond-test-scores-test.herokuapp.com/admin
-
-https://mciea-dashboard.herokuapp.com/
+(Survey Monkey)[https://www.surveymonkey.com/dashboard]
