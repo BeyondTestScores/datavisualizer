@@ -142,12 +142,6 @@ class Survey < ApplicationRecord
       school_tree_category_question.question.survey_monkey_structure(1).to_json
     )
 
-    puts ""
-    puts ""
-    puts "RESPONSE: #{response.body}"
-    puts ""
-    puts ""
-
     smid = response.body['id']
 
     choices = response.body["answers"]["choices"]
@@ -324,12 +318,6 @@ class Survey < ApplicationRecord
 
     details = survey_monkey_details
 
-    puts ""
-    puts ""
-    puts "DETAILS #{details}"
-    puts ""
-    puts ""
-    
     if name != details['title']
       update_survey_monkey({
         "title": name
